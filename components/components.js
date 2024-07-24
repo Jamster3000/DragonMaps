@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (headerPlaceholder) {
         const headerFile = document.body.classList.contains('designer-page') 
             ? '/designer-header.html' 
-            : '/components/header.html';
+            : '/header.html';
         fetch(baseUrl + headerFile)
             .then(response => response.text())
             .then(data => {
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load footer (only if not on designer page)
     const footerPlaceholder = document.getElementById('footer-placeholder');
     if (footerPlaceholder && !document.body.classList.contains('designer-page')) {
-        fetch(baseUrl + '/components/footer.html')
+        fetch(baseUrl + '/ßfooter.html')
             .then(response => response.text())
             .then(data => {
                 footerPlaceholder.innerHTML = data;
