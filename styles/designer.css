@@ -198,3 +198,8 @@ button:hover {
 .dropdown:hover .dropdown-content {
     display: block;
 }
+
+#toolbox button.active {
+  background-color: #4CAF50;
+  color: white;
+}
