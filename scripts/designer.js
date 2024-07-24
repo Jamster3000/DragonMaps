@@ -6,8 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
   let currentTool = 'draw';
 
   // Set canvas size
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
+  function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    // Redraw canvas content here if needed
+  }
+
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
 
   // Tool selection
   toolbox.addEventListener('click', function(e) {
@@ -43,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.strokeStyle = 'black';
     } else if (currentTool === 'erase') {
       ctx.strokeStyle = 'white';
+      ctx.lineWidth = 20; // Wider eraser
     }
 
     ctx.lineTo(x, y);
