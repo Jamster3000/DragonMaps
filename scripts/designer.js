@@ -40,42 +40,41 @@ document.addEventListener('DOMContentLoaded', function() {
     draw(e);
   }
 
-  function draw(e) {
+function draw(e) {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
     if (currentTool === 'fill') {
-      if (!isDrawing) {
-        floodFill(x, y, hexToRgba(currentColor));
-      }
-      return;
+        if (!isDrawing) {
+            floodFill(x, y, hexToRgba(currentColor));
+        }
+        return;
     }
 
     if (!isDrawing) return;
 
-    ctx.lineWidth = 5;
+    ctx.lineWidth = currentSize;
     ctx.lineCap = 'round';
 
     switch (currentTool) {
-      case 'draw':
-        ctx.strokeStyle = currentColor;
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        break;
-      case 'erase':
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineWidth = 20;
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.globalCompositeOperation = 'source-over';
-        break;
+        case 'draw':
+            ctx.strokeStyle = currentColor;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            break;
+        case 'erase':
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.globalCompositeOperation = 'source-over';
+            break;
     }
-  }
+}
 
   function stopDrawing() {
     if (isDrawing) {
@@ -96,20 +95,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (colorsMatch(targetColor, fillColor)) return;
 
     function colorsMatch(color1, color2) {
-      return color1[0] === color2[0] && color1[1] === color2[1] && 
-             color1[2] === color2[2] && Math.abs(color1[3] - color2[3]) < 10;
+        return color1[0] === color2[0] && color1[1] === color2[1] && 
+               color1[2] === color2[2] && Math.abs(color1[3] - color2[3]) < 10;
     }
 
     function fill(x, y) {
-      if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
-      if (!colorsMatch(getPixelColor(imageData, x, y), targetColor)) return;
+        if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
+        if (!colorsMatch(getPixelColor(imageData, x, y), targetColor)) return;
 
-      setPixelColor(imageData, x, y, fillColor);
+        setPixelColor(imageData, x, y, fillColor);
 
-      fill(x + 1, y);
-      fill(x - 1, y);
-      fill(x, y + 1);
-      fill(x, y - 1);
+        fill(x + 1, y);
+        fill(x - 1, y);
+        fill(x, y + 1);
+        fill(x, y - 1);
     }
 
     fill(x, y);
@@ -176,65 +175,44 @@ document.addEventListener('DOMContentLoaded', function() {
   function showToolbarPopup(tool) {
     toolbarPopup.innerHTML = ''; // Clear previous content
     switch (tool) {
-      case 'draw':
-        const colorPickerDraw = document.createElement('input');
-        const sizeSliderDraw = document.createElement('input');
-
-        //color picker
-        colorPickerDraw.type = 'color';
-        colorPickerDraw.value = currentColor;
-        colorPickerDraw.addEventListener('change', (e) => {
-          currentColor = e.target.value;
-        });
-
-        //size
-        sizeSliderDrawtype = 'range';
-        sizeSliderDraw.min = '5';
-        sizeSliderDraw.max = '50';
-        sizeSliderDraw.value = '20';
-        sizeSliderDraw.addEventListener('input', (e) => {
-          ctx.lineWidth = e.target.value;
-        });
-        
-        toolbarPopup.appendChild(colorPickerDraw);
-        toolbarPopup.appendChild(sizeSliderDraw);
-        break;
-      case 'fill':
-        const colorPickerFill = document.createElement('input');
-        const sizeSliderDrawFill = document.createElement('input');
-        //color picker
-        colorPickerFill.type = 'color';
-        colorPickerFill.value = currentColor;
-        colorPickerFill.addEventListener('change', (e) => {
-          currentColor = e.target.value;
-        });
-
-        //size
-        sizeSliderFill.type = 'range';
-        sizeSliderFill.min = '5';
-        sizeSliderv.max = '50';
-        sizeSliderFill.value = '20';
-        sizeSliderFill.addEventListener('input', (e) => {
-          ctx.lineWidth = e.target.value;
-        });
-        
-        toolbarPopup.appendChild(colorPickerFill);
-        toolbarPopup.appendChild(sizeSliderFill);
-        break;
-      case 'erase':
-        var sizeSliderErase = document.createElement('input');
-        sizeSliderErase.type = 'range';
-        sizeSliderErase.min = '5';
-        sizeSliderErase.max = '50';
-        sizeSliderErase.value = '20';
-        sizeSliderErase.addEventListener('input', (e) => {
-          ctx.lineWidth = e.target.value;
-        });
-        toolbarPopup.appendChild(sizeSliderErase);
-        break;
+        case 'draw':
+        case 'fill':
+            const colorPicker = document.createElement('input');
+            const sizeSlider = document.createElement('input');
+            
+            // Color picker
+            colorPicker.type = 'color';
+            colorPicker.value = currentColor;
+            colorPicker.addEventListener('change', (e) => {
+                currentColor = e.target.value;
+            });
+            
+            // Size slider
+            sizeSlider.type = 'range';
+            sizeSlider.min = '1';
+            sizeSlider.max = '50';
+            sizeSlider.value = currentSize;
+            sizeSlider.addEventListener('input', (e) => {
+                currentSize = parseInt(e.target.value);
+            });
+            
+            toolbarPopup.appendChild(colorPicker);
+            toolbarPopup.appendChild(sizeSlider);
+            break;
+        case 'erase':
+            const eraserSizeSlider = document.createElement('input');
+            eraserSizeSlider.type = 'range';
+            eraserSizeSlider.min = '1';
+            eraserSizeSlider.max = '50';
+            eraserSizeSlider.value = currentSize;
+            eraserSizeSlider.addEventListener('input', (e) => {
+                currentSize = parseInt(e.target.value);
+            });
+            toolbarPopup.appendChild(eraserSizeSlider);
+            break;
     }
     toolbarPopup.style.display = 'block';
-  }
+}
 
   function hexToRgba(hex) {
     const r = parseInt(hex.slice(1, 3), 16);
