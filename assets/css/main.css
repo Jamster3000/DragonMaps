@@ -77,26 +77,22 @@ h1, h2 {
 }
 
 h1::after, h2::after {
-    content: '';
+    content: '✨';
     position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 10px;
-    height: 10px;
-    background-color: var(--accent-color);
-    border-radius: 50%;
-    opacity: 0.7;
-    animation: sparkle 1.5s infinite alternate;
+    top: -10px;
+    right: -20px;
+    font-size: 24px;
+    aanimation: float 3s ease-in-out infinite;
 }
 
-@keyframes sparkle {
-    0% { transform: scale(1); opacity: 0.7; }
-    100% { transform: scale(1.2); opacity: 1; } /* Corrected 'trasform' to 'transform' and '(' to '{' */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 button {
     font-family: 'MedievalSharp', cursive; 
-    background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+    background: var(--secondary-color);
     color: #fff;
     border: none;
     padding: 0.5rem 1rem;
@@ -105,7 +101,7 @@ button {
 }
 
 button:hover {
-    background: linear-gradient(to right, var(--accent-color), var(--primary-color));
+    background: var(--accent-color);
 }
 
 footer {
