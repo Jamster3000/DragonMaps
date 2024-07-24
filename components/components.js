@@ -1,21 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Get the full path of the current page
-    const fullPath = window.location.pathname;
-    
-    // Calculate the relative path to the root
-    const pathToRoot = fullPath.split('/').slice(0, -1).map(() => '..').join('/') || '.';
+    // Set the base path to include 'testWebSite'
+    const basePath = '/testWebSite';
 
     // Load header
     const headerPlaceholder = document.getElementById('header-placeholder');
     if (headerPlaceholder) {
         const headerFile = document.body.classList.contains('designer-page') 
-            ? `${pathToRoot}/designer-header.html` 
-            : `${pathToRoot}/components/header.html`;
+            ? `${basePath}/designer-header.html` 
+            : `${basePath}/components/header.html`;
         fetch(headerFile)
             .then(response => response.text())
             .then(data => {
-                // Replace relative paths with the correct path to root
-                const updatedData = data.replace(/href="(?!http|https:\/\/)/g, `href="${pathToRoot}/`);
+                // Replace relative paths with the correct base path
+                const updatedData = data.replace(/href="(?!http|https:\/\/)/g, `href="${basePath}/`);
                 headerPlaceholder.innerHTML = updatedData;
             })
             .catch(error => console.error('Error loading header:', error));
@@ -24,11 +21,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load footer (only if not on designer page)
     const footerPlaceholder = document.getElementById('footer-placeholder');
     if (footerPlaceholder && !document.body.classList.contains('designer-page')) {
-        fetch(`${pathToRoot}/components/footer.html`)
+        fetch(`${basePath}/components/footer.html`)
             .then(response => response.text())
             .then(data => {
-                // Replace relative paths with the correct path to root
-                const updatedData = data.replace(/href="(?!http|https:\/\/)/g, `href="${pathToRoot}/`);
+                // Replace relative paths with the correct base path
+                const updatedData = data.replace(/href="(?!http|https:\/\/)/g, `href="${basePath}/`);
                 footerPlaceholder.innerHTML = updatedData;
             })
             .catch(error => console.error('Error loading footer:', error));
