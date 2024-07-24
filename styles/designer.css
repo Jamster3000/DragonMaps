@@ -279,3 +279,33 @@ button:hover {
 .overlay-content input {
     display: block;
     margin-bottom: 10px;
+}
+
+.popup-toolbox {
+  position: absolute;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  z-index: 1000;
+  display: none;
+}
+
+.popup-toolbox h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.tool-option {
+  margin-bottom: 10px;
+}
+
+.tool-option label {
+  display: inline-block;
+  width: 100px;
+}
+
+.tool-option input,
+.tool-option select {
+  width: 150px;
+}
