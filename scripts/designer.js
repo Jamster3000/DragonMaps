@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
   stage.add(layer);
 
   const toggleToolboxButton = document.getElementById('toggle-toolbox');
-  if (toogleToolboxButton) {
+  if (toggleToolboxButton) {
     toggleToolboxButton.addEventListener('click', function() {
       const toolbox = document.getElemenetById('toolbox');
       if (toolbox) {
