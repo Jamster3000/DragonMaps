@@ -6,24 +6,13 @@
   <meta name="description" content="Create and share epic D&D battlemaps with DragonMaps. Design your maps with our easy-to-use online tool.">
   <title>DragonMaps - D&D Battlemap Creator</title>
   <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="../styles/update.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="../scripts/mdUpdateScripts.js"></script>
 </head>
 
 <body>
-  <header>
-    <nav>
-      <div class="logo">DragonMaps</div>
-      <ul>
-        <li><a href="../index.html">Home</a></li>
-        <li><a href="designer.html">Designer</a></li>
-        <li><a href="gallery.html">Gallery</a></li>
-        <li><a href="tutorials.html">Tutorials</a></li>
-        <li><a href="updates.html">Updates</a></li>
-      </ul>
-    </nav>
-  </header>
+  <div id="header-placeholder"></div>
 
   <div id="posts-container"></div>
 
@@ -50,8 +39,9 @@
 
                     const postElement = document.createElement('div');
                     postElement.innerHTML = `
-                        <h2>${file}</h2>
-                        ${html}
+                        <div class="update-post-container">
+                            ${html}
+                        </div>
                     `;
                     postsContainer.appendChild(postElement);
                 } catch (error) {
