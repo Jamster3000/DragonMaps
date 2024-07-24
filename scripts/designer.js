@@ -1,16 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
   const canvas = document.getElementById('map-canvas');
   const ctx = canvas.getContext('2d');
+  const gridCanvas = document.createElement('canvas');
+  const gridCtx = gridCanvas.getContext('2d');
   const toolbox = document.getElementById('toolbox');
   let isDrawing = false;
   let currentTool = 'draw';
-  let objects = [];
-  let selectedObject = null;
+  let drawingHistory = [];
 
   // Set initial canvas size
   function resizeCanvas() {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
+    gridCanvas.width = canvas.width;
+    gridCanvas.height = canvas.height;
     redrawCanvas();
   }
 
@@ -38,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function draw(e) {
-    if (!isDrawing && currentTool !== 'select' && currentTool !== 'fill') return;
+    if (!isDrawing && currentTool !== 'fill') return;
 
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -54,23 +57,15 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(x, y);
-        addObject('line', x, y, ctx.lineWidth, ctx.lineWidth);
         break;
       case 'erase':
-        ctx.strokeStyle = 'white';
+        ctx.globalCompositeOperation = 'destination-out';
         ctx.lineWidth = 20;
         ctx.lineTo(x, y);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(x, y);
-        break;
-      case 'select':
-        selectObject(x, y);
-        redrawCanvas();
-        if (selectedObject) {
-          ctx.strokeStyle = 'red';
-          ctx.strokeRect(selectedObject.x, selectedObject.y, selectedObject.width, selectedObject.height);
-        }
+        ctx.globalCompositeOperation = 'source-over';
         break;
       case 'fill':
         floodFill(x, y, [255, 0, 0, 255]); // Fill with red color
@@ -79,19 +74,15 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function stopDrawing() {
-    isDrawing = false;
-    ctx.beginPath();
+    if (isDrawing) {
+      isDrawing = false;
+      ctx.beginPath();
+      saveDrawingState();
+    }
   }
 
-  function addObject(type, x, y, width, height) {
-    objects.push({ type, x, y, width, height });
-  }
-
-  function selectObject(x, y) {
-    selectedObject = objects.find(obj => 
-      x >= obj.x && x <= obj.x + obj.width &&
-      y >= obj.y && y <= obj.y + obj.height
-    );
+  function saveDrawingState() {
+    drawingHistory.push(canvas.toDataURL());
   }
 
   function floodFill(x, y, fillColor) {
@@ -100,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function matchColor(x, y) {
       const color = getPixelColor(imageData, x, y);
-      return color[0] === targetColor[0] && color[1] === targetColor[1] && color[2] === targetColor[2];
+      return color[0] === targetColor[0] && color[1] === targetColor[1] && color[2] === targetColor[2] && color[3] === targetColor[3];
     }
 
     function fill(x, y) {
@@ -117,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     fill(x, y);
     ctx.putImageData(imageData, 0, 0);
+    saveDrawingState();
   }
 
   function getPixelColor(imageData, x, y) {
@@ -130,41 +122,35 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function drawGrid(size = 50) {
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-    ctx.lineWidth = 1;
+    gridCtx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+    gridCtx.lineWidth = 1;
 
-    for (let x = 0; x <= canvas.width; x += size) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-      ctx.stroke();
+    for (let x = 0; x <= gridCanvas.width; x += size) {
+      gridCtx.beginPath();
+      gridCtx.moveTo(x, 0);
+      gridCtx.lineTo(x, gridCanvas.height);
+      gridCtx.stroke();
     }
 
-    for (let y = 0; y <= canvas.height; y += size) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
+    for (let y = 0; y <= gridCanvas.height; y += size) {
+      gridCtx.beginPath();
+      gridCtx.moveTo(0, y);
+      gridCtx.lineTo(gridCanvas.width, y);
+      gridCtx.stroke();
     }
   }
 
   function redrawCanvas() {
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Redraw grid
-    drawGrid();
-    
-    // Redraw all objects
-    objects.forEach(obj => {
-      // Implement drawing logic for each object type
-      if (obj.type === 'line') {
-        ctx.beginPath();
-        ctx.arc(obj.x, obj.y, obj.width / 2, 0, 2 * Math.PI);
-        ctx.fillStyle = 'black';
-        ctx.fill();
+    if (drawingHistory.length > 0) {
+      const img = new Image();
+      img.onload = function() {
+        ctx.drawImage(img, 0, 0);
       }
-    });
+      img.src = drawingHistory[drawingHistory.length - 1];
+    }
+    gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+    drawGrid();
   }
 
   function createNewMap() {
@@ -174,13 +160,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     canvas.width = width * gridSize;
     canvas.height = height * gridSize;
+    gridCanvas.width = canvas.width;
+    gridCanvas.height = canvas.height;
 
-    objects = []; // Clear existing objects
+    drawingHistory = []; // Clear existing drawing history
     redrawCanvas();
   }
 
   // Add this to your File menu options
-  // document.querySelector('#new-map-option').addEventListener('click', createNewMap);
+  document.querySelector('#new-map-option').addEventListener('click', createNewMap);
 
   // Initial draw of the grid
   drawGrid();
