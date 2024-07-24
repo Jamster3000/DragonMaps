@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load header
     const headerPlaceholder = document.getElementById('header-placeholder');
     if (headerPlaceholder) {
-        const headerFile = document.body.classList.contains('designer-page') ? 'designer-header.html' : 'header.html';
+        const headerFile = document.body.classList.contains('designer-page') ? 'designer-header.html' : 'components/header.html';
         fetch(headerFile)
             .then(response => response.text())
             .then(data => {
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load footer (only if not on designer page)
     const footerPlaceholder = document.getElementById('footer-placeholder');
     if (footerPlaceholder && !document.body.classList.contains('designer-page')) {
-        fetch('footer.html')
+        fetch('components/footer.html')
             .then(response => response.text())
             .then(data => {
                 footerPlaceholder.innerHTML = data;
