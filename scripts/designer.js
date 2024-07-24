@@ -3,12 +3,6 @@ let currentTool = 'draw';
 let isDrawing = false;
 let lastLine;
 
-document.getElementById('toggle-toolbox').addEventListener('click', function() {
-  const toolbox = document.getElementById('toolbox');
-  toolbox.classList.toggle('toolbox-side');
-  toolbox.classList.toggle('visible');
-});
-
 document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('canvas-area');
   
@@ -145,6 +139,12 @@ function initializeNewMap(width, height, gridSize) {
   drawGrid(gridSize);
   layer.batchDraw();
 }
+
+document.getElementById('toggle-toolbox').addEventListener('click', function() {
+  const toolbox = document.getElementById('toolbox');
+  toolbox.classList.toggle('toolbox-side');
+  toolbox.classList.toggle('visible');
+});
 
 // Add event listener for new map option
 document.getElementById('new-map-option').addEventListener('click', createNewMap);
