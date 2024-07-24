@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const postsContainer = document.getElementById('posts-container');
-    const postsFolder = 'posts'; // Folder where markdown files are stored
+    const postsFolder = '../posts'; // Folder where markdown files are stored
 
     // List of markdown files
     const posts = [
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     posts.forEach(post => {
-        const filePath = `$../{postsFolder}/${post}`;
+        const filePath = `${postsFolder}/${post}`;
 
         fetch(filePath)
             .then(response => {
