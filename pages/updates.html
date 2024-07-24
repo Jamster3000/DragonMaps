@@ -30,7 +30,37 @@
   <footer>
     <p>&copy; 2024 DragonMaps. All rights reserved.</p>
   </footer>
+
+  <script>
+        const postsContainer = document.getElementById('posts-container');
+
+        async function fetchMarkdownFile(filename) {
+            const response = await fetch(`../posts/${filename}`);
+            return await response.text();
+        }
+
+        async function renderPosts() {
+            // You'll need to maintain a list of your Markdown files
+            const postFiles = ['24-7-2024-Welcome.md'];
+
+            for (const file of postFiles) {
+                try {
+                    const markdown = await fetchMarkdownFile(file);
+                    const html = marked.parse(markdown);
+
+                    const postElement = document.createElement('div');
+                    postElement.innerHTML = `
+                        <h2>${file}</h2>
+                        ${html}
+                    `;
+                    postsContainer.appendChild(postElement);
+                } catch (error) {
+                    console.error(`Error loading ${file}:`, error);
+                }
+            }
+        }
+
+        renderPosts();
+    </script>
 </body>
 </html>
-
-
