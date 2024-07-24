@@ -97,6 +97,10 @@ button {
   font-size: 1rem;
 }
 
+button:hover {
+    background-color: var(--accent-color);
+}
+
 footer {
   background-color: var(--primary-color);
   color: var(--background-color);
