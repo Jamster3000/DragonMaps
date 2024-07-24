@@ -28,6 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
   setupEventListeners();
 });
 
+document.getElementById('toggle-toolbox').addEventListener('click', function() {
+  const toolbox = document.getElementById('toolbox');
+  toolbox.classList.toggle('toolbox-side');
+  toolbox.classList.toggle('visible');
+});
+
+document.getElementById('new-map-option').addEventListener('click', createNewMap);
+
 function setupEventListeners() {
   const toolbox = document.getElementById('toolbox');
   toolbox.addEventListener('click', function(e) {
@@ -141,11 +149,3 @@ function drawGrid(gridSize) {
 
   gridLayer.batchDraw();
 }
-
-document.getElementById('toggle-toolbox').addEventListener('click', function() {
-  const toolbox = document.getElementById('toolbox');
-  toolbox.classList.toggle('toolbox-side');
-  toolbox.classList.toggle('visible');
-});
-
-document.getElementById('new-map-option').addEventListener('click', createNewMap);
