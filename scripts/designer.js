@@ -179,12 +179,26 @@ document.addEventListener('DOMContentLoaded', function() {
       case 'draw':
       case 'fill':
         const colorPicker = document.createElement('input');
+        const sizeSlider = document.createElement('input');
+
+        //color picker
         colorPicker.type = 'color';
         colorPicker.value = currentColor;
         colorPicker.addEventListener('change', (e) => {
           currentColor = e.target.value;
         });
+
+        //size
+        sizeSlider.type = 'range';
+        sizeSlider.min = '5';
+        sizeSlider.max = '50';
+        sizeSlider.value = '20';
+        sizeSlider.addEventListener('input', (e) => {
+          ctx.lineWidth = e.target.value;
+        });
+        
         toolbarPopup.appendChild(colorPicker);
+        toolbarPopup.appendChild(sizeSlider);
         break;
       case 'erase':
         const sizeSlider = document.createElement('input');
