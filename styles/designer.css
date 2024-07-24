@@ -226,3 +226,14 @@ button:hover {
 #map-canvas {
   z-index: 2;
 }
+
+#toolbar-popup {
+  display: none;
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
