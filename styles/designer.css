@@ -1,0 +1,200 @@
+:root {
+    --background-color: #1a0b2e;
+    --primary-color: #4B0082;
+    --primary-color-light: #6A5ACD;
+    --secondary-color: #9370DB;
+    --accent-color: #8A2BE2;
+    --text-color: #e0e0e0;
+    --header-color: #2E0854;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.magical-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(106, 13, 173, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 20% 20%, rgba(138, 43, 226, 0.05) 0%, transparent 30%),
+        radial-gradient(circle at 80% 80%, rgba(147, 112, 219, 0.05) 0%, transparent 30%);
+    background-size: 100% 100%, 50% 50%, 75% 75%;
+    background-repeat: no-repeat;
+    animation: backgroundShimmer 20s infinite alternate;
+    z-index: -1;
+}
+
+@keyframes backgroundShimmer {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+header {
+    background-color: var(--header-color);
+    color: var(--text-color);
+    padding: 1rem;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--secondary-color);
+    text-shadow: 0 0 10px rgba(147, 112, 219, 0.5);
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin-left: 1.5rem;
+}
+
+nav ul li a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: var(--secondary-color);
+}
+
+#designer-container {
+    display: flex;
+    flex-grow: 1;
+    height: calc(100vh - 120px); /* Adjust based on your header/footer height */
+}
+
+#toolbox, #asset-library {
+    width: 250px;
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    overflow-y: auto;
+    border-radius: 10px;
+    margin: 1rem;
+    box-shadow: 0 0 20px rgba(106, 13, 173, 0.1);
+}
+
+#canvas-area {
+    flex-grow: 1;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#map-canvas {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 2px solid var(--accent-color);
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
+}
+
+h2 {
+    font-family: 'Cinzel', serif;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px rgba(147, 112, 219, 0.3);
+}
+
+footer {
+    background-color: var(--header-color);
+    color: var(--text-color);
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto;
+    border-top: 2px solid var(--accent-color);
+}
+
+/* Add some basic styling for buttons or tools */
+button {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--accent-color);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    #designer-container {
+        flex-direction: column;
+    }
+
+    #toolbox, #asset-library {
+        width: auto;
+        margin: 0.5rem;
+    }
+}
+
+.designer-header {
+    background-color: var(--header-color);
+    padding: 0.5rem 1rem;
+}
+
+.designer-header .logo {
+    font-size: 20px;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--primary-color);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: var(--text-color);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: var(--primary-color-light);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
