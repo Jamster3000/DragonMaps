@@ -105,7 +105,7 @@ button {
 }
 
 button:hover {
-    background: linear-gradient(to right, var(--accent-color), var(--secondary-color));
+    background: linear-gradient(to right, var(--accent-color), var(--primary-color));
 }
 
 footer {
