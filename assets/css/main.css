@@ -1,6 +1,7 @@
 :root {
     --background-color: #FFFFF0;
     --primary-color: #4B0082;
+    --primary-color-light: #6A5ACD;
     --secondary-color: #9370DB;
     --accent-color: #00CED1;
     --text-color: #2E2E2E;
@@ -20,9 +21,14 @@ body {
 }
 
 header {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-light));
     color: var(--background-color);
     padding: 1rem;
+}
+
+header, footer {
+    background: var(--primary-color); /* Fallback for older browsers */
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-light));
 }
 
 nav {
@@ -89,8 +95,8 @@ h1::after, h2::after {
 }
 
 button {
-    font-family: 'MedievalSharp', cursive; /* Corrected spelling of 'MedievalSharp' */
-    background-color: var(--secondary-color); /* Changed to secondary color for consistency */
+    font-family: 'MedievalSharp', cursive; 
+    background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
     color: #fff;
     border: none;
     padding: 0.5rem 1rem;
@@ -99,11 +105,11 @@ button {
 }
 
 button:hover {
-    background-color: var(--accent-color);
+    background: linear-gradient(to right, var(--accent-color), var(--secondary-color));
 }
 
 footer {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-light));
     color: var(--background-color);
     text-align: center;
     padding: 1rem;
