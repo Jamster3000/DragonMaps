@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let isDrawing = false;
   let currentTool = 'draw';
   let currentColor = 'black';
-  let drawingHistory = [];
+  let drawingHistory = []; 
 
   function resizeCanvas() {
     canvas.width = canvas.offsetWidth;
