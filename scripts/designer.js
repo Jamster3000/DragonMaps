@@ -97,8 +97,11 @@ function stopDrawing() {
   isDrawing = false;
 }
 
-// New map function
 function createNewMap() {
+  showNewMapOverlay();
+}
+
+function showNewMapOverlay() {
   const overlay = document.createElement('div');
   overlay.id = 'new-map-overlay';
   overlay.innverHTML = `
