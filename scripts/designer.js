@@ -31,6 +31,14 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  document.getElementById('toggle-toolbox').addEventListener('click', function() {
+    const toolbox = document.getElementById('toolbox');
+    toolbox.classList.toggle('toolbox-side');
+    toolbox.classList.toggle('visible');
+  });
+  
+  document.getElementById('new-map-option').addEventListener('click', createNewMap);
   
   // Draw grid
   drawGrid();
@@ -38,14 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set up event listeners
   setupEventListeners();
 });
-
-document.getElementById('toggle-toolbox').addEventListener('click', function() {
-  const toolbox = document.getElementById('toolbox');
-  toolbox.classList.toggle('toolbox-side');
-  toolbox.classList.toggle('visible');
-});
-
-document.getElementById('new-map-option').addEventListener('click', createNewMap);
 
 function setupEventListeners() {
   const toolbox = document.getElementById('toolbox');
