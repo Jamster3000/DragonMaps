@@ -203,3 +203,14 @@ button:hover {
   background-color: #4CAF50;
   color: white;
 }
+
+#map-canvas {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+}
+
+#canvas-area {
+  flex-grow: 1;
+  overflow: hidden;
+}
