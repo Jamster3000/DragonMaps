@@ -3,6 +3,12 @@ let currentTool = 'draw';
 let isDrawing = false;
 let lastLine;
 
+document.getElementById('toggle-toolbox').addEventListener('click', function() {
+  const toolbox = document.getElementById('toolbox');
+  toolbox.classList.toggle('toolbox-side');
+  toolbox.classList.toggle('visible');
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('canvas-area');
   
@@ -28,8 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
   setupEventListeners();
 });
 
-function drawGrid() {
-  const gridSize = 50;
+
+function drawGrid(gridSize) {
   const width = stage.width();
   const height = stage.height();
 
@@ -67,13 +73,16 @@ function setupEventListeners() {
   stage.on('mousedown touchstart', startDrawing);
   stage.on('mousemove touchmove', draw);
   stage.on('mouseup touchend', stopDrawing);
+
+  document.getElementById('new-map-option').addEventListener('click', createNewMap);
 }
 
 function startDrawing(e) {
+  if (currentTool !== 'draw' && currentTool !== 'erase') return;
   isDrawing = true;
   const pos = stage.getPointerPosition();
   lastLine = new Konva.Line({
-    stroke: 'black',
+    stroke: currentTool === 'draw' ? 'black' : 'white',
     strokeWidth: 5,
     globalCompositeOperation:
       currentTool === 'erase' ? 'destination-out' : 'source-over',
@@ -96,17 +105,44 @@ function stopDrawing() {
 
 // New map function
 function createNewMap() {
-  const width = prompt("Enter map width (in squares):", "20");
-  const height = prompt("Enter map height (in squares):", "15");
-  const gridSize = 50; // pixels per grid square
+  const overlay = document.createElement('div');
+  overlay.id = 'new-map-overlay';
+  overlay.innverHTML = `
+    <div class="overlay-content">
+      <h2>Create New Map</h2>
+      <label for="map-width">Width (pixels):</label>
+      <input type="number" id="map_width" value="800">
+      <label for="map-height" value="600">
+      <input type"number" id="map-height" value="600">
+      <label for="grid-size">Grid Size (pixels):</label>
+      <input type="number" id="grid-size" value="50">
+      <button id="create-map">Create</button>
+      <button id="cancel-create">Cancel</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
 
-  stage.width(width * gridSize);
-  stage.height(height * gridSize);
+  document.getElementById('create-map').addEventListener('click', function() {
+    const width = parseInt(document.getElementById('map-width').value);
+    const height = parseInt(document.getElementById('map-height').value);
+    const gridSize = parseInt(document.getElementById('grid-size').value);
+    initializeNewMap(width, height, gridSize)
+    document.body.removeChild(overlay);
+  });
+
+  document.getElementById('cancel-create').addEventListener('click', function() {
+    document.body.removeChild(overlay);
+  });
+}
+
+function initializeNewMap(width, height, gridSize) {
+  stage.width(width);
+  stage.height(height);
 
   gridLayer.destroyChildren();
   layer.destroyChildren();
 
-  drawGrid();
+  drawGrid(gridSize);
   layer.batchDraw();
 }
 
