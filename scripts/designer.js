@@ -28,32 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
   setupEventListeners();
 });
 
-
-function drawGrid(gridSize) {
-  const width = stage.width();
-  const height = stage.height();
-
-  for (let i = 0; i < width; i += gridSize) {
-    const line = new Konva.Line({
-      points: [i, 0, i, height],
-      stroke: '#ddd',
-      strokeWidth: 1
-    });
-    gridLayer.add(line);
-  }
-
-  for (let i = 0; i < height; i += gridSize) {
-    const line = new Konva.Line({
-      points: [0, i, width, i],
-      stroke: '#ddd',
-      strokeWidth: 1
-    });
-    gridLayer.add(line);
-  }
-
-  gridLayer.batchDraw();
-}
-
 function setupEventListeners() {
   const toolbox = document.getElementById('toolbox');
   toolbox.addEventListener('click', function(e) {
@@ -104,13 +78,13 @@ function createNewMap() {
 function showNewMapOverlay() {
   const overlay = document.createElement('div');
   overlay.id = 'new-map-overlay';
-  overlay.innverHTML = `
+  overlay.innerHTML = `
     <div class="overlay-content">
       <h2>Create New Map</h2>
       <label for="map-width">Width (pixels):</label>
-      <input type="number" id="map_width" value="800">
-      <label for="map-height" value="600">
-      <input type"number" id="map-height" value="600">
+      <input type="number" id="map-width" value="800">
+      <label for="map-height">Height (pixels):</label>
+      <input type="number" id="map-height" value="600">
       <label for="grid-size">Grid Size (pixels):</label>
       <input type="number" id="grid-size" value="50">
       <button id="create-map">Create</button>
@@ -123,7 +97,7 @@ function showNewMapOverlay() {
     const width = parseInt(document.getElementById('map-width').value);
     const height = parseInt(document.getElementById('map-height').value);
     const gridSize = parseInt(document.getElementById('grid-size').value);
-    initializeNewMap(width, height, gridSize)
+    initializeNewMap(width, height, gridSize);
     document.body.removeChild(overlay);
   });
 
@@ -143,11 +117,35 @@ function initializeNewMap(width, height, gridSize) {
   layer.batchDraw();
 }
 
+function drawGrid(gridSize) {
+  const width = stage.width();
+  const height = stage.height();
+
+  for (let i = 0; i < width; i += gridSize) {
+    const line = new Konva.Line({
+      points: [i, 0, i, height],
+      stroke: '#ddd',
+      strokeWidth: 1
+    });
+    gridLayer.add(line);
+  }
+
+  for (let i = 0; i < height; i += gridSize) {
+    const line = new Konva.Line({
+      points: [0, i, width, i],
+      stroke: '#ddd',
+      strokeWidth: 1
+    });
+    gridLayer.add(line);
+  }
+
+  gridLayer.batchDraw();
+}
+
 document.getElementById('toggle-toolbox').addEventListener('click', function() {
   const toolbox = document.getElementById('toolbox');
   toolbox.classList.toggle('toolbox-side');
   toolbox.classList.toggle('visible');
 });
 
-// Add event listener for new map option
 document.getElementById('new-map-option').addEventListener('click', createNewMap);
