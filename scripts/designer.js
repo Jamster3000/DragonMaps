@@ -177,59 +177,60 @@ document.addEventListener('DOMContentLoaded', function() {
     toolbarPopup.innerHTML = ''; // Clear previous content
     switch (tool) {
       case 'draw':
-        const colorPicker = document.createElement('input');
-        var sizeSlider = document.createElement('input');
+        const colorPickerDraw = document.createElement('input');
+        const sizeSliderDraw = document.createElement('input');
 
         //color picker
-        colorPicker.type = 'color';
-        colorPicker.value = currentColor;
-        colorPicker.addEventListener('change', (e) => {
+        colorPickerDraw.type = 'color';
+        colorPickerDraw.value = currentColor;
+        colorPickerDraw.addEventListener('change', (e) => {
           currentColor = e.target.value;
         });
 
         //size
-        sizeSlider.type = 'range';
-        sizeSlider.min = '5';
-        sizeSlider.max = '50';
-        sizeSlider.value = '20';
-        sizeSlider.addEventListener('input', (e) => {
+        sizeSliderDrawtype = 'range';
+        sizeSliderDraw.min = '5';
+        sizeSliderDraw.max = '50';
+        sizeSliderDraw.value = '20';
+        sizeSliderDraw.addEventListener('input', (e) => {
           ctx.lineWidth = e.target.value;
         });
         
-        toolbarPopup.appendChild(colorPicker);
-        toolbarPopup.appendChild(sizeSlider);
+        toolbarPopup.appendChild(colorPickerDraw);
+        toolbarPopup.appendChild(sizeSliderDraw);
         break;
       case 'fill':
-        const colorPicker = document.createElement('input');
+        const colorPickerFill = document.createElement('input');
+        const sizeSliderDrawFill = document.createElement('input');
         //color picker
-        colorPicker.type = 'color';
-        colorPicker.value = currentColor;
-        colorPicker.addEventListener('change', (e) => {
+        colorPickerFill.type = 'color';
+        colorPickerFill.value = currentColor;
+        colorPickerFill.addEventListener('change', (e) => {
           currentColor = e.target.value;
         });
 
         //size
-        sizeSlider.type = 'range';
-        sizeSlider.min = '5';
-        sizeSlider.max = '50';
-        sizeSlider.value = '20';
-        sizeSlider.addEventListener('input', (e) => {
+        sizeSliderFill.type = 'range';
+        sizeSliderFill.min = '5';
+        sizeSliderv.max = '50';
+        sizeSliderFill.value = '20';
+        sizeSliderFill.addEventListener('input', (e) => {
           ctx.lineWidth = e.target.value;
         });
         
-        toolbarPopup.appendChild(colorPicker);
-        toolbarPopup.appendChild(sizeSlider);
+        toolbarPopup.appendChild(colorPickerFill);
+        toolbarPopup.appendChild(sizeSliderFill);
         break;
       case 'erase':
-        var sizeSlider = document.createElement('input');
-        sizeSlider.type = 'range';
-        sizeSlider.min = '5';
-        sizeSlider.max = '50';
-        sizeSlider.value = '20';
-        sizeSlider.addEventListener('input', (e) => {
+        var sizeSliderErase = document.createElement('input');
+        sizeSliderErase.type = 'range';
+        sizeSliderErase.min = '5';
+        sizeSliderErase.max = '50';
+        sizeSliderErase.value = '20';
+        sizeSliderErase.addEventListener('input', (e) => {
           ctx.lineWidth = e.target.value;
         });
-        toolbarPopup.appendChild(sizeSlider);
+        toolbarPopup.appendChild(sizeSliderErase);
         break;
     }
     toolbarPopup.style.display = 'block';
