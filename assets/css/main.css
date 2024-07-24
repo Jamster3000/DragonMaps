@@ -16,8 +16,15 @@
 body {
     font-family: 'Roboto', sans-serif;
     line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--background-color);
+    background: linear-gradient(135deg, #1a0b2e, #4b0082, #6a0dad);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
 }
 
 header {
@@ -74,20 +81,6 @@ h1, h2 {
     color: var(--primary-color);
     position: relative;
     display: inline-block;
-}
-
-h1::after, h2::after {
-    content: '✨';
-    position: absolute;
-    top: -10px;
-    right: -20px;
-    font-size: 24px;
-    aanimation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
 }
 
 button {
