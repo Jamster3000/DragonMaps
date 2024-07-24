@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     posts.forEach(post => {
-        const filePath = `${postsFolder}/${post}`;
+        const filePath = `$../{postsFolder}/${post}`;
 
         fetch(filePath)
             .then(response => {
