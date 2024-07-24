@@ -4,8 +4,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const gridCanvas = document.getElementById('grid-canvas');
   const gridCtx = gridCanvas.getContext('2d');
   const toolbox = document.getElementById('toolbox');
+  const toolbarPopup = document.getElementById('toolbar-popup');
   let isDrawing = false;
   let currentTool = 'draw';
+  let currentColor = 'black';
   let drawingHistory = [];
 
   function resizeCanvas() {
@@ -24,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
       currentTool = e.target.getAttribute('data-tool');
       document.querySelectorAll('#toolbox button').forEach(btn => btn.classList.remove('active'));
       e.target.classList.add('active');
+      showToolbarPopup(currentTool);
     }
   });
 
@@ -44,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (currentTool === 'fill') {
       if (!isDrawing) {
-        floodFill(x, y, [255, 0, 0, 255]); // Fill with red color
+        floodFill(x, y, hexToRgba(currentColor));
       }
       return;
     }
@@ -56,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     switch (currentTool) {
       case 'draw':
-        ctx.strokeStyle = 'black';
+        ctx.strokeStyle = currentColor;
         ctx.lineTo(x, y);
         ctx.stroke();
         ctx.beginPath();
@@ -94,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function colorsMatch(color1, color2) {
       return color1[0] === color2[0] && color1[1] === color2[1] && 
-             color1[2] === color2[2] && color1[3] === color2[3];
+             color1[2] === color2[2] && Math.abs(color1[3] - color2[3]) < 10;
     }
 
     function fill(x, y) {
@@ -125,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function drawGrid(size = 50) {
-    gridCtx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+    gridCtx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
     gridCtx.lineWidth = 1;
 
     for (let x = 0; x <= gridCanvas.width; x += size) {
@@ -168,6 +171,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     drawingHistory = []; // Clear existing drawing history
     redrawCanvas();
+  }
+
+  function showToolbarPopup(tool) {
+    toolbarPopup.innerHTML = ''; // Clear previous content
+    switch (tool) {
+      case 'draw':
+      case 'fill':
+        const colorPicker = document.createElement('input');
+        colorPicker.type = 'color';
+        colorPicker.value = currentColor;
+        colorPicker.addEventListener('change', (e) => {
+          currentColor = e.target.value;
+        });
+        toolbarPopup.appendChild(colorPicker);
+        break;
+      case 'erase':
+        const sizeSlider = document.createElement('input');
+        sizeSlider.type = 'range';
+        sizeSlider.min = '5';
+        sizeSlider.max = '50';
+        sizeSlider.value = '20';
+        sizeSlider.addEventListener('input', (e) => {
+          ctx.lineWidth = e.target.value;
+        });
+        toolbarPopup.appendChild(sizeSlider);
+        break;
+    }
+    toolbarPopup.style.display = 'block';
+  }
+
+  function hexToRgba(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return [r, g, b, 255];
   }
 
   document.querySelector('#new-map-option').addEventListener('click', createNewMap);
