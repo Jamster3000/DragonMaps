@@ -1,14 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
   const canvas = document.getElementById('map-canvas');
   const ctx = canvas.getContext('2d');
-  const gridCanvas = document.createElement('canvas');
+  const gridCanvas = document.getElementById('grid-canvas');
   const gridCtx = gridCanvas.getContext('2d');
   const toolbox = document.getElementById('toolbox');
   let isDrawing = false;
   let currentTool = 'draw';
   let drawingHistory = [];
 
-  // Set initial canvas size
   function resizeCanvas() {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
@@ -20,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
-  // Tool selection
   toolbox.addEventListener('click', function(e) {
     if (e.target.tagName === 'BUTTON') {
       currentTool = e.target.getAttribute('data-tool');
@@ -29,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Drawing functionality
   canvas.addEventListener('mousedown', startDrawing);
   canvas.addEventListener('mousemove', draw);
   canvas.addEventListener('mouseup', stopDrawing);
@@ -41,11 +38,18 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function draw(e) {
-    if (!isDrawing && currentTool !== 'fill') return;
-
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+
+    if (currentTool === 'fill') {
+      if (!isDrawing) {
+        floodFill(x, y, [255, 0, 0, 255]); // Fill with red color
+      }
+      return;
+    }
+
+    if (!isDrawing) return;
 
     ctx.lineWidth = 5;
     ctx.lineCap = 'round';
@@ -67,9 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.moveTo(x, y);
         ctx.globalCompositeOperation = 'source-over';
         break;
-      case 'fill':
-        floodFill(x, y, [255, 0, 0, 255]); // Fill with red color
-        break;
     }
   }
 
@@ -89,14 +90,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const targetColor = getPixelColor(imageData, x, y);
 
-    function matchColor(x, y) {
-      const color = getPixelColor(imageData, x, y);
-      return color[0] === targetColor[0] && color[1] === targetColor[1] && color[2] === targetColor[2] && color[3] === targetColor[3];
+    if (colorsMatch(targetColor, fillColor)) return;
+
+    function colorsMatch(color1, color2) {
+      return color1[0] === color2[0] && color1[1] === color2[1] && 
+             color1[2] === color2[2] && color1[3] === color2[3];
     }
 
     function fill(x, y) {
       if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
-      if (!matchColor(x, y)) return;
+      if (!colorsMatch(getPixelColor(imageData, x, y), targetColor)) return;
 
       setPixelColor(imageData, x, y, fillColor);
 
@@ -167,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
     redrawCanvas();
   }
 
-  // Add this to your File menu options
   document.querySelector('#new-map-option').addEventListener('click', createNewMap);
 
   // Initial draw of the grid
