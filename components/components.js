@@ -15,7 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(headerFile)
             .then(response => response.text())
             .then(data => {
-                headerPlaceholder.innerHTML = data;
+                // Replace INDEX_PATH with the correct base path
+                const updatedData = data.replace(/INDEX_PATH/g, basePath);
+                headerPlaceholder.innerHTML = updatedData;
             })
             .catch(error => console.error('Error loading header:', error));
     }
@@ -26,7 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(basePath + '/components/footer.html')
             .then(response => response.text())
             .then(data => {
-                footerPlaceholder.innerHTML = data;
+                // Replace INDEX_PATH with the correct base path
+                const updatedData = data.replace(/INDEX_PATH/g, basePath);
+                footerPlaceholder.innerHTML = updatedData;
             })
             .catch(error => console.error('Error loading footer:', error));
     }
