@@ -21,6 +21,17 @@ document.addEventListener('DOMContentLoaded', function() {
   layer = new Konva.Layer();
   stage.add(layer);
 
+  const toggleToolboxButton = document.getElementById('toggle-toolbox');
+  if (toogleToolboxButton) {
+    toggleToolboxButton.addEventListener('click', function() {
+      const toolbox = document.getElemenetById('toolbox');
+      if (toolbox) {
+        toolbox.classList.toggle('toolbox-side');
+        toolbox.classList.toggle('visible');
+      }
+    });
+  }
+  
   // Draw grid
   drawGrid();
 
@@ -38,11 +49,19 @@ document.getElementById('new-map-option').addEventListener('click', createNewMap
 
 function setupEventListeners() {
   const toolbox = document.getElementById('toolbox');
+  const popupToolBox = document.getElementById('popup-toolbox');
+  
   toolbox.addEventListener('click', function(e) {
     if (e.target.tagName === 'BUTTON') {
       currentTool = e.target.getAttribute('data-tool');
       document.querySelectorAll('#toolbox button').forEach(btn => btn.classList.remove('active'));
-      e.target.classList.add('active');
+
+      if (currentTool !== '') {
+        e.target.classList.add('active');
+        showToolOptions(currentTool, e.target);
+      }else {
+        popupToolbox.style.display = 'none';
+      }
     }
   });
 
@@ -53,13 +72,64 @@ function setupEventListeners() {
   document.getElementById('new-map-option').addEventListener('click', createNewMap);
 }
 
+function showToolOptions(tool, buttonElement) {
+  const popupToolbox = document.getElementById('popup-toolbox');
+  const toolOptions = document.getElementById('tool-options');
+  toolOptions.innerHTML = '';
+
+  const options = getToolOptions(tool);
+  options.forEach(option => {
+    const optionElement = document.createElement('div');
+    optionElement.classList.add('tool-option');
+    optionElement.innerHTML = `
+      <label for="${option.id}">${option.label}:</label>
+      ${option.type === 'select' 
+        ? `<select id="${option.id}">${option.options.map(o => `<option value="${o}">${o}</option>`).join('')}</select>`
+        : `<input type="${option.type}" id="${option.id}" value="${option.value}">`
+      }
+    `;
+    toolOptions.appendChild(optionElement);
+  });
+
+  const rect = buttonElement.getBoundingClientRect();
+  popupToolbox.style.left = `${rect.right + 10}px`;
+  popupToolbox.style.top = `${rect.top}px`;
+  popupToolbox.style.display = 'block';
+}
+
+function getToolOptions(tool) {
+  switch (tool) {
+    case 'draw':
+      return [
+        { id: 'draw-color', label: 'Color', type: 'color', value: '#000000' },
+        { id: 'draw-size', label: 'Size', type: 'number', value: 5 },
+        { id: 'draw-snap', label: 'Snap to Grid', type: 'checkbox', value: false }
+      ];
+    case 'erase':
+      return [
+        { id: 'erase-size', label: 'Size', type: 'number', value: 20 }
+      ];
+    case 'fill':
+      return [
+        { id: 'fill-color', label: 'Color', type: 'color', value: '#000000' },
+        { id: 'fill-tolerance', label: 'Tolerance', type: 'number', value: 10 }
+      ];
+    default:
+      return [];
+  }
+}
+
 function startDrawing(e) {
-  if (currentTool !== 'draw' && currentTool !== 'erase') return;
+  if (!currentTool || (currentTool !== 'draw' && currentTool !== 'erase')) return;
   isDrawing = true;
+  
   const pos = stage.getPointerPosition();
+  const color = currentTool === 'draw' ? document.getElementById('draw-color').value : 'white';
+  const size = currentTool === 'draw' ? parseInt(document.getElementById('draw-size').value) : parseInt(document.getElementById('erase-size').value);
+  
   lastLine = new Konva.Line({
-    stroke: currentTool === 'draw' ? 'black' : 'white',
-    strokeWidth: 5,
+    stroke: color,
+    strokeWidth: size,
     globalCompositeOperation:
       currentTool === 'erase' ? 'destination-out' : 'source-over',
     points: [pos.x, pos.y]
