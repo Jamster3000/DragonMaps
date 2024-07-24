@@ -201,8 +201,6 @@ document.addEventListener('DOMContentLoaded', function() {
         break;
       case 'fill':
         const colorPicker = document.createElement('input');
-        var sizeSlider = document.createElement('input');
-
         //color picker
         colorPicker.type = 'color';
         colorPicker.value = currentColor;
