@@ -2,59 +2,29 @@ let stage, layer, gridLayer;
 let currentTool = 'draw';
 let isDrawing = false;
 let lastLine;
-let gridSize = 50; 
+let gridSize = 50;
 let gridOffset = { x: 0, y: 0 };
+let isPanning = false;
 
 document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('canvas-container');
   
-  // Create Konva stage
   stage = new Konva.Stage({
     container: 'canvas-container',
     width: container.offsetWidth,
     height: container.offsetHeight
-    //draggable: true
   });
 
-  // Create grid layer
   gridLayer = new Konva.Layer();
   stage.add(gridLayer);
 
-  // Create main layer
   layer = new Konva.Layer();
   stage.add(layer);
 
-  // Draw grid
   drawGrid();
-
-  // Set up event listeners
   setupEventListeners();
-
-  stage.on('mousedown touchstart', (e) => {
-    if (e.target === stage) {
-      stage.startDragPos = stage.getPointerPosition();
-    }
-  });
-
-  stage.on('mousemove touchmove', (e) => {
-    if (stage.startDragPos) {
-      const pos = stage.getPointerPosition();
-      const dx = pos.x - stage.startDragPos.x;
-      const dy = pos.y - stage.startDragPos.y;
-      stage.position({
-        x: stage.x() + dx,
-        y: stage.y() + dy
-      });
-      stage.startDragPos = pos;
-      updateGrid();
-    }
-  });
-  
-  stage.on('mouseup touchend', () => {
-    stage.startDragPos = null;
-  });
-  
 });
+
 
 function setupEventListeners() {
   const toolbox = document.getElementById('toolbox');
@@ -74,18 +44,53 @@ function setupEventListeners() {
     }
   });
 
-  stage.on('mousedown touchstart', startDrawing);
-  stage.on('mousemove touchmove', draw);
-  stage.on('mouseup touchend', stopDrawing);
+  stage.content.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  });
+
+  // Handle mouse events
+  stage.on('mousedown', handleMouseDown);
+  stage.on('mousemove', handleMouseMove);
+  stage.on('mouseup', handleMouseUp);
 
   document.getElementById('new-map-option').addEventListener('click', createNewMap);
   document.getElementById('toggle-toolbox').addEventListener('click', toggleToolbox);
 
-  // Add event listener for stage dragging
-  stage.on('dragmove', updateGrid);
-
-  // Add event listener for window resize
   window.addEventListener('resize', resizeStage);
+}
+
+function handleMouseDown(e) {
+  if (e.evt.button === 2) { // Right mouse button
+    isPanning = true;
+    stage.container().style.cursor = 'grabbing';
+  } else if (e.evt.button === 0) { // Left mouse button
+    if (currentTool === 'draw' || currentTool === 'erase') {
+      startDrawing(e);
+    }
+  }
+}
+
+function handleMouseMove(e) {
+  if (isPanning) {
+    const dx = e.evt.movementX;
+    const dy = e.evt.movementY;
+    stage.position({
+      x: stage.x() + dx,
+      y: stage.y() + dy
+    });
+    updateGrid();
+  } else if (isDrawing) {
+    draw(e);
+  }
+}
+
+function handleMouseUp(e) {
+  if (e.evt.button === 2) { // Right mouse button
+    isPanning = false;
+    stage.container().style.cursor = 'default';
+  } else if (e.evt.button === 0) { // Left mouse button
+    stopDrawing();
+  }
 }
 
 function showToolOptions(tool, buttonElement) {
@@ -180,9 +185,7 @@ function resizeStage() {
 }
 
 function startDrawing(e) {
-  if (!currentTool || (currentTool !== 'draw' && currentTool !== 'erase')) return;
   isDrawing = true;
-  
   const pos = stage.getRelativePointerPosition();
   const color = currentTool === 'draw' ? document.getElementById('draw-color').value : 'white';
   const size = currentTool === 'draw' ? parseInt(document.getElementById('draw-size').value) : parseInt(document.getElementById('erase-size').value);
