@@ -5,6 +5,7 @@ let lastLine;
 let gridSize = 50;
 let gridOffset = { x: 0, y: 0 };
 let isPanning = false;
+let gridgroup;
 
 document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('canvas-container');
@@ -21,10 +22,41 @@ document.addEventListener('DOMContentLoaded', function() {
   layer = new Konva.Layer();
   stage.add(layer);
 
-  drawGrid();
+  createGrid();
   setupEventListeners();
 });
 
+function createGrid() {
+  const gridSize = 50;
+  const width = stage.width() * 3;  // Make the grid 3 times wider than the stage
+  const height = stage.height() * 3;  // Make the grid 3 times taller than the stage
+
+  gridGroup = new Konva.Group({
+    x: -stage.width(),  // Position the grid to extend beyond the visible area
+    y: -stage.height(),
+  });
+
+  for (let x = 0; x < width; x += gridSize) {
+    const line = new Konva.Line({
+      points: [x, 0, x, height],
+      stroke: '#ddd',
+      strokeWidth: 1,
+    });
+    gridGroup.add(line);
+  }
+
+  for (let y = 0; y < height; y += gridSize) {
+    const line = new Konva.Line({
+      points: [0, y, width, y],
+      stroke: '#ddd',
+      strokeWidth: 1,
+    });
+    gridGroup.add(line);
+  }
+
+  gridLayer.add(gridGroup);
+  gridLayer.batchDraw();
+}
 
 function setupEventListeners() {
   const toolbox = document.getElementById('toolbox');
@@ -78,10 +110,19 @@ function handleMouseMove(e) {
       x: stage.x() + dx,
       y: stage.y() + dy
     });
-    updateGrid();
+    updateGridPosition();  // Update grid position when panning
   } else if (isDrawing) {
     draw(e);
   }
+}
+
+function updateGridPosition() {
+  const stagePos = stage.position();
+  gridGroup.position({
+    x: -stagePos.x - stage.width(),
+    y: -stagePos.y - stage.height(),
+  });
+  gridLayer.batchDraw();
 }
 
 function handleMouseUp(e) {
@@ -174,14 +215,14 @@ function updateGrid() {
   const pos = stage.position();
   gridOffset.x = -pos.x;
   gridOffset.y = -pos.y;
-  drawGrid();
+  //drawGrid();
 }
 
 function resizeStage() {
   const container = document.getElementById('canvas-container');
   stage.width(container.offsetWidth);
   stage.height(container.offsetHeight);
-  drawGrid();
+  //drawGrid();
 }
 
 function startDrawing(e) {
@@ -255,7 +296,7 @@ function initializeNewMap(width, height, newGridSize) {
   gridLayer.destroyChildren();
   layer.destroyChildren();
 
-  drawGrid();
+  //drawGrid();
   layer.batchDraw();
 }
 
