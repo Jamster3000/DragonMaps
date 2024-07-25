@@ -2,9 +2,7 @@ let stage, layer, gridLayer;
 let currentTool = 'draw';
 let isDrawing = false;
 let lastLine;
-const gridSize = 50; // Default grid size
-let stageWidth = window.innerWidth;
-let stageHeight = window.innerHeight;
+let gridSize = 50; // Default grid size
 
 document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('canvas-container');
@@ -12,8 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Create Konva stage
   stage = new Konva.Stage({
     container: 'canvas-container',
-    width: stageWidth,
-    height: stageHeight,
+    width: container.offsetWidth,
+    height: container.offsetHeight,
     draggable: true
   });
 
@@ -25,15 +23,37 @@ document.addEventListener('DOMContentLoaded', function() {
   layer = new Konva.Layer();
   stage.add(layer);
 
+  // Draw grid
+  drawGrid();
+
   // Set up event listeners
   setupEventListeners();
-
-  // Initial draw of the grid
-  drawGrid();
 });
 
 function setupEventListeners() {
-  // ... (keep your existing event listeners)
+  const toolbox = document.getElementById('toolbox');
+  const popupToolBox = document.getElementById('popup-toolbox');
+  
+  toolbox.addEventListener('click', function(e) {
+    if (e.target.tagName === 'BUTTON') {
+      currentTool = e.target.getAttribute('data-tool');
+      document.querySelectorAll('#toolbox button').forEach(btn => btn.classList.remove('active'));
+
+      if (currentTool !== '') {
+        e.target.classList.add('active');
+        showToolOptions(currentTool, e.target);
+      } else {
+        popupToolBox.style.display = 'none';
+      }
+    }
+  });
+
+  stage.on('mousedown touchstart', startDrawing);
+  stage.on('mousemove touchmove', draw);
+  stage.on('mouseup touchend', stopDrawing);
+
+  document.getElementById('new-map-option').addEventListener('click', createNewMap);
+  document.getElementById('toggle-toolbox').addEventListener('click', toggleToolbox);
 
   // Add event listener for stage dragging
   stage.on('dragmove', updateGrid);
@@ -42,8 +62,12 @@ function setupEventListeners() {
   window.addEventListener('resize', resizeStage);
 }
 
-function updateGrid() {
-  drawGrid();
+function showToolOptions(tool, buttonElement) {
+  // ... (keep this function as is) ...
+}
+
+function getToolOptions(tool) {
+  // ... (keep this function as is) ...
 }
 
 function drawGrid() {
@@ -76,11 +100,14 @@ function drawGrid() {
   gridLayer.batchDraw();
 }
 
+function updateGrid() {
+  drawGrid();
+}
+
 function resizeStage() {
-  stageWidth = window.innerWidth;
-  stageHeight = window.innerHeight;
-  stage.width(stageWidth);
-  stage.height(stageHeight);
+  const container = document.getElementById('canvas-container');
+  stage.width(container.offsetWidth);
+  stage.height(container.offsetHeight);
   drawGrid();
 }
 
@@ -110,4 +137,32 @@ function draw(e) {
   layer.batchDraw();
 }
 
-// ... (keep other utility functions)
+function stopDrawing() {
+  isDrawing = false;
+}
+
+function createNewMap() {
+  showNewMapOverlay();
+}
+
+function showNewMapOverlay() {
+  // ... (keep this function as is) ...
+}
+
+function initializeNewMap(width, height, newGridSize) {
+  stage.width(width);
+  stage.height(height);
+  gridSize = newGridSize;
+
+  gridLayer.destroyChildren();
+  layer.destroyChildren();
+
+  drawGrid();
+  layer.batchDraw();
+}
+
+function toggleToolbox() {
+  const toolbox = document.getElementById('toolbox');
+  toolbox.classList.toggle('toolbox-side');
+  toolbox.classList.toggle('visible');
+}
