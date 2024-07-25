@@ -2,20 +2,19 @@ let stage, layer, gridLayer;
 let currentTool = 'draw';
 let isDrawing = false;
 let lastLine;
-let viewportX = 0;
-let viewportY = 0;
 const gridSize = 50; // Default grid size
-const viewportWidth = 800; // Viewport width
-const viewportHeight = 600; // Viewport height
+let stageWidth = window.innerWidth;
+let stageHeight = window.innerHeight;
 
 document.addEventListener('DOMContentLoaded', function() {
-  const container = document.getElementById('canvas-area');
+  const container = document.getElementById('canvas-container');
   
-  // Create Konva stage with viewport size
+  // Create Konva stage
   stage = new Konva.Stage({
-    container: 'canvas-area',
-    width: viewportWidth,
-    height: viewportHeight
+    container: 'canvas-container',
+    width: stageWidth,
+    height: stageHeight,
+    draggable: true
   });
 
   // Create grid layer
@@ -37,27 +36,28 @@ function setupEventListeners() {
   // ... (keep your existing event listeners)
 
   // Add event listener for stage dragging
-  stage.draggable(true);
-  stage.on('dragmove', updateViewport);
+  stage.on('dragmove', updateGrid);
+
+  // Add event listener for window resize
+  window.addEventListener('resize', resizeStage);
 }
 
-function updateViewport() {
-  viewportX = -stage.x();
-  viewportY = -stage.y();
+function updateGrid() {
   drawGrid();
 }
 
 function drawGrid() {
   gridLayer.destroyChildren();
 
-  const startX = Math.floor(viewportX / gridSize) * gridSize;
-  const startY = Math.floor(viewportY / gridSize) * gridSize;
-  const endX = startX + viewportWidth + gridSize;
-  const endY = startY + viewportHeight + gridSize;
+  const stageRect = stage.getClientRect();
+  const startX = Math.floor(stageRect.x / gridSize) * gridSize - stageRect.x;
+  const startY = Math.floor(stageRect.y / gridSize) * gridSize - stageRect.y;
+  const endX = stageRect.width + gridSize;
+  const endY = stageRect.height + gridSize;
 
   for (let x = startX; x < endX; x += gridSize) {
     const line = new Konva.Line({
-      points: [x - viewportX, 0, x - viewportX, viewportHeight],
+      points: [x, 0, x, stageRect.height],
       stroke: '#ddd',
       strokeWidth: 1
     });
@@ -66,7 +66,7 @@ function drawGrid() {
 
   for (let y = startY; y < endY; y += gridSize) {
     const line = new Konva.Line({
-      points: [0, y - viewportY, viewportWidth, y - viewportY],
+      points: [0, y, stageRect.width, y],
       stroke: '#ddd',
       strokeWidth: 1
     });
@@ -76,11 +76,19 @@ function drawGrid() {
   gridLayer.batchDraw();
 }
 
+function resizeStage() {
+  stageWidth = window.innerWidth;
+  stageHeight = window.innerHeight;
+  stage.width(stageWidth);
+  stage.height(stageHeight);
+  drawGrid();
+}
+
 function startDrawing(e) {
   if (!currentTool || (currentTool !== 'draw' && currentTool !== 'erase')) return;
   isDrawing = true;
   
-  const pos = stage.getPointerPosition();
+  const pos = stage.getRelativePointerPosition();
   const color = currentTool === 'draw' ? document.getElementById('draw-color').value : 'white';
   const size = currentTool === 'draw' ? parseInt(document.getElementById('draw-size').value) : parseInt(document.getElementById('erase-size').value);
   
@@ -89,22 +97,17 @@ function startDrawing(e) {
     strokeWidth: size,
     globalCompositeOperation:
       currentTool === 'erase' ? 'destination-out' : 'source-over',
-    points: [pos.x + viewportX, pos.y + viewportY]
+    points: [pos.x, pos.y]
   });
   layer.add(lastLine);
 }
 
 function draw(e) {
   if (!isDrawing) return;
-  const pos = stage.getPointerPosition();
-  let newPoints = lastLine.points().concat([pos.x + viewportX, pos.y + viewportY]);
+  const pos = stage.getRelativePointerPosition();
+  let newPoints = lastLine.points().concat([pos.x, pos.y]);
   lastLine.points(newPoints);
   layer.batchDraw();
 }
-
-// Remove or modify these functions as they're no longer needed
-// function createNewMap() { ... }
-// function showNewMapOverlay() { ... }
-// function initializeNewMap() { ... }
 
 // ... (keep other utility functions)
