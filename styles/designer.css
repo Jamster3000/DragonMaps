@@ -8,6 +8,7 @@
     --header-color: #2E0854;
 }
 
+/* General Styles */
 body {
     font-family: 'Roboto', sans-serif;
     line-height: 1.6;
@@ -20,6 +21,30 @@ body {
     flex-direction: column;
 }
 
+h2 {
+    font-family: 'Cinzel', serif;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px rgba(147, 112, 219, 0.3);
+}
+
+button {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--accent-color);
+}
+
+/* Magical Background */
 .magical-background {
     position: fixed;
     top: 0;
@@ -41,11 +66,16 @@ body {
     100% { background-position: 100% 100%; }
 }
 
-header {
+/* Header and Navigation */
+header, .designer-header {
     background-color: var(--header-color);
     color: var(--text-color);
     padding: 1rem;
     border-bottom: 2px solid var(--accent-color);
+}
+
+.designer-header {
+    padding: 0.5rem 1rem;
 }
 
 nav {
@@ -59,6 +89,10 @@ nav {
     font-size: 28px;
     color: var(--secondary-color);
     text-shadow: 0 0 10px rgba(147, 112, 219, 0.5);
+}
+
+.designer-header .logo {
+    font-size: 20px;
 }
 
 nav ul {
@@ -82,13 +116,14 @@ nav ul li a:hover {
     color: var(--secondary-color);
 }
 
+/* Designer Container */
 #designer-container {
     display: flex;
-    height: calc(100vh - 60px); /* Adjust based on your header height */
+    height: calc(100vh - 60px);
 }
 
 #toolbox, #asset-library {
-    width: 200px; /* Adjust as needed */
+    width: 200px;
     background-color: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     padding: 1rem;
@@ -98,6 +133,13 @@ nav ul li a:hover {
     box-shadow: 0 0 20px rgba(106, 13, 173, 0.1);
 }
 
+#canvas-container {
+    width: 100%;
+    height: calc(100vh - 60px);
+    overflow: hidden;
+    position: relative;
+}
+
 #canvas-area {
     flex-grow: 1;
     position: relative;
@@ -105,25 +147,42 @@ nav ul li a:hover {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+}
+
+#grid-canvas, #map-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+#grid-canvas {
+    z-index: 1;
+    pointer-events: none;
 }
 
 #map-canvas {
-    width: 100%;
-    height: 100%;
+    z-index: 2;
     background-color: rgba(255, 255, 255, 0.03);
     border: 2px solid var(--accent-color);
     border-radius: 10px;
     box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
 }
 
-h2 {
-    font-family: 'Cinzel', serif;
-    color: var(--secondary-color);
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-    text-shadow: 0 0 10px rgba(147, 112, 219, 0.3);
+.konvajs-content {
+    border-radius: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
+/* Footer */
 footer {
     background-color: var(--header-color);
     color: var(--text-color);
@@ -133,43 +192,7 @@ footer {
     border-top: 2px solid var(--accent-color);
 }
 
-button {
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    border: none;
-    padding: 0.5rem 1rem;
-    margin: 0.25rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: var(--accent-color);
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    #designer-container {
-        flex-direction: column;
-        height: calc(100vh - 60px); /* Adjust based on your header height */
-    }
-
-    #toolbox, #asset-library {
-        width: auto;
-        margin: 0.5rem;
-    }
-}
-
-.designer-header {
-    background-color: var(--header-color);
-    padding: 0.5rem 1rem;
-}
-
-.designer-header .logo {
-    font-size: 20px;
-}
-
+/* Dropdown */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -200,66 +223,42 @@ button:hover {
     display: block;
 }
 
+/* Toolbox */
 #toolbox button.active {
     background-color: #4CAF50;
     color: white;
 }
 
-#canvas-area {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-#grid-canvas, #map-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    display: block;
-}
-
-#grid-canvas {
-    z-index: 1;
-    pointer-events: none;
-}
-
-#map-canvas {
-    z-index: 2;
-}
-
 #toggle-toolbox {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1000;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
 }
 
 .toolbox-overlay {
-  position: absolute;
-  top: 50px;
-  left: 10px;
-  background-color: white;
-  padding: 10px;
-  border: 1px solid #ccc;
-  z-index: 999;
+    position: absolute;
+    top: 50px;
+    left: 10px;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    z-index: 999;
 }
 
 .toolbox-side {
-  position: absolute;
-  top: 50px;
-  left: -200px;
-  width: 200px;
-  transition: left 0.3s ease-in-out;
+    position: absolute;
+    top: 50px;
+    left: -200px;
+    width: 200px;
+    transition: left 0.3s ease-in-out;
 }
 
 .toolbox-side.visible {
-  left: 0;
+    left: 0;
 }
 
+/* New Map Overlay */
 #new-map-overlay {
     position: fixed;
     top: 0;
@@ -267,7 +266,7 @@ button:hover {
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.5);
-    display: felx;
+    display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1001;
@@ -284,36 +283,45 @@ button:hover {
     margin-bottom: 10px;
 }
 
+/* Popup Toolbox */
 .popup-toolbox {
-  position: absolute;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  z-index: 1000;
-  display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+    display: none;
 }
 
 .popup-toolbox h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 .tool-option {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 .tool-option label {
-  display: inline-block;
-  width: 100px;
+    display: inline-block;
+    width: 100px;
 }
 
 .tool-option input,
 .tool-option select {
-  width: 150px;
+    width: 150px;
 }
 
-.konvajs-content {
-  border-radius: 0;
-  margin: 0;
+/* Responsive Design */
+@media (max-width: 768px) {
+    #designer-container {
+        flex-direction: column;
+        height: calc(100vh - 60px);
+    }
+
+    #toolbox, #asset-library {
+        width: auto;
+        margin: 0.5rem;
+    }
 }
