@@ -134,20 +134,16 @@ nav ul li a:hover {
 }
 
 #canvas-container {
-    width: 100%;
-    height: calc(100vh - 60px);
+    width: 100vw;
+    height: calc(100vh - 60px); /* Adjust based on your header height */
     overflow: hidden;
     position: relative;
 }
 
+
 #canvas-area {
-    flex-grow: 1;
-    position: relative;
-    padding: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+    width: 100%;
+    height: 100%;
 }
 
 #grid-canvas, #map-canvas {
@@ -175,9 +171,7 @@ nav ul li a:hover {
 }
 
 .konvajs-content {
-    border-radius: 0;
-    margin: 0;
-    position: absolute;
+    position: absolute !important;
     top: 0;
     left: 0;
 }
@@ -227,6 +221,21 @@ footer {
 #toolbox button.active {
     background-color: #4CAF50;
     color: white;
+}
+
+#toolbox {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#toolbox button {
+    display: block;
+    margin-bottom: 5px;
 }
 
 #toggle-toolbox {
