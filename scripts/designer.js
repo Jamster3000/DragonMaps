@@ -2,7 +2,8 @@ let stage, layer, gridLayer;
 let currentTool = 'draw';
 let isDrawing = false;
 let lastLine;
-let gridSize = 50; // Default grid size
+let gridSize = 50; 
+let gridOffset = { x: 0, y: 0 };
 
 document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('canvas-container');
@@ -11,8 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
   stage = new Konva.Stage({
     container: 'canvas-container',
     width: container.offsetWidth,
-    height: container.offsetHeight,
-    draggable: true
+    height: container.offsetHeight
+    //draggable: true
   });
 
   // Create grid layer
@@ -28,6 +29,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Set up event listeners
   setupEventListeners();
+
+  stage.on('mousedown touchstart', (e) => {
+    if (e.target === stage) {
+      stage.startDragPos = stage.getPointerPosition();
+    }
+  });
+
+  stage.on('mousemove touchmove', (e) => {
+    if (stage.startDragPos) {
+      const pos = stage.getPointerPosition();
+      const dx = pos.x - stage.startDragPos.x;
+      const dy = pos.y - stage.startDragPos.y;
+      stage.position({
+        x: stage.x() + dx,
+        y: stage.y() + dy
+      });
+      stage.startDragPos = pos;
+      updateGrid();
+    }
+  });
+  
+  stage.on('mouseup touchend', () => {
+    stage.startDragPos = null;
+  });
+  
 });
 
 function setupEventListeners() {
@@ -63,19 +89,58 @@ function setupEventListeners() {
 }
 
 function showToolOptions(tool, buttonElement) {
-  // ... (keep this function as is) ...
+  const popupToolbox = document.getElementById('popup-toolbox');
+  const toolOptions = document.getElementById('tool-options');
+  toolOptions.innerHTML = '';
+
+  const options = getToolOptions(tool);
+  options.forEach(option => {
+    const optionElement = document.createElement('div');
+    optionElement.classList.add('tool-option');
+    optionElement.innerHTML = `
+      <label for="${option.id}">${option.label}:</label>
+      ${option.type === 'select' 
+        ? `<select id="${option.id}">${option.options.map(o => `<option value="${o}">${o}</option>`).join('')}</select>`
+        : `<input type="${option.type}" id="${option.id}" value="${option.value}">`
+      }
+    `;
+    toolOptions.appendChild(optionElement);
+  });
+
+  const rect = buttonElement.getBoundingClientRect();
+  popupToolbox.style.left = `${rect.right + 10}px`;
+  popupToolbox.style.top = `${rect.top}px`;
+  popupToolbox.style.display = 'block';
 }
 
 function getToolOptions(tool) {
-  // ... (keep this function as is) ...
+  switch (tool) {
+    case 'draw':
+      return [
+        { id: 'draw-color', label: 'Color', type: 'color', value: '#000000' },
+        { id: 'draw-size', label: 'Size', type: 'number', value: 5 },
+        { id: 'draw-snap', label: 'Snap to Grid', type: 'checkbox', value: false }
+      ];
+    case 'erase':
+      return [
+        { id: 'erase-size', label: 'Size', type: 'number', value: 20 }
+      ];
+    case 'fill':
+      return [
+        { id: 'fill-color', label: 'Color', type: 'color', value: '#000000' },
+        { id: 'fill-tolerance', label: 'Tolerance', type: 'number', value: 10 }
+      ];
+    default:
+      return [];
+  }
 }
 
 function drawGrid() {
   gridLayer.destroyChildren();
 
   const stageRect = stage.getClientRect();
-  const startX = Math.floor(stageRect.x / gridSize) * gridSize - stageRect.x;
-  const startY = Math.floor(stageRect.y / gridSize) * gridSize - stageRect.y;
+  const startX = Math.floor(gridOffset.x / gridSize) * gridSize - gridOffset.x;
+  const startY = Math.floor(gridOffset.y / gridSize) * gridSize - gridOffset.y;
   const endX = stageRect.width + gridSize;
   const endY = stageRect.height + gridSize;
 
@@ -101,6 +166,9 @@ function drawGrid() {
 }
 
 function updateGrid() {
+  const pos = stage.position();
+  gridOffset.x = -pos.x;
+  gridOffset.y = -pos.y;
   drawGrid();
 }
 
@@ -146,7 +214,34 @@ function createNewMap() {
 }
 
 function showNewMapOverlay() {
-  // ... (keep this function as is) ...
+  const overlay = document.createElement('div');
+  overlay.id = 'new-map-overlay';
+  overlay.innerHTML = `
+    <div class="overlay-content">
+      <h2>Create New Map</h2>
+      <label for="map-width">Width (pixels):</label>
+      <input type="number" id="map-width" value="800">
+      <label for="map-height">Height (pixels):</label>
+      <input type="number" id="map-height" value="600">
+      <label for="grid-size">Grid Size (pixels):</label>
+      <input type="number" id="grid-size" value="50">
+      <button id="create-map">Create</button>
+      <button id="cancel-create">Cancel</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  document.getElementById('create-map').addEventListener('click', function() {
+    const width = parseInt(document.getElementById('map-width').value);
+    const height = parseInt(document.getElementById('map-height').value);
+    const gridSize = parseInt(document.getElementById('grid-size').value);
+    initializeNewMap(width, height, gridSize);
+    document.body.removeChild(overlay);
+  });
+
+  document.getElementById('cancel-create').addEventListener('click', function() {
+    document.body.removeChild(overlay);
+  });
 }
 
 function initializeNewMap(width, height, newGridSize) {
