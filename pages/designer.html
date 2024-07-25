@@ -7,11 +7,9 @@
   <title>DragonMaps - D&D Battlemap Creator</title>
   <link rel="stylesheet" href="../styles/designer.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap">
-</head>
-
-<body class="designer-page">
   <script src="https://unpkg.com/konva@8.4.2/konva.min.js"></script>
-  <script src="../scripts/designer.js"></script>
+</head>
+<body class="designer-page">
   <header class="designer-header">
     <nav>
       <div class="logo">DragonMaps Designer</div>
@@ -44,7 +42,6 @@
       </ul>
     </nav>
   </header>
-
   <main id="designer-container">
     <button id="toggle-toolbox">Toggle Toolbox</button>
     <div id="toolbox" class="toolbox-overlay">
@@ -54,19 +51,16 @@
       <button data-tool="select">Select</button>
       <button data-tool="fill">Fill</button>
     </div>
-
     <div id="popup-toolbox" class="popup-toolbox">
       <h3>Tool Options</h3>
       <div id="tool-options"></div>
     </div>
     
-    <section id="canvas-area">
-      <canvas id="grid-canvas"></canvas>
-      <canvas id="map-canvas"></canvas>
+    <section id="canvas-container">
+      <!-- Konva will create its own canvas elements here -->
     </section>
     
     <div id="toolbar-popup"></div>
-
     <aside id="asset-library">
       <h2>Assets</h2>
       <div class="asset-category">
@@ -83,7 +77,6 @@
       </div>
     </aside>
   </main>
-
   <script src="../scripts/designer.js"></script>
 </body>
 </html>
