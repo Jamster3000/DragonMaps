@@ -1,5 +1,5 @@
 let stage, layer, gridLayer;
-let currentTool = 'draw';
+let currentTool = null;
 let isDrawing = false;
 let lastLine;
 let gridSize = 50;
@@ -27,34 +27,41 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function createGrid() {
-  const gridSize = 50;
-  const width = stage.width() * 3;  // Make the grid 3 times wider than the stage
-  const height = stage.height() * 3;  // Make the grid 3 times taller than the stage
-
-  gridGroup = new Konva.Group({
-    x: -stage.width(),  // Position the grid to extend beyond the visible area
-    y: -stage.height(),
-  });
-
-  for (let x = 0; x < width; x += gridSize) {
-    const line = new Konva.Line({
-      points: [x, 0, x, height],
-      stroke: '#ddd',
-      strokeWidth: 1,
-    });
-    gridGroup.add(line);
-  }
-
-  for (let y = 0; y < height; y += gridSize) {
-    const line = new Konva.Line({
-      points: [0, y, width, y],
-      stroke: '#ddd',
-      strokeWidth: 1,
-    });
-    gridGroup.add(line);
-  }
-
+  gridGroup = new Konva.Group();
   gridLayer.add(gridGroup);
+  updateGrid();
+}
+
+function updateGrid() {
+  const stagePos = stage.position();
+  const viewportWidth = stage.width();
+  const viewportHeight = stage.height();
+
+  const startX = Math.floor((0 - stagePos.x) / gridSize) * gridSize;
+  const endX = Math.ceil((viewportWidth - stagePos.x) / gridSize) * gridSize;
+  const startY = Math.floor((0 - stagePos.y) / gridSize) * gridSize;
+  const endY = Math.ceil((viewportHeight - stagePos.y) / gridSize) * gridSize;
+
+  gridGroup.destroyChildren();
+
+  for (let x = startX; x <= endX; x += gridSize) {
+    const line = new Konva.Line({
+      points: [x, startY, x, endY],
+      stroke: '#ddd',
+      strokeWidth: 1,
+    });
+    gridGroup.add(line);
+  }
+
+  for (let y = startY; y <= endY; y += gridSize) {
+    const line = new Konva.Line({
+      points: [startX, y, endX, y],
+      stroke: '#ddd',
+      strokeWidth: 1,
+    });
+    gridGroup.add(line);
+  }
+
   gridLayer.batchDraw();
 }
 
@@ -64,14 +71,18 @@ function setupEventListeners() {
   
   toolbox.addEventListener('click', function(e) {
     if (e.target.tagName === 'BUTTON') {
-      currentTool = e.target.getAttribute('data-tool');
-      document.querySelectorAll('#toolbox button').forEach(btn => btn.classList.remove('active'));
-
-      if (currentTool !== '') {
+      const selectedTool = e.target.getAttribute('data-tool');
+      if (currentTool === selectedTool) {
+        // Deselect the tool
+        currentTool = '';
+        e.target.classList.remove('active');
+        popupToolBox.style.display = 'none';
+      } else {
+        // Select the new tool
+        currentTool = selectedTool;
+        document.querySelectorAll('#toolbox button').forEach(btn => btn.classList.remove('active'));
         e.target.classList.add('active');
         showToolOptions(currentTool, e.target);
-      } else {
-        popupToolBox.style.display = 'none';
       }
     }
   });
@@ -85,10 +96,43 @@ function setupEventListeners() {
   stage.on('mousemove', handleMouseMove);
   stage.on('mouseup', handleMouseUp);
 
-  document.getElementById('new-map-option').addEventListener('click', createNewMap);
+  document.getElementById('new-map-option').addEventListener('click', showNewMapOverlay);
   document.getElementById('toggle-toolbox').addEventListener('click', toggleToolbox);
+  document.addEventListener('keydown', handleKeyDown);
+  document.addEventListener('keyup', handleKeyUp);
+}
 
-  window.addEventListener('resize', resizeStage);
+function handleKeyDown(e) {
+  switch(e.key.toLowerCase()) {
+    case 'd':
+      selectTool('draw');
+      break;
+    case 'e':
+      selectTool('erase');
+      break;
+    case 's':
+      selectTool('select');
+      break;
+    case 'f':
+      selectTool('fill');
+      break;
+    case 'shift':
+      document.getElementById('draw-snap').checked = true;
+      break;
+    }
+}
+
+function handleKeyUp(e) {
+    if (e.key.toLowerCase() === 'shift') {
+      document.getElementById('draw-snap').checked = false;
+    }
+}
+
+function selectTool(tool) {
+    const toolButton = document.querySelector(`#toolbox button[data-tool="${tool}"]`);
+    if (toolButton) {
+      toolButton.click();
+    }
 }
 
 function handleMouseDown(e) {
@@ -110,7 +154,8 @@ function handleMouseMove(e) {
       x: stage.x() + dx,
       y: stage.y() + dy
     });
-    updateGridPosition();  // Update grid position when panning
+    updateGrid();
+    stage.batchDraw();
   } else if (isDrawing) {
     draw(e);
   }
@@ -119,8 +164,8 @@ function handleMouseMove(e) {
 function updateGridPosition() {
   const stagePos = stage.position();
   gridGroup.position({
-    x: -stagePos.x - stage.width(),
-    y: -stagePos.y - stage.height(),
+    x: -stagePos.x % gridSize,
+    y: -stagePos.y % gridSize
   });
   gridLayer.batchDraw();
 }
@@ -211,40 +256,39 @@ function drawGrid() {
   gridLayer.batchDraw();
 }
 
-function updateGrid() {
-  const pos = stage.position();
-  gridOffset.x = -pos.x;
-  gridOffset.y = -pos.y;
-  //drawGrid();
-}
-
-function resizeStage() {
-  const container = document.getElementById('canvas-container');
-  stage.width(container.offsetWidth);
-  stage.height(container.offsetHeight);
-  //drawGrid();
-}
-
 function startDrawing(e) {
   isDrawing = true;
-  const pos = stage.getRelativePointerPosition();
+  const pos = getRelativePointerPosition(layer);
   const color = currentTool === 'draw' ? document.getElementById('draw-color').value : 'white';
   const size = currentTool === 'draw' ? parseInt(document.getElementById('draw-size').value) : parseInt(document.getElementById('erase-size').value);
+  
+  let snapToGridEnabled = document.getElementById('draw-snap').checked || e.evt.shiftKey;
+  let startPos = snapToGridEnabled ? snapToGrid(pos.x, pos.y) : pos;
   
   lastLine = new Konva.Line({
     stroke: color,
     strokeWidth: size,
     globalCompositeOperation:
       currentTool === 'erase' ? 'destination-out' : 'source-over',
-    points: [pos.x, pos.y]
+    points: [startPos.x, startPos.y]
   });
   layer.add(lastLine);
+}
+function snapToGrid(x, y) {
+  return {
+    x: Math.round(x / gridSize) * gridSize,
+    y: Math.round(y / gridSize) * gridSize
+  };
 }
 
 function draw(e) {
   if (!isDrawing) return;
-  const pos = stage.getRelativePointerPosition();
-  let newPoints = lastLine.points().concat([pos.x, pos.y]);
+  const pos = getRelativePointerPosition(layer);
+  let snapToGridEnabled = document.getElementById('draw-snap').checked || e.evt.shiftKey;
+  
+  let newPos = snapToGridEnabled ? snapToGrid(pos.x, pos.y) : pos;
+  
+  let newPoints = lastLine.points().concat([newPos.x, newPos.y]);
   lastLine.points(newPoints);
   layer.batchDraw();
 }
@@ -253,55 +297,27 @@ function stopDrawing() {
   isDrawing = false;
 }
 
-function createNewMap() {
-  showNewMapOverlay();
-}
-
 function showNewMapOverlay() {
-  const overlay = document.createElement('div');
-  overlay.id = 'new-map-overlay';
-  overlay.innerHTML = `
-    <div class="overlay-content">
-      <h2>Create New Map</h2>
-      <label for="map-width">Width (pixels):</label>
-      <input type="number" id="map-width" value="800">
-      <label for="map-height">Height (pixels):</label>
-      <input type="number" id="map-height" value="600">
-      <label for="grid-size">Grid Size (pixels):</label>
-      <input type="number" id="grid-size" value="50">
-      <button id="create-map">Create</button>
-      <button id="cancel-create">Cancel</button>
-    </div>
-  `;
-  document.body.appendChild(overlay);
+  console.log(layer.getChildren());
+  const text = "Are you sure?\nThis will remove everything you've done so far?";
 
-  document.getElementById('create-map').addEventListener('click', function() {
-    const width = parseInt(document.getElementById('map-width').value);
-    const height = parseInt(document.getElementById('map-height').value);
-    const gridSize = parseInt(document.getElementById('grid-size').value);
-    initializeNewMap(width, height, gridSize);
-    document.body.removeChild(overlay);
-  });
-
-  document.getElementById('cancel-create').addEventListener('click', function() {
-    document.body.removeChild(overlay);
-  });
-}
-
-function initializeNewMap(width, height, newGridSize) {
-  stage.width(width);
-  stage.height(height);
-  gridSize = newGridSize;
-
-  gridLayer.destroyChildren();
-  layer.destroyChildren();
-
-  //drawGrid();
-  layer.batchDraw();
+  if (layer.getChildren().length > 0) {
+    if (confirm(text) == true) {
+      layer.removeChildren();
+    }
+  }
 }
 
 function toggleToolbox() {
   const toolbox = document.getElementById('toolbox');
-  toolbox.classList.toggle('toolbox-side');
+  const toggleButton = document.getElementById('toggle-toolbox');
   toolbox.classList.toggle('visible');
+  toggleButton.innerHTML = toolbox.classList.contains('visible') ? '&#9658;&#9658;' : '&#9668;&#9668;';
+}
+
+function getRelativePointerPosition(node) {
+  const transform = node.getAbsoluteTransform().copy();
+  transform.invert();
+  const pos = node.getStage().getPointerPosition();
+  return transform.point(pos);
 }
