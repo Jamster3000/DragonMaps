@@ -4,10 +4,11 @@
     --background-color: #1E1E2E;
     --primary-color: #FF9A8B;
     --primary-color-light: #4A5568;
-    --secondary-color: #9370DB;
+    --secondary-color: #7EB2DD;
     --accent-color: #8A2BE2;
     --text-color: #E0E0E0;
     --header-color: #C9A0DC;
+    --header-color-text: #2E1A47;
 }
 
 body {
