@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Roboto:wght@300;400;700&display=swap');
 
 :root {
-    --background-color: #4A0E4E;
-    --primary-color: #4B0082;
-    --primary-color-light: #6A5ACD;
+    --background-color: #1E1E2E;
+    --primary-color: #FF9A8B;
+    --primary-color-light: #4A5568;
     --secondary-color: #9370DB;
     --accent-color: #8A2BE2;
-    --text-color: #e0e0e0;
-    --header-color: #4A235A;
+    --text-color: #E0E0E0;
+    --header-color: #C9A0DC;
 }
 
 body {
