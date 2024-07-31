@@ -131,6 +131,7 @@ function setupEventListeners() {
   });
 
   stage.content.addEventListener('contextmenu', (e) => {
+    e.evt.preventDefault();
     menuNode.style.display = 'initial';
   });
 
