@@ -45,17 +45,6 @@ window.addEventListener('click', () => {
   menuNode.style.display = 'none';
 });
 
-stage.on('contextmenu', function (e) {
-    // prevent default behavior
-    e.evt.preventDefault();
-    if (e.target === stage) {
-      // if we are on empty place of the stage we will do nothing
-      return;
-    }
-    
-    menuNode.style.display = 'initial';
-});
-
 function updateGrid() {
     //clear any grid updates pending to update
   clearTimeout(gridUpdateTimeout);
@@ -348,3 +337,14 @@ function getToolOptions(tool) {
       return [];
   }
 }
+
+stage.on('contextmenu', function (e) {
+    // prevent default behavior
+    e.evt.preventDefault();
+    if (e.target === stage) {
+      // if we are on empty place of the stage we will do nothing
+      return;
+    }
+    
+    menuNode.style.display = 'initial';
+});
