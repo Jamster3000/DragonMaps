@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Set the base path to include 'testWebSite'
-    const basePath = '/testWebSite';
+    const basePath = '/dragonmaps';
 
     // Load header
     const headerPlaceholder = document.getElementById('header-placeholder');
