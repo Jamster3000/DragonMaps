@@ -27,8 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function createGrid() {
-  gridGroup = new Konva.Group();
-  gridLayer.add(gridGroup);
+  if (!gridGroup) {
+    gridGroup = new Konva.Group();
+    gridLayer.add(gridGroup);
+  }
   updateGrid();
 }
 
@@ -71,6 +73,7 @@ function setupEventListeners() {
   
   toolbox.addEventListener('click', function(e) {
     if (e.target.tagName === 'BUTTON') {
+      console.log(e.target.getAttribute('data-tool'));
       const selectedTool = e.target.getAttribute('data-tool');
       if (currentTool === selectedTool) {
         // Deselect the tool
@@ -124,7 +127,9 @@ function handleKeyDown(e) {
 
 function handleKeyUp(e) {
     if (e.key.toLowerCase() === 'shift') {
-      document.getElementById('draw-snap').checked = false;
+      try {
+         document.getElementById('draw-snap').checked = false;
+      } catch (TypeError){}
     }
 }
 
@@ -214,7 +219,8 @@ function getToolOptions(tool) {
       ];
     case 'erase':
       return [
-        { id: 'erase-size', label: 'Size', type: 'number', value: 20 }
+        { id: 'erase-size', label: 'Size', type: 'number', value: 20 },
+        { id: 'erase-snap', label: 'Snap to Grid', type: 'checkbox', value: false }
       ];
     case 'fill':
       return [
@@ -270,7 +276,9 @@ function startDrawing(e) {
     strokeWidth: size,
     globalCompositeOperation:
       currentTool === 'erase' ? 'destination-out' : 'source-over',
-    points: [startPos.x, startPos.y]
+    points: [startPos.x, startPos.y],
+    lineCap: 'round',
+    lineJoin: 'round'
   });
   layer.add(lastLine);
 }
