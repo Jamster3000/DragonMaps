@@ -56,6 +56,11 @@ header, footer {
     text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
 }
 
+.logo a:link{
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
 nav {
     display: flex;
     justify-content: space-between;
