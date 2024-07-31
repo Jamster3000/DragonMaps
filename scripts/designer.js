@@ -7,7 +7,7 @@ let gridOffset = { x: 0, y: 0 };
 let isPanning = false;
 let gridGroup;
 let gridUpdateTimeout;
-var menuNode = document.getElementById('menu');
+var menuNode = document.getElementById('menu'); 
 
 document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('canvas-container');
