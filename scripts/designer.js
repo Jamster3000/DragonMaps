@@ -6,6 +6,7 @@ let gridSize = 50;
 let gridOffset = { x: 0, y: 0 };
 let isPanning = false;
 let gridGroup;
+let gridUpdateTimeout;
 
 document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('canvas-container');
@@ -35,36 +36,67 @@ function createGrid() {
 }
 
 function updateGrid() {
-  const stagePos = stage.position();
-  const viewportWidth = stage.width();
-  const viewportHeight = stage.height();
-
-  const startX = Math.floor((0 - stagePos.x) / gridSize) * gridSize;
-  const endX = Math.ceil((viewportWidth - stagePos.x) / gridSize) * gridSize;
-  const startY = Math.floor((0 - stagePos.y) / gridSize) * gridSize;
-  const endY = Math.ceil((viewportHeight - stagePos.y) / gridSize) * gridSize;
-
-  gridGroup.destroyChildren();
-
-  for (let x = startX; x <= endX; x += gridSize) {
-    const line = new Konva.Line({
-      points: [x, startY, x, endY],
-      stroke: '#ddd',
-      strokeWidth: 1,
-    });
-    gridGroup.add(line);
+    //clear any grid updates pending to update
+  clearTimeout(gridUpdateTimeout);
+  
+  gridUpdateTimeout = setTimeout(() => {
+        const stagePos = stage.position();
+        const scale = stage.scaleX();
+        const viewportWidth = stage.width() / scale;
+        const viewportHeight = stage.height() / scale;
+    
+        const startX = Math.floor((0 - stagePos.x / scale) / gridSize) * gridSize;
+        const endX = Math.ceil((viewportWidth - stagePos.x / scale) / gridSize) * gridSize;
+        const startY = Math.floor((0 - stagePos.y / scale) / gridSize) * gridSize;
+        const endY = Math.ceil((viewportHeight - stagePos.y / scale) / gridSize) * gridSize;
+    
+        gridGroup.destroyChildren();
+    
+        for (let x = startX; x <= endX; x += gridSize) {
+          const line = new Konva.Line({
+            points: [x, startY, x, endY],
+            stroke: '#ddd',
+            strokeWidth: 1 / scale,
+          });
+          gridGroup.add(line);
+        }
+    
+        for (let y = startY; y <= endY; y += gridSize) {
+          const line = new Konva.Line({
+            points: [startX, y, endX, y],
+            stroke: '#ddd',
+            strokeWidth: 1 / scale,
+          });
+          gridGroup.add(line);
+        }
+    
+        gridLayer.batchDraw();
+  }, 0);
   }
+}
 
-  for (let y = startY; y <= endY; y += gridSize) {
-    const line = new Konva.Line({
-      points: [startX, y, endX, y],
-      stroke: '#ddd',
-      strokeWidth: 1,
-    });
-    gridGroup.add(line);
-  }
-
-  gridLayer.batchDraw();
+function handleZoom(e) {
+    e.evt.preventDefault();
+    
+    const oldScale = stage.scaleX();
+    const pointer = stage.getPointerPosition();
+    const mousePointTo = {
+        x: (pointer.x - stage.x()) / oldScale,
+        y: (pointer.y - stage.y()) / oldScale,
+    };
+    
+    const newScale = e.evt.deltaY > 0 ? oldScale * 0.9 : oldScale * 1.1;
+    
+    stage.scale({ x: newScale, y: newScale });
+    
+    const newPos = {
+        x: pointer.x - mousePointTo.x * newScale,
+        y: pointer.y - mousePointTo.y * newScale,
+    };
+    stage.position(newPos);
+    
+    updateGrid();
+    stage.batchDraw();
 }
 
 function setupEventListeners() {
@@ -97,6 +129,7 @@ function setupEventListeners() {
   stage.on('mousedown', handleMouseDown);
   stage.on('mousemove', handleMouseMove);
   stage.on('mouseup', handleMouseUp);
+  stage.on('wheel', handleZoom);
 
   document.getElementById('new-map-option').addEventListener('click', showNewMapOverlay);
   document.getElementById('toggle-toolbox').addEventListener('click', toggleToolbox);
