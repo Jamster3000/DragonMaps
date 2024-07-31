@@ -140,6 +140,10 @@ function setupEventListeners() {
   stage.on('mouseup', handleMouseUp);
   stage.on('wheel', handleZoom);
 
+  stage.on('contextmenu', function (e) {
+    menuNode.style.display = 'initial';
+  });
+
   document.getElementById('new-map-option').addEventListener('click', showNewMapOverlay);
   document.getElementById('toggle-toolbox').addEventListener('click', toggleToolbox);
   document.addEventListener('keydown', handleKeyDown);
@@ -337,7 +341,3 @@ function getToolOptions(tool) {
       return [];
   }
 }
-
-stage.on('contextmenu', function (e) {
-    menuNode.style.display = 'initial';
-});
