@@ -72,7 +72,6 @@ function updateGrid() {
     
         gridLayer.batchDraw();
   }, 0);
-  }
 }
 
 function handleZoom(e) {
