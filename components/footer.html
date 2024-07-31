@@ -12,10 +12,15 @@
   margin: 0;
 }
 
+.footer-links {
+  display: flex;
+  gap: 30px; /* This creates space between the links */
+}
+
 .footer-links a {
   margin-left: 20px;
   text-decoration: none;
-  gap: 20px;
+  color: #333;
 }
 
 .footer-links a:hover {
@@ -42,7 +47,7 @@
 <footer>
   <div class="footer-content">
     <p>&copy; 2024 DragonMaps. All rights reserved.</p>
-    <nav>
+    <nav class="footer-links">
       <a href="pages/privacy-policy">Privacy Policy</a>
       <a href="pages/terms-of-service">Terms of Service</a>
       <a href="pages/attributions">Attributions</a></footer>
