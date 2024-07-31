@@ -131,7 +131,7 @@ function setupEventListeners() {
   });
 
   stage.content.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
+    menuNode.style.display = 'initial';
   });
 
   // Handle mouse events
@@ -139,10 +139,6 @@ function setupEventListeners() {
   stage.on('mousemove', handleMouseMove);
   stage.on('mouseup', handleMouseUp);
   stage.on('wheel', handleZoom);
-
-  stage.on('contextmenu', function (e) {
-    menuNode.style.display = 'initial';
-  });
 
   document.getElementById('new-map-option').addEventListener('click', showNewMapOverlay);
   document.getElementById('toggle-toolbox').addEventListener('click', toggleToolbox);
