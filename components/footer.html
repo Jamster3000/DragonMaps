@@ -1,4 +1,56 @@
+<style>
+  footer {
+  background-color: #f8f8f8;
+  padding: 20px 0;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-content p {
+  margin: 0;
+}
+
+.footer-links a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #333;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-links {
+    margin-top: 10px;
+  }
+  
+  .footer-links a {
+    margin: 0 10px;
+  }
+}
+</style>
+
 <footer>
-  <p>&copy; 2024 DragonMaps. All rights reserved.</p>
-  <a href="pages/privacy-policy">Privacy Policy</a>
+  <div class="footer-content">
+    <p>&copy; 2024 DragonMaps. All rights reserved.</p>
+    <nav>
+      <a href="pages/privacy-policy">Privacy Policy</a>
+      <a href="pages/terms-of-service">Terms of Service</a>
+      <a href="pages/attributions">Attributions</a></footer>
+    </nav>
+  </div>
 </footer>
