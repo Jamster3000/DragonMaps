@@ -339,12 +339,5 @@ function getToolOptions(tool) {
 }
 
 stage.on('contextmenu', function (e) {
-    // prevent default behavior
-    e.evt.preventDefault();
-    if (e.target === stage) {
-      // if we are on empty place of the stage we will do nothing
-      return;
-    }
-    
     menuNode.style.display = 'initial';
 });
