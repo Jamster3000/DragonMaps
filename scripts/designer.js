@@ -7,6 +7,7 @@ let gridOffset = { x: 0, y: 0 };
 let isPanning = false;
 let gridGroup;
 let gridUpdateTimeout;
+var menuNode = document.getElementById('menu');
 
 document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('canvas-container');
@@ -34,6 +35,25 @@ function createGrid() {
   }
   updateGrid();
 }
+
+document.getElementById('test').addEventListener('click', () => {
+    alert("yay");
+});
+
+window.addEventListener('click', () => {
+  // hide menu
+  menuNode.style.display = 'none';
+});
+
+stage.on('contextmenu', function (e) {
+    // prevent default behavior
+    e.evt.preventDefault();
+    if (e.target === stage) {
+      // if we are on empty place of the stage we will do nothing
+      return;
+    }
+    
+    menuNode.style.display = 'initial';
 
 function updateGrid() {
     //clear any grid updates pending to update
@@ -72,6 +92,7 @@ function updateGrid() {
     
         gridLayer.batchDraw();
   }, 0);
+  }
 }
 
 function handleZoom(e) {
