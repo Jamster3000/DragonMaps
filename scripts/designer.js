@@ -130,9 +130,12 @@ function setupEventListeners() {
     }
   });
 
-  stage.content.addEventListener('contextmenu', (e) => {
+  stage.content.addEventListener('contextmenu', function(e) => {
     e.evt.preventDefault();
     menuNode.style.display = 'initial';
+    console.log(target.e);
+    menuNode.style.top = containerRect.top + stage.getPointerPosition().y + 4 + 'px';
+    menuNode.style.left = containerRect.left + stage.getPointerPosition().x + 4 + 'px';
   });
 
   // Handle mouse events
