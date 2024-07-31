@@ -54,6 +54,7 @@ stage.on('contextmenu', function (e) {
     }
     
     menuNode.style.display = 'initial';
+});
 
 function updateGrid() {
     //clear any grid updates pending to update
