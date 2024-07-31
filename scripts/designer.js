@@ -130,7 +130,7 @@ function setupEventListeners() {
     }
   });
 
-  stage.content.addEventListener('contextmenu', function(e) => {
+  stage.content.addEventListener('contextmenu', function(e) {
     e.evt.preventDefault();
     menuNode.style.display = 'initial';
     console.log(target.e);
