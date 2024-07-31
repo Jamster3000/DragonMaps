@@ -49,18 +49,6 @@ header, footer {
     border-bottom: 2px solid var(--primary-color);
 }
 
-.logo {
-    font-family: 'Cinzel', serif;
-    font-size: 28px;
-    color: var(--secondary-color);
-    text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
-}
-
-.logo a:link{
-    color: var(--secondary-color);
-    text-decoration: none;
-}
-
 nav {
     display: flex;
     justify-content: space-between;
@@ -86,6 +74,18 @@ nav ul li a {
 
 nav ul li a:hover {
     color: var(--accent-color);
+}
+
+.logo {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--secondary-color);
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+.logo a:link{
+    color: var(--secondary-color);
+    text-decoration: none;
 }
 
 main {
