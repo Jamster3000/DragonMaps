@@ -5,25 +5,29 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        const email = document.getElementById('email').value;
-        const message = document.getElementById('message').value;
+        const formData = new FormData(form);
 
-        // Here you would typically send the data to a server
-        // Since this is client-side only, we'll simulate a response
-
-        // Simulate processing time
         responseDiv.textContent = 'Sending...';
         responseDiv.className = '';
 
-        setTimeout(() => {
-            if (email && message) {
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
                 responseDiv.textContent = 'Thank you for your message. We\'ll get back to you soon!';
                 responseDiv.className = 'success';
                 form.reset(); // Clear the form
             } else {
-                responseDiv.textContent = 'Please fill out all fields.';
-                responseDiv.className = 'error';
+                throw new Error('Form submission failed');
             }
-        }, 1500);
+        }).catch(error => {
+            responseDiv.textContent = 'Sorry, an error occurred. Please try again later.';
+            responseDiv.className = 'error';
+            console.error('Form submission error:', error);
+        });
     });
 });
