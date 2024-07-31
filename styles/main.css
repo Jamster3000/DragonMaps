@@ -99,11 +99,29 @@ main {
     to { opacity: 1; transform: translateY(0); }
 }
 
-h1, h2, h3 {
+h1{
     font-family: 'Cinzel', serif;
     color: var(--secondary-color);
     margin-bottom: 1.5rem;
     font-size: 2.5rem;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    animation: headerGlow 4s infinite alternate;
+}
+
+h2{
+    font-family: 'Cinzel', serif;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    animation: headerGlow 4s infinite alternate;
+}
+
+h3{
+    font-family: 'Cinzel', serif;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
     text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
     animation: headerGlow 4s infinite alternate;
 }
