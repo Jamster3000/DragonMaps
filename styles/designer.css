@@ -385,10 +385,10 @@ footer {
 
 
 #right-panel {
-    position: absolute;
+    position: fixed;
     top: 50px;
-    right: -350px;
-    width: 350px;
+    right: -30%;
+    width: 30%;
     height: calc(100% - 70px);
     background-color: var(--background-color);
     border-left: 1px solid var(--primary-color);
@@ -405,7 +405,8 @@ footer {
     right: 0;
     top: 0;
     bottom: 0;
-    width: 250px; /* Adjust as needed */
+    max-width: 250px;
+    width: 100%; /* Adjust as needed */
     background-color: #f0f0f0;
     transition: transform 0.3s ease-in-out;
     transform: translateX(100%);
