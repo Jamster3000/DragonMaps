@@ -56,10 +56,9 @@ document.addEventListener('DOMContentLoaded', function () {
             { key: 'D', description: 'Select draw tool' },
             { key: 'E', description: 'Select erase tool' },
             { key: 'S', description: 'Select select tool' },
-            { key: 'F', description: 'Select fill tool' },
             { key: 'Ctrl + Z', description: 'Undo' },
             { key: 'Ctrl + Y', description: 'Redo' },
-            // Add more shortcuts here
+            { key: 'Alt + N', description: 'New Map' }
         ];
 
         shortcutsTable.innerHTML = shortcuts.map(shortcut => `
