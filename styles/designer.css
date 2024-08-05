@@ -29,18 +29,18 @@ body {
     box-shadow: 0 0 5px grey;
     border-radius: 3px;
 }
-    
-#menu button {
-    width: 100%;
-    background-color: white;
-    border: none;
-    margin: 0;
-    padding: 10px;
-}
-    
-#menu button:hover {
-    background-color: lightgray;
-}
+
+    #menu button {
+        width: 100%;
+        background-color: white;
+        border: none;
+        margin: 0;
+        padding: 10px;
+    }
+
+        #menu button:hover {
+            background-color: lightgray;
+        }
 
 h2 {
     font-family: 'Cinzel', serif;
@@ -61,9 +61,9 @@ button {
     transition: background-color 0.3s ease;
 }
 
-button:hover {
-    background-color: var(--accent-color);
-}
+    button:hover {
+        background-color: var(--accent-color);
+    }
 
 /* Magical Background */
 .magical-background {
@@ -72,10 +72,7 @@ button:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
-        radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 20% 20%, rgba(255, 107, 107, 0.05) 0%, transparent 30%),
-        radial-gradient(circle at 80% 80%, rgba(255, 69, 0, 0.05) 0%, transparent 30%);
+    background-image: radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%), radial-gradient(circle at 20% 20%, rgba(255, 107, 107, 0.05) 0%, transparent 30%), radial-gradient(circle at 80% 80%, rgba(255, 69, 0, 0.05) 0%, transparent 30%);
     background-size: 100% 100%, 50% 50%, 75% 75%;
     background-repeat: no-repeat;
     animation: backgroundShimmer 20s infinite alternate;
@@ -83,8 +80,13 @@ button:hover {
 }
 
 @keyframes backgroundShimmer {
-    0% { background-position: 0% 0%; }
-    100% { background-position: 100% 100%; }
+    0% {
+        background-position: 0% 0%;
+    }
+
+    100% {
+        background-position: 100% 100%;
+    }
 }
 
 /* Header and Navigation */
@@ -211,16 +213,16 @@ footer {
     right: 0;
 }
 
-.dropdown-content a {
-    color: var(--text-color);
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
+    .dropdown-content a {
+        color: var(--text-color);
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
 
-.dropdown-content a:hover {
-    background-color: var(--accent-color);
-}
+        .dropdown-content a:hover {
+            background-color: var(--accent-color);
+        }
 
 .dropdown:hover .dropdown-content {
     display: block;
@@ -240,9 +242,9 @@ footer {
     overflow-x: hidden;
 }
 
-#toolbox.visible {
-    left: 0;
-}
+    #toolbox.visible {
+        left: 0;
+    }
 
 #toggle-toolbox {
     position: fixed;
@@ -258,9 +260,9 @@ footer {
     transition: transform 0.2s ease;
 }
 
-#toggle-toolbox:hover {
-    transform: translateY(-50%) scale(1.1);
-}
+    #toggle-toolbox:hover {
+        transform: translateY(-50%) scale(1.1);
+    }
 
 #toolbox button {
     display: flex;
@@ -319,10 +321,10 @@ footer {
     border-radius: 5px;
 }
 
-.overlay-content input {
-    display: block;
-    margin-bottom: 10px;
-}
+    .overlay-content input {
+        display: block;
+        margin-bottom: 10px;
+    }
 
 /* Popup Toolbox */
 .popup-toolbox {
@@ -336,24 +338,24 @@ footer {
     color: var(--text-color);
 }
 
-.popup-toolbox h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
+    .popup-toolbox h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
 
 .tool-option {
     margin-bottom: 10px;
 }
 
-.tool-option label {
-    display: inline-block;
-    width: 100px;
-}
+    .tool-option label {
+        display: inline-block;
+        width: 100px;
+    }
 
-.tool-option input,
-.tool-option select {
-    width: 150px;
-}
+    .tool-option input,
+    .tool-option select {
+        width: 150px;
+    }
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -409,9 +411,9 @@ footer {
     transform: translateX(100%);
 }
 
-    #right-panel.visible {
-        right: 0;
-    }
+#right-panel.visible {
+    right: 0;
+}
 
 
 #toggle-right-panel {
@@ -640,7 +642,7 @@ button {
     }
 
     #shortcuts-table kbd {
-        background-color: #f1f1f1;
+        background-color: var(--header-color);
         border: 1px solid #ccc;
         border-radius: 3px;
         padding: 2px 4px;
