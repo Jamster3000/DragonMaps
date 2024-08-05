@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { key: 'S', description: 'Select select tool' },
             { key: 'Ctrl + Z', description: 'Undo' },
             { key: 'Ctrl + Y', description: 'Redo' },
-            { key: 'Alt + N', description: 'New Map' }
+            { key: 'Alt + N', description: 'New Map' },
         ];
 
         shortcutsTable.innerHTML = shortcuts.map(shortcut => `
