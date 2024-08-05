@@ -11,9 +11,7 @@
     <script src="https://unpkg.com/konva@8.4.2/konva.min.js"></script>
 </head>
 <body class="designer-page">
-    <div id="menu">
-        <button id="test">Test</button>
-    </div>
+    <div id="menu"></div>
     <header class="designer-header">
         <nav>
             <div class="logo"><a href="/" style="color: #FF6B6B; text-decoration: none;">DragonMaps Designer</a></div>
@@ -40,6 +38,13 @@
                         <a id="show-grid-menu-item" title="Toggle the grid visibility: (ALT+G)" href="#">Show Grid</a>
                     </div>
                 </div>
+                <div id="help-menu" class="dropdown">
+                    <button class="dropbtn">Help</button>
+                    <div class="dropdown-content">
+                        <a hred="#" id="shortcuts" title="List of shortcuts for the DragonMap Designer.">Shortcuts</a>
+                        <a href="tutorials.html" id="tutorals" title="See DragonMaps tutorials.">Tutorial</a>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
@@ -50,7 +55,6 @@
             <button data-tool="draw" title="Draw"><i class="fas fa-pencil-alt"></i></button>
             <button data-tool="erase" title="Erase"><i class="fas fa-eraser"></i></button>
             <button data-tool="select" title="Select"><i class="fas fa-mouse-pointer"></i></button>
-            <button data-tool="fill" title="Fill"><i class="fas fa-fill-drip"></i></button>
             <button data-tool="text" title="Text"><i class="fa-solid fa-font"></i></button>
             <button data-tool="shape" title="Shape"><i class="fa-solid fa-shapes"></i></button>
         </div>
@@ -64,6 +68,8 @@
         </section>
 
         <div id="toolbar-popup"></div>
+
+        <button id="toggle-right-panel">&#9668;&#9668;</button>
         <aside id="right-panel">
             <div class="panel-section" id="layers-section">
                 <h3 class="section-header">Layers <span class="toggle-icon">▼</span></h3>
@@ -89,6 +95,14 @@
                 </div>
             </div>
         </aside>
+
+        <div id="shortcuts-overlay" class="overlay">
+            <div class="overlay-content">
+                <h2>Keyboard Shortcuts</h2>
+                <table id="shortcuts-table"></table>
+                <button id="close-shortcuts">Close</button>
+            </div>
+        </div>
     </main>
     <script src="../scripts/designer.js"></script>
     <script src="../scripts/archive.js"></script>

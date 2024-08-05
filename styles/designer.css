@@ -247,7 +247,7 @@ footer {
 #toggle-toolbox {
     position: fixed;
     top: 10%;
-    left: 10px;
+    left: 20px;
     transform: translateY(-50%);
     background: rgba(0, 0, 0, 0.5);
     color: white;
@@ -383,14 +383,54 @@ footer {
 
 
 #right-panel {
+    position: fixed;
+    top: 50px;
+    right: -350px;
     width: 350px;
-    height: 100%;
-    overflow-y: auto;
+    height: calc(100% - 70px);
     background-color: var(--background-color);
     border-left: 1px solid var(--primary-color);
     color: var(--text-color);
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
+    padding: 10px;
+    overflow-y: auto;
     overflow-x: hidden;
 }
+
+#right-sidebar {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 250px; /* Adjust as needed */
+    background-color: #f0f0f0;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%);
+}
+
+    #right-panel.visible {
+        right: 0;
+    }
+
+
+#toggle-right-panel {
+    position: fixed;
+    top: 10%;
+    right: 25px;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 1001;
+    transition: transform 0.2s ease;
+}
+
+    #toggle-right-panel:hover {
+        transform: translateY(-50%) scale(1.1);
+    }
 
 .panel-section {
     margin-bottom: 5px;
@@ -497,6 +537,57 @@ button {
         object-fit: contain;
     }
 
+#right-panel button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    #right-panel button:hover {
+        background-color: var(--accent-color);
+        transform: scale(1.05);
+    }
+
+    #right-panel button i {
+        font-size: 20px;
+    }
+
+    #right-panel button.active {
+        background-color: var(--accent-color);
+        box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+    }
+
+    #right-panel button::after {
+        content: attr(title);
+        position: absolute;
+        left: 120%;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: var(--header-color);
+        color: var(--text-color);
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 9999;
+    }
+
+    #right-panel button:hover::after {
+        opacity: 1;
+    }
+
 /* Webkit Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 12px;
@@ -514,4 +605,44 @@ button {
 
     ::-webkit-scrollbar-thumb:hover {
         background-color: var(--accent-color);
+    }
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.overlay-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 80%;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+#shortcuts-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+    #shortcuts-table td {
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #shortcuts-table kbd {
+        background-color: #f1f1f1;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 2px 4px;
+        font-family: monospace;
     }

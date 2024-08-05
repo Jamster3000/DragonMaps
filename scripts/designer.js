@@ -4,6 +4,7 @@ let isDrawing = false;
 let lastLine;
 let gridSize = 50;
 let gridActive = true;
+let gridPattern;
 let gridOffset = {
     x: 0,
     y: 0
@@ -16,8 +17,8 @@ let actionHistory = [];
 let currentActionIndex = -1;
 let activeMenu = null;
 let activeMenuItem = -1;
-let isRightMouseDown = false;
 let isShowingContextMenu = false;
+let isRightMouseDown = false;
 let rightClickStartPos = null;
 let rightClickStartTime = null;
 const MOVE_THRESHOLD = 5; // pixels
@@ -25,6 +26,55 @@ const CLICK_DURATION_THRESHOLD = 200; // milliseconds
 
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('canvas-container');
+    const rightPanel = document.getElementById('right-panel');
+    const toggleRightPanelButton = document.getElementById('toggle-right-panel');
+    const shortcutsLink = document.getElementById('shortcuts');
+    const shortcutsOverlay = document.getElementById('shortcuts-overlay');
+    const closeShortcuts = document.getElementById('close-shortcuts');
+    const shortcutsTable = document.getElementById('shortcuts-table');
+
+    toggleRightPanelButton.addEventListener('click', toggleRightPanel);
+    shortcutsLink.addEventListener('click', showShortcuts);
+    closeShortcuts.addEventListener('click', hideShortcuts);
+
+    function toggleRightPanel() {
+        rightPanel.classList.toggle('visible');
+        if (rightPanel.classList.contains('visible')) {
+            toggleRightPanelButton.innerHTML = '&#9658;&#9658;';
+            toggleRightPanelButton.style.right = '377px'; // Adjust this value based on your panel width
+        } else {
+            toggleRightPanelButton.innerHTML = '&#9668;&#9668;';
+            toggleRightPanelButton.style.right = '25px';
+        }
+    }
+
+    function showShortcuts() {
+        const shortcuts = [
+            { key: 'Alt + T', description: 'Toggle toolbox' },
+            { key: 'Alt + G', description: 'Toggle grid' },
+            { key: 'Alt + N', description: 'New map' },
+            { key: 'D', description: 'Select draw tool' },
+            { key: 'E', description: 'Select erase tool' },
+            { key: 'S', description: 'Select select tool' },
+            { key: 'F', description: 'Select fill tool' },
+            { key: 'Ctrl + Z', description: 'Undo' },
+            { key: 'Ctrl + Y', description: 'Redo' },
+            // Add more shortcuts here
+        ];
+
+        shortcutsTable.innerHTML = shortcuts.map(shortcut => `
+            <tr>
+                <td><kbd>${shortcut.key}</kbd></td>
+                <td>${shortcut.description}</td>
+            </tr>
+        `).join('');
+
+        shortcutsOverlay.style.display = 'flex';
+    }
+
+    function hideShortcuts() {
+        shortcutsOverlay.style.display = 'none';
+    }
 
     stage = new Konva.Stage({
         container: 'canvas-container',
@@ -48,9 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     stage.content.addEventListener('contextmenu', function (e) {
         e.preventDefault();
-        if (!isPanning) {
-            showContextMenu(e);
-        }
+        
     });
 
     document.addEventListener('click', function () {
@@ -100,9 +148,10 @@ document.addEventListener('click', function (event) {
     if (activeMenu && !document.getElementById(`${activeMenu}-menu`).contains(event.target)) {
         toggleMenu(activeMenu);
     }
+
     if (!isShowingContextMenu) {
         hideContextMenu(); // Hide the context menu on click if it is not being shown
-    }
+    } 
 });
 
 //Toggles the toolbox visibility with the alt+t shortcut key
@@ -152,6 +201,10 @@ function setupEventListeners() {
         e.evt.preventDefault();
     });
 
+    stage.on('click', function () {
+        hideContextMenu();
+    });
+
     // Handle mouse events
     stage.on('mousedown', handleMouseDown);
     stage.on('mousemove', handleMouseMove);
@@ -191,19 +244,22 @@ function onDrop(e) {
     e.preventDefault();
     const imageUrl = e.dataTransfer.getData('text');
 
-    // Calculate where to place the image on the stage
-    const stageRect = stage.container().getBoundingClientRect();
-    const x = e.clientX - stageRect.left;
-    const y = e.clientY - stageRect.top;
+    // Get the stage's container's bounding rectangle
+    const stageContainer = stage.container();
+    const stageRect = stageContainer.getBoundingClientRect();
+
+    // Calculate the drop position relative to the stage
+    const dropX = ((e.clientX-40) - stageRect.left - stage.x()) / stage.scaleX();
+    const dropY = ((e.clientY-40) - stageRect.top - stage.y()) / stage.scaleY();
 
     // Create a new Konva Image
     const imageObj = new Image();
     imageObj.onload = function () {
         const konvaImage = new Konva.Image({
-            x: x,
-            y: y,
+            x: dropX,
+            y: dropY,
             image: imageObj,
-            draggable: true // Make the image draggable within the Konva stage
+            draggable: true
         });
 
         // Add the image to the layer
@@ -247,7 +303,6 @@ function showNewMapOverlay() {
 
 //updates the grid when it's being drawn on or otherwise changed
 function updateGrid() {
-    //clear any grid updates pending to update
     clearTimeout(gridUpdateTimeout);
 
     gridUpdateTimeout = setTimeout(() => {
@@ -263,29 +318,30 @@ function updateGrid() {
 
         gridGroup.destroyChildren();
 
+        const verticalLines = [];
+        const horizontalLines = [];
+
         for (let x = startX; x <= endX; x += gridSize) {
-            const line = new Konva.Line({
+            verticalLines.push(new Konva.Line({
                 points: [x, startY, x, endY],
                 stroke: '#ddd',
                 strokeWidth: 1 / scale,
-            });
-            gridGroup.add(line);
+            }));
         }
 
         for (let y = startY; y <= endY; y += gridSize) {
-            const line = new Konva.Line({
+            horizontalLines.push(new Konva.Line({
                 points: [startX, y, endX, y],
                 stroke: '#ddd',
                 strokeWidth: 1 / scale,
-            });
-            gridGroup.add(line);
+            }));
         }
 
+        gridGroup.add(...verticalLines, ...horizontalLines);
         gridLayer.batchDraw();
-
-        dragElement(document.getElementById("popup-toolbox"));
     }, 0);
 }
+
 
 //snap to grid calculation
 function snapToGrid(x, y) {
@@ -411,17 +467,57 @@ function hideContextMenu() {
 //shows the right click menu
 function showContextMenu(e) {
     if (isPanning) {
-        return; // Skip showing context menu if panning is active
+        return;
     }
 
-    console.log("Showing context menu");
     const menuNode = document.getElementById('menu');
-    menuNode.style.display = 'initial';
+    menuNode.innerHTML = ''; // Clear existing menu items
+
+    const menuItems = [
+        { label: 'Add Text', action: addText },
+        { label: 'Paste', action: paste },
+    ];
+
+    menuItems.forEach(item => {
+        const menuItem = document.createElement('div');
+        menuItem.textContent = item.label;
+        menuItem.addEventListener('click', () => {
+            item.action(e);
+            hideContextMenu();
+        });
+        menuNode.appendChild(menuItem);
+    });
+
+    menuNode.style.display = 'block';
     menuNode.style.top = `${e.evt.clientY}px`;
     menuNode.style.left = `${e.evt.clientX}px`;
 
-    // Set context menu state
     isShowingContextMenu = true;
+}
+
+function addText(e) {
+    // Add text at the clicked position
+    console.log('Add text');
+}
+
+function addShape(e) {
+    // Add a shape at the clicked position
+    console.log('Add shape');
+}
+
+function paste(e) {
+    // Paste copied content at the clicked position
+    console.log('Paste');
+}
+
+function selectAll() {
+    // Select all elements on the canvas
+    console.log('Select all');
+}
+
+function clearAll() {
+    // Clear all elements on the canvas
+    console.log('Clear all');
 }
 
 
@@ -557,7 +653,7 @@ function handleKeyUp(e) {
 
 //handles the mouse movement
 function handleMouseMove(e) {
-    if (rightClickStartPos) {
+    if (isRightMouseDown) {
         const currentPos = stage.getPointerPosition();
         const dx = currentPos.x - rightClickStartPos.x;
         const dy = currentPos.y - rightClickStartPos.y;
@@ -587,8 +683,11 @@ function handleMouseUp(e) {
         const clickDuration = Date.now() - rightClickStartTime;
         if (!isPanning && clickDuration < CLICK_DURATION_THRESHOLD) {
             showContextMenu(e);
+        } else {
+            hideContextMenu();
         }
         isPanning = false;
+        isRightMouseDown = false;
         rightClickStartPos = null;
         rightClickStartTime = null;
         stage.container().style.cursor = 'default';
@@ -600,6 +699,8 @@ function handleMouseUp(e) {
 //handles when a mouse button is pressed down
 function handleMouseDown(e) {
     if (e.evt.button === 2) { // Right mouse button
+        hideContextMenu(); // Hide the context menu when starting a new right-click action
+        isRightMouseDown = true;
         rightClickStartPos = stage.getPointerPosition();
         rightClickStartTime = Date.now();
         isPanning = false; // Don't start panning immediately
