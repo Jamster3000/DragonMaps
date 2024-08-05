@@ -621,7 +621,7 @@ button {
 }
 
 .overlay-content {
-    background-color: white;
+    background-color: --background-color;
     padding: 20px;
     border-radius: 5px;
     max-width: 80%;
