@@ -1,4 +1,4 @@
-﻿let stage, layer, gridLayer;
+let stage, layer, gridLayer;
 let currentTool = null;
 let isDrawing = false;
 let lastLine;
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     stage.content.addEventListener('contextmenu', function (e) {
         e.preventDefault();
-        
+
     });
 
     document.addEventListener('click', function () {
@@ -150,7 +150,7 @@ document.addEventListener('click', function (event) {
 
     if (!isShowingContextMenu) {
         hideContextMenu(); // Hide the context menu on click if it is not being shown
-    } 
+    }
 });
 
 //Toggles the toolbox visibility with the alt+t shortcut key
@@ -248,8 +248,8 @@ function onDrop(e) {
     const stageRect = stageContainer.getBoundingClientRect();
 
     // Calculate the drop position relative to the stage
-    const dropX = ((e.clientX-40) - stageRect.left - stage.x()) / stage.scaleX();
-    const dropY = ((e.clientY-40) - stageRect.top - stage.y()) / stage.scaleY();
+    const dropX = ((e.clientX - 40) - stageRect.left - stage.x()) / stage.scaleX();
+    const dropY = ((e.clientY - 40) - stageRect.top - stage.y()) / stage.scaleY();
 
     // Create a new Konva Image
     const imageObj = new Image();
