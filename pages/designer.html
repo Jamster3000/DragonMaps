@@ -1,85 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Create and share epic D&D battlemaps with DragonMaps. Design your maps with our easy-to-use online tool.">
-  <title>DragonMaps - D&D Battlemap Creator</title>
-  <link rel="stylesheet" href="../styles/designer.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap">
-  <script src="https://unpkg.com/konva@8.4.2/konva.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create and share epic D&D battlemaps with DragonMaps. Design your maps with our easy-to-use online tool.">
+    <title>DragonMaps - D&D Battlemap Creator</title>
+    <link rel="stylesheet" href="../styles/designer.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script src="https://unpkg.com/konva@8.4.2/konva.min.js"></script>
 </head>
 <body class="designer-page">
-  <div id="menu">
-    <button id="test">Test</button>
-  </div>
-  <header class="designer-header">
-    <nav>
-      <div class="logo"><a href="/" style="color: #FF6B6B; text-decoration: none;">DragonMaps Designer</a></div>
-      <ul>
-        <li class="dropdown">
-          <a href="#" class="dropbtn">File</a>
-          <div class="dropdown-content">
-            <a href="#" id="new-map-option">New</a>
-            <a href="#">Open</a>
-            <a href="#">Save</a>
-          </div>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropbtn">Edit</a>
-          <div class="dropdown-content">
-            <a href="#">Undo</a>
-            <a href="#">Redo</a>
-            <a href="#">Copy</a>
-            <a href="#">Paste</a>
-          </div>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropbtn">View</a>
-          <div class="dropdown-content">
-            <a href="#">Zoom In</a>
-            <a href="#">Zoom Out</a>
-            <a href="#">Grid</a>
-          </div>
-        </li>
-      </ul>
-    </nav>
-  </header>
-  <main id="designer-container">
-    <button id="toggle-toolbox" class="toggle-button">&#9668;&#9668;</button>
-    <div id="toolbox" class="toolbox-overlay">
-      <h2>Tools</h2>
-      <button data-tool="draw">Draw</button>
-      <button data-tool="erase">Erase</button>
-      <button data-tool="select">Select</button>
-      <button data-tool="fill">Fill</button>
+    <div id="menu">
+        <button id="test">Test</button>
     </div>
-    <div id="popup-toolbox" class="popup-toolbox">
-      <h3>Tool Options</h3>
-      <div id="tool-options"></div>
-    </div>
-    
-    <section id="canvas-container">
-      <!-- Konva will create its own canvas elements here from the script/designer.js -->
-    </section>
-    
-    <div id="toolbar-popup"></div>
-    <aside id="asset-library">
-      <h2>Assets</h2>
-      <div class="asset-category">
-        <h3>Terrain</h3>
-        <div class="asset-item">Grass</div>
-        <div class="asset-item">Water</div>
-        <div class="asset-item">Mountain</div>
-      </div>
-      <div class="asset-category">
-        <h3>Objects</h3>
-        <div class="asset-item">Tree</div>
-        <div class="asset-item">Rock</div>
-        <div class="asset-item">House</div>
-      </div>
-    </aside>
-  </main>
-  <script src="../scripts/designer.js"></script>
+    <header class="designer-header">
+        <nav>
+            <div class="logo"><a href="/" style="color: #FF6B6B; text-decoration: none;">DragonMaps Designer</a></div>
+            <div class="menu-container">
+                <div id="file-menu" class="dropdown">
+                    <button class="dropbtn">File</button>
+                    <div class="dropdown-content">
+                        <a href="#" id="new-map-option" title="New Map, clearing the existing creation: (ALT+n)">New</a>
+                        <a href="#" title="open a map that has already been exported via Json">Open</a>
+                        <a href="#" title="Import your own selection of assets. This will be kept stored on your device and will need to be reimported if you clear your devices cache.">Import</a>
+                    </div>
+                </div>
+                <div id="edit-menu" class="dropdown">
+                    <button class="dropbtn">Edit</button>
+                    <div class="dropdown-content">
+                        <a id="undo-menu-item" title="CTRL+Z" href="#">Undo</a>
+                        <a id="redo-menu-item" title="CTRL+Y" href="#">Redo</a>
+                        <a id="grid-settings" title="Customize the grid to your liking" href="#">Grid Settings</a>
+                    </div>
+                </div>
+                <div id="view-menu" class="dropdown">
+                    <button class="dropbtn">View</button>
+                    <div class="dropdown-content">
+                        <a id="show-grid-menu-item" title="Toggle the grid visibility: (ALT+G)" href="#">Show Grid</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main id="designer-container">
+        <button id="toggle-toolbox" class="toggle-button">&#9668;&#9668;</button>
+        <div id="toolbox" class="toolbox-overlay">
+            <h2>Tools</h2>
+            <button data-tool="draw" title="Draw"><i class="fas fa-pencil-alt"></i></button>
+            <button data-tool="erase" title="Erase"><i class="fas fa-eraser"></i></button>
+            <button data-tool="select" title="Select"><i class="fas fa-mouse-pointer"></i></button>
+            <button data-tool="fill" title="Fill"><i class="fas fa-fill-drip"></i></button>
+            <button data-tool="text" title="Text"><i class="fa-solid fa-font"></i></button>
+            <button data-tool="shape" title="Shape"><i class="fa-solid fa-shapes"></i></button>
+        </div>
+        <div id="popup-toolbox" title="Hold click and drag to move this window" class="popup-toolbox">
+            <h3>Tool Options</h3>
+            <div id="tool-options"></div>
+        </div>
+
+        <section id="canvas-container">
+            <!-- Konva will create its own canvas elements here from the script/designer.js -->
+        </section>
+
+        <div id="toolbar-popup"></div>
+        <aside id="right-panel">
+            <div class="panel-section" id="layers-section">
+                <h3 class="section-header">Layers <span class="toggle-icon">▼</span></h3>
+                <div class="section-content">
+                    <ul id="layer-list">
+                        <!-- Layers will be added here dynamically -->
+                    </ul>
+                    <button id="add-layer" title="Create a new layer, this will not remove anything you've previously done.">Add Layer</button>
+                </div>
+            </div>
+
+            <div class="panel-section" id="assets-section">
+                <h3 class="section-header">Assets <span class="toggle-icon">▼</span></h3>
+                <div class="section-content">
+                </div>
+            </div>
+
+            <div class="panel-section" id="export-section">
+                <h3 class="section-header">Export <span class="toggle-icon">▼</span></h3>
+                <div class="section-content">
+                    <button id="export-image" title="Export your creation as an image">Export as Image</button>
+                    <button id="export-json" title="Export your image as a super special data structured format. You can use this to open your map back into dragonMaps.">Export as JSON</button>
+                </div>
+            </div>
+        </aside>
+    </main>
+    <script src="../scripts/designer.js"></script>
+    <script src="../scripts/archive.js"></script>
 </body>
 </html>

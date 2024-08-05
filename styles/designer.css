@@ -102,7 +102,17 @@ header, .designer-header {
 nav {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: end;
+}
+
+.menu-container {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+nav .dropdown {
+    justify-content: center;
 }
 
 .logo {
@@ -114,27 +124,6 @@ nav {
 
 .designer-header .logo {
     font-size: 20px;
-}
-
-nav ul {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-nav ul li {
-    margin-left: 1.5rem;
-}
-
-nav ul li a {
-    color: var(--nav-link-color);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-nav ul li a:hover {
-    color: var(--accent-color);
 }
 
 /* Designer Container */
@@ -240,14 +229,15 @@ footer {
 /* Toolbox */
 #toolbox {
     position: fixed;
-    top: 50px;
-    left: -200px;
-    width: 200px;
-    height: 100%;
+    top: 80px;
+    left: -100px;
+    width: 50px;
+    height: 80%;
     color: white;
     transition: left 0.3s ease-in-out;
     z-index: 1000;
     padding: 10px;
+    overflow-x: hidden;
 }
 
 #toolbox.visible {
@@ -256,7 +246,7 @@ footer {
 
 #toggle-toolbox {
     position: fixed;
-    top: 50%;
+    top: 10%;
     left: 10px;
     transform: translateY(-50%);
     background: rgba(0, 0, 0, 0.5);
@@ -265,35 +255,63 @@ footer {
     padding: 10px;
     cursor: pointer;
     z-index: 1001;
+    transition: transform 0.2s ease;
+}
+
+#toggle-toolbox:hover {
+    transform: translateY(-50%) scale(1.1);
 }
 
 #toolbox button {
-    display: block;
-    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
     background-color: var(--primary-color);
     color: var(--text-color);
     border: none;
-    padding: 5px 10px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-#toolbox button.active {
-    background-color: var(--accent-color);
-}
+    #toolbox button:hover {
+        background-color: var(--accent-color);
+        transform: scale(1.05);
+    }
 
-/* New Map Overlay */
-#new-map-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1001;
-}
+    #toolbox button i {
+        font-size: 20px;
+    }
+
+    #toolbox button.active {
+        background-color: var(--accent-color);
+        box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+    }
+
+    #toolbox button::after {
+        content: attr(title);
+        position: absolute;
+        left: 120%;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: var(--header-color);
+        color: var(--text-color);
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 9999;
+    }
+
+    #toolbox button:hover::after {
+        opacity: 1;
+    }
 
 .overlay-content {
     background-color: var(--header-color);
@@ -349,3 +367,151 @@ footer {
         margin: 0.5rem;
     }
 }
+
+.dropdown-content a {
+    color: var(--text-color);
+    background-color: var(--primary-color);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+    .dropdown-content a:hover, .dropdown-content a.highlighted {
+        background-color: var(--accent-color);
+        color: var(--text-color);
+    }
+
+
+#right-panel {
+    width: 350px;
+    height: 100%;
+    overflow-y: auto;
+    background-color: var(--background-color);
+    border-left: 1px solid var(--primary-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+}
+
+.panel-section {
+    margin-bottom: 5px;
+}
+
+.section-header, .category-header {
+    cursor: pointer;
+    padding: 10px;
+    background-color: var(--header-color);
+    border-bottom: 1px solid var(--primary-color);
+    color: var(--nav-link-color);
+}
+
+.section-content, .category-content {
+    padding: 10px;
+    display: none;
+    background-color: var(--background-color);
+}
+
+.toggle-icon {
+    float: right;
+    color: var(--secondary-color);
+}
+
+#layer-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+    #layer-list li {
+        padding: 5px;
+        border-bottom: 1px solid var(--primary-color);
+    }
+
+.asset-category img {
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    cursor: pointer;
+    border: 1px solid var(--accent-color);
+}
+
+button {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 5px 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    button:hover {
+        background-color: var(--secondary-color);
+    }
+
+#add-layer, #export-image, #export-json {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.section-header:hover, .category-header:hover {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.category-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+    .category-content img {
+        width: 90%;
+        max-width: 300px; /* Adjust this value as needed */
+        height: auto;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+        .category-content img:hover {
+            transform: scale(1.05);
+        }
+
+/* Optional: Add a lightbox effect for full-size view */
+.fullscreen-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+    .fullscreen-image img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+    }
+
+/* Webkit Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 6px;
+    border: 3px solid var(--background-color);
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--accent-color);
+    }
