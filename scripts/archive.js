@@ -26,11 +26,16 @@ async function getItemDetails(item) {
     const response = await fetch(metadataUrl);
     const data = await response.json();
     const creator = data.metadata.creator || 'Unknown Creator';
+    const license = data.metadata.licenseurl;
+    const keywords = data.metadata.subject;
+
     const images = data.files
-        .filter(file => ['PNG', 'JPEG', 'GIF'].includes(file.format))
+        .filter(file => ['PNG', 'JPEG'].includes(file.format))
         .map(file => ({
             url: `https://archive.org/download/${item.identifier}/${file.name}`,
             creator: creator,
+            license: license,
+            keywords: keywords,
             thumbnail: `https://archive.org/download/${item.identifier}/${file.name}&width=200` // Thumbnail URL
         }));
 

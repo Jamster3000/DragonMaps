@@ -23,123 +23,35 @@ let rightClickStartPos = null;
 let rightClickStartTime = null;
 const MOVE_THRESHOLD = 5; // pixels
 const CLICK_DURATION_THRESHOLD = 200; // milliseconds
+let shortcutsLink = document.getElementById('shortcuts');
+let shortcutsOverlay = document.getElementById('shortcuts-overlay');
+let closeShortcuts = document.getElementById('close-shortcuts');
+let shortcutsTable = document.getElementById('shortcuts-table');
 
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('canvas-container');
-    const rightPanel = document.getElementById('right-panel');
-    const toggleRightPanelButton = document.getElementById('toggle-right-panel');
-    const shortcutsLink = document.getElementById('shortcuts');
-    const shortcutsOverlay = document.getElementById('shortcuts-overlay');
-    const closeShortcuts = document.getElementById('close-shortcuts');
-    const shortcutsTable = document.getElementById('shortcuts-table');
 
-    toggleRightPanelButton.addEventListener('click', toggleRightPanel);
-    shortcutsLink.addEventListener('click', showShortcuts);
-    closeShortcuts.addEventListener('click', hideShortcuts);
-
-    function toggleRightPanel() {
-        rightPanel.classList.toggle('visible');
-        if (rightPanel.classList.contains('visible')) {
-            toggleRightPanelButton.innerHTML = '&#9658;&#9658;';
-            toggleRightPanelButton.style.right = '377px'; // Adjust this value based on your panel width
-        } else {
-            toggleRightPanelButton.innerHTML = '&#9668;&#9668;';
-            toggleRightPanelButton.style.right = '25px';
-        }
-    }
-
-    function showShortcuts() {
-        const shortcuts = [
-            { key: 'Alt + T', description: 'Toggle toolbox' },
-            { key: 'Alt + G', description: 'Toggle grid' },
-            { key: 'Alt + N', description: 'New map' },
-            { key: 'D', description: 'Select draw tool' },
-            { key: 'E', description: 'Select erase tool' },
-            { key: 'S', description: 'Select select tool' },
-            { key: 'Ctrl + Z', description: 'Undo' },
-            { key: 'Ctrl + Y', description: 'Redo' },
-            { key: 'Alt + N', description: 'New Map' },
-        ];
-
-        shortcutsTable.innerHTML = shortcuts.map(shortcut => `
-            <tr>
-                <td><kbd>${shortcut.key}</kbd></td>
-                <td>${shortcut.description}</td>
-            </tr>
-        `).join('');
-
-        shortcutsOverlay.style.display = 'flex';
-    }
-
-    function hideShortcuts() {
-        shortcutsOverlay.style.display = 'none';
-    }
-
+    //creates a new stage
     stage = new Konva.Stage({
         container: 'canvas-container',
         width: container.offsetWidth,
         height: container.offsetHeight
     });
 
+    //creates and adds a grid layer to the canvas
     gridLayer = new Konva.Layer();
     stage.add(gridLayer);
 
+    //adds layer to the canvas that everything is drawn and placed on.
     layer = new Konva.Layer();
     stage.add(layer);
 
-    createGrid();
-    setupEventListeners();
-
-    const popupToolbox = document.getElementById("toolbar-popup");
-    if (popupToolbox) {
-        dragElement(popupToolbox);
-    }
-
-    stage.content.addEventListener('contextmenu', function (e) {
-        e.preventDefault();
-
-    });
-
-    document.addEventListener('click', function () {
-        hideContextMenu();
-    })
-
-    /*deals with the assets section of the right panel*/
-    document.querySelectorAll('.section-header, .category-header').forEach(header => {
-        header.addEventListener('click', function () {
-            this.classList.toggle('active');
-            let content = this.nextElementSibling;
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-            let icon = this.querySelector('.toggle-icon');
-            icon.textContent = icon.textContent === '▼' ? '▲' : '▼';
-        });
-    });
-
-    // Load assets from the right panel
-    function loadAssets(category, assets) {
-        let container = document.querySelector(`#assets-section .asset-category:nth-child(${category}) .category-content`);
-        assets.forEach(asset => {
-            let img = document.createElement('img');
-            img.src = asset.url;
-            img.alt = asset.name;
-            img.title = asset.name;
-            img.draggable = true; // Make the image draggable
-            img.addEventListener('dragstart', onDragStart);
-            container.appendChild(img);
-        });
-    }
-
-    //feature to export the finished battlemap onto the user's device
-    document.getElementById('export-image').addEventListener('click', function () {
-        // Implement image export logic
-        console.log('Exporting as image...');
-    });
-
-    //export the battlemap to json or similar
-    document.getElementById('export-json').addEventListener('click', function () {
-        // Implement JSON export logic
-        console.log('Exporting as JSON...');
-    });
+    createGrid(); //creates the grid on the grid layer
+    setupEventListeners(); //creates and manages event listeners
+    setupShortcutKeyHelp(); //creates te shortcut key help overlay
+    shortcut_draggable();
+    rightPanel(); //manages the right panel, toggle, and everything included in the right panel
+    popup_draggable();//makes the popup tool box draggable
 });
 
 //listens for the right click menu
@@ -153,13 +65,9 @@ document.addEventListener('click', function (event) {
     }
 });
 
-//Toggles the toolbox visibility with the alt+t shortcut key
-document.addEventListener('keydown', function (e) {
-    if (e.key === 't' && e.altKey) {
-        e.preventDefault();
-        document.getElementById('toggle-toolbox').click();
-    }
-});
+document.addEventListener('click', function () {
+    hideContextMenu();
+})
 
 //hides the right click menu
 window.addEventListener('click', () => {
@@ -223,6 +131,42 @@ function setupEventListeners() {
     document.getElementById('show-grid-menu-item').addEventListener('click', toggleGrid);
 }
 
+
+//===========================================
+//window overlays
+//==========================================
+function setupShortcutKeyHelp() {
+    shortcutsLink.addEventListener('click', showShortcuts);
+    closeShortcuts.addEventListener('click', hideShortcuts);
+}
+
+function showShortcuts() {
+    const shortcuts = [
+        { key: 'Alt + T', description: 'Toggle toolbox' },
+        { key: 'Alt + R', description: 'Toggle right panel' },
+        { key: 'Alt + G', description: 'Toggle grid' },
+        { key: 'Alt + N', description: 'New map' },
+        { key: 'D', description: 'Select draw tool' },
+        { key: 'E', description: 'Select erase tool' },
+        { key: 'S', description: 'Select select tool' },
+        { key: 'Ctrl + Z', description: 'Undo' },
+        { key: 'Ctrl + Y', description: 'Redo' },
+        { key: 'Alt + N', description: 'New Map' },
+    ];
+
+    shortcutsTable.innerHTML = shortcuts.map(shortcut => `
+            <tr>
+                <td><kbd>${shortcut.key}</kbd></td>
+                <td>${shortcut.description}</td>
+            </tr>
+        `).join('');
+
+    shortcutsOverlay.style.display = 'flex';
+}
+
+function hideShortcuts() {
+    shortcutsOverlay.style.display = 'none';
+}
 
 
 //==================
@@ -566,6 +510,8 @@ function handleKeyDown(e) {
         }
     }
 
+    
+
     if (e.altKey) {
         switch (e.key.toLowerCase()) {
             case 'f':
@@ -590,27 +536,47 @@ function handleKeyDown(e) {
                 e.preventDefault();
                 showNewMapOverlay();
                 return;
+            case 'r':
+                e.preventDefault();
+                document.getElementById('toggle-right-panel').click();
+                return;
+            case 't':
+                e.preventDefault();
+                document.getElementById('toggle-toolbox').click();
+                return;
+            case 's':
+                e.preventDefault();
+                if (shortcutsOverlay.style.display === "" || shortcutsOverlay.style.display === "none") {
+                    showShortcuts();
+                } else if (shortcutsOverlay.style.display === "flex") {
+                    hideShortcuts();
+                }
+            case 'u':
+                e.preventDefault();
+                window.open("tutorials.html", '_blank').focus();
         }
     }
 
-    switch (e.key.toLowerCase()) {
-        case 'd':
-            selectTool('draw');
-            break;
-        case 'e':
-            selectTool('erase');
-            break;
-        case 's':
-            selectTool('select');
-            break;
-        case 'f':
-            selectTool('fill');
-            break;
-        case 'shift':
-            try {
-                document.getElementById(`${currentTool}-snap`).checked = true;
+    if (!e.altKey) {
+        switch (e.key.toLowerCase()) {
+            case 'd':
+                selectTool('draw');
                 break;
-            } catch (TypeError) { }
+            case 'e':
+                selectTool('erase');
+                break;
+            case 's':
+                selectTool('select');
+                break;
+            case 'f':
+                selectTool('fill');
+                break;
+            case 'shift':
+                try {
+                    document.getElementById(`${currentTool}-snap`).checked = true;
+                    break;
+                } catch (TypeError) { }
+        }
     }
 
     if (activeMenu) {
@@ -714,6 +680,21 @@ function handleMouseDown(e) {
 //==============================
 //tools and features
 //==============================
+
+function shortcut_draggable() {
+    const shortcut = document.querySelector(".overlay-content");
+    if (shortcut) {
+        dragElement(shortcut);
+    }
+}
+
+function popup_draggable() {
+    const popupToolbox = document.getElementById("toolbar-popup");
+    if (popupToolbox) {
+        dragElement(popupToolbox);
+    }
+}
+
 //allowing of dragging elements
 function dragElement(elmnt) {
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -926,4 +907,60 @@ function recordAction(action) {
     actionHistory = actionHistory.slice(0, currentActionIndex + 1);
     actionHistory.push(action);
     currentActionIndex++;
+}
+
+function rightPanel() {
+    const rightPanel = document.getElementById('right-panel');
+    const toggleRightPanelButton = document.getElementById('toggle-right-panel');
+
+    toggleRightPanelButton.addEventListener('click', toggleRightPanel);
+
+    function toggleRightPanel() {
+        rightPanel.classList.toggle('visible');
+        toggleRightPanelButton.classList.toggle('panel-open');
+
+        if (rightPanel.classList.contains('visible')) {
+            toggleRightPanelButton.innerHTML = '&#9658;&#9658;';
+        } else {
+            toggleRightPanelButton.innerHTML = '&#9668;&#9668;';
+        }
+    }
+
+    /*deals with the assets section of the right panel*/
+    document.querySelectorAll('.section-header, .category-header').forEach(header => {
+        header.addEventListener('click', function () {
+            this.classList.toggle('active');
+            let content = this.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            let icon = this.querySelector('.toggle-icon');
+            icon.textContent = icon.textContent === '▼' ? '▲' : '▼';
+        });
+    });
+
+
+    // Load assets from the right panel
+    function loadAssets(category, assets) {
+        let container = document.querySelector(`#assets-section .asset-category:nth-child(${category}) .category-content`);
+        assets.forEach(asset => {
+            let img = document.createElement('img');
+            img.src = asset.url;
+            img.alt = asset.name;
+            img.title = asset.name;
+            img.draggable = true; // Make the image draggable
+            img.addEventListener('dragstart', onDragStart);
+            container.appendChild(img);
+        });
+    }
+
+    //feature to export the finished battlemap onto the user's device
+    document.getElementById('export-image').addEventListener('click', function () {
+        // Implement image export logic
+        console.log('Exporting as image...');
+    });
+
+    //export the battlemap to json or similar
+    document.getElementById('export-json').addEventListener('click', function () {
+        // Implement JSON export logic
+        console.log('Exporting as JSON...');
+    });
 }

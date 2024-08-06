@@ -105,6 +105,17 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: end;
+    padding: 0 20px;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
 }
 
 .menu-container {
@@ -428,11 +439,15 @@ footer {
     padding: 10px;
     cursor: pointer;
     z-index: 1001;
-    transition: transform 0.2s ease;
+    transition: right 0.3s ease, transform 0.2s ease;
 }
 
     #toggle-right-panel:hover {
         transform: translateY(-50%) scale(1.1);
+    }
+
+    #toggle-right-panel.panel-open {
+        right: 490px;
     }
 
 .panel-section {
@@ -605,6 +620,7 @@ button {
 }
 
 .overlay-content {
+    position: absolute;
     background-color: var(--background-color);
     padding: 20px;
     border-radius: 5px;
@@ -629,6 +645,28 @@ button {
         border-radius: 3px;
         padding: 2px 4px;
         font-family: monospace;
+    }
+
+/*search bar*/
+.search-bar {
+    background-color: var(--background-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 20px;
+    color: var(--text-color);
+    padding: 8px 15px;
+    margin-left: 20px;
+    width: 200px;
+    transition: all 0.3s ease;
+}
+
+    .search-bar::placeholder {
+        color: var(--nav-link-color);
+    }
+
+    .search-bar:focus {
+        outline: none;
+        box-shadow: 0 0 5px var(--accent-color);
+        width: 250px;
     }
 
 /* Webkit Scrollbar Styles */
