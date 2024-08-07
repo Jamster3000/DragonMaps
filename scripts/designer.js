@@ -74,46 +74,94 @@ document.addEventListener('click', function () {
 })
 
 //searches for each character input
+//uses debounce to reduce the amount of search calls
+//uses memoization to cache results and recall from them
+// makes use of dociment fragment for better performance rather than manipulating the DOM directly.
+//uses lazy loading only loading images in that are in viewport
 const searchBar = document.getElementById('search-bar');
 const searchResults = document.getElementById('search-results');
 const resultsContainer = document.getElementById('image-grid');
 
-// Search on input change
-searchBar.addEventListener('input', () => {
-    isEditingText = true;
+//debounce: delay before the search actually searches the input
+function debounce(func, delay){
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+const memoizedSearch = (() => {
+    const cache = new Map();
+    return (query) => {
+        if (cache.has(query)) {
+            return cache.get(query);
+        }
+        const result = search(query);
+        cache.set(query, result);
+        return result;
+    };
+})();
+
+const performSearch = debounce(() => {
     const query = searchBar.value.trim();
-    const results = search(query);
+    const results = memoizedSearch(query);
 
-    if (query === "") {
-        searchResults.style.display = "none";
-    } else {
-        searchResults.style.display = "block";
-        resultsContainer.innerHTML = ''; // Clear previous results
+    isEditingText = true;
+
+    searchResults.style.display = query === "" ? "none" : "block";
+    resultsContainer.innerHTML = ''; // Clear previous results
+
+    if (query !== "") {
+        const fragment = document.createDocumentFragment();
+
+        results.forEach(result => {
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('result-item');
+
+            const img = new Image();
+            img.className = "image-results";
+            img.alt = 'Search result image';
+            img.style.border = "1px solid #FF4500";
+            img.title = 'Drag to reorder';
+            img.draggable = true;
+            img.dataset.src = result.url; // For lazy loading
+            img.addEventListener('dragstart', onDragStart);
+
+            resultItem.appendChild(img);
+            fragment.appendChild(resultItem);
+        });
+
+        resultsContainer.appendChild(fragment);
+        lazyLoadImages();
     }
+}, 300);
 
-    results.forEach(result => {
-        const resultItem = document.createElement('div');
-        resultItem.classList.add('result-item');
+// Lazy loading
+function lazyLoadImages() {
+    const images = resultsContainer.querySelectorAll('img[data-src]');
+    const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
 
-        const url = result.url;
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.removeAttribute('data-src');
+                observer.unobserve(img);
+            }
+        });
+    }, options);
 
-        // Create image element
-        const img = document.createElement('img');
-        img.src = url;
-        img.className = "image-results";
-        img.alt = 'Search result image';
-        img.style.border = "1px solid #FF4500"
-        img.title = 'Drag to reorder'; // Adjust as needed
-        img.draggable = true;
-        img.addEventListener('dragstart', onDragStart);
-        img.onerror = () => {
-            console.error('Failed to load image:', url);
-        };
-
-        resultItem.appendChild(img);
-        resultsContainer.appendChild(resultItem);
-    });
-});
+    images.forEach(img => observer.observe(img));
+}
+        
+// Search on input change
+searchBar.addEventListener('input', permormSearch);
 
 //Shows the search results when clicking on the search bar assuming there is something that has been searched and not cleared.
 searchBar.addEventListener('focus', () => {
