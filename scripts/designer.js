@@ -131,11 +131,11 @@ const performSearch = debounce(() => {
             img.style.border = "1px solid #FF4500";
             img.style.maxWidth = "100px";
             img.style.margin = "5px";
-            img.title = 'Drag to reorder';
+            img.title = 'Drag to place on grid';
             img.draggable = true;
             
             // Add a loading placeholder
-            img.src = 'path/to/placeholder.gif';
+            img.src = '../assets/images/loading.gif';
             
             // Add drag start event listener
             img.addEventListener('dragstart', onDragStart);
