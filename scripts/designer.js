@@ -82,6 +82,17 @@ const searchBar = document.getElementById('search-bar');
 const searchResults = document.getElementById('search-results');
 const resultsContainer = document.getElementById('image-grid');
 
+function preloadImages(urls) {
+    return Promise.all(urls.map(url => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(url);
+            img.onerror = () => reject(url);
+            img.src = url;
+        });
+    }));
+}
+
 //debounce: delay before the search actually searches the input
 function debounce(func, delay){
     let timeoutId;
@@ -112,6 +123,14 @@ const performSearch = debounce(() => {
     searchResults.style.display = query === "" ? "none" : "block";
     resultsContainer.innerHTML = ''; // Clear previous results
 
+    preloadImages(results.slice(0, 10).map(result => result.url))
+        .then(preloadedUrls => {
+            console.log('Preloaded images:', preloadedUrls);
+        })
+        .catch(failedUrls => {
+            console.error('Failed to preload some images:', failedUrls);
+        });
+    
     if (query !== "") {
         const fragment = document.createDocumentFragment();
 
