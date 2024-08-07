@@ -113,45 +113,31 @@ const memoizedSearch = (() => {
     };
 })();
 
-const performSearch = debounce(() => {
+function performSearch() {
     const query = searchBar.value.trim();
+    const results = search(query);
+    
     searchResults.style.display = query === "" ? "none" : "block";
     resultsContainer.innerHTML = ''; // Clear previous results
 
+    console.log(`Performing search for "${query}"`);
+
     if (query !== "") {
-        const results = memoizedSearch(query);
-        const fragment = document.createDocumentFragment();
         results.forEach(result => {
-            const resultItem = document.createElement('div');
-            resultItem.classList.add('result-item');
-            const img = new Image();
-            img.className = "image-results";
+            const img = document.createElement('img');
+            img.src = result.url;
             img.alt = 'Search result image';
             img.style.border = "1px solid #FF4500";
-            img.title = 'Drag to reorder';
-            img.draggable = true;
-            img.decoding = "asynchronous";
-            img.addEventListener('dragstart', onDragStart);
-            
-            resultItem.appendChild(img);
-            fragment.appendChild(resultItem);
+            img.style.maxWidth = "100px"; // Set a max width for debugging
+            img.style.margin = "5px"; // Add some margin for spacing
+            resultsContainer.appendChild(img);
         });
-        resultsContainer.appendChild(fragment);
-        //lazyLoadImages();
-
-        // Preload the first 10 images
-        //preloadImages(results.slice(0, 10).map(result => result.url))
-        //    .then(preloadedUrls => {
-        //        console.log('Preloaded images:', preloadedUrls);
-        //    })
-        //    .catch(failedUrls => {
-        //        console.error('Failed to preload some images:', failedUrls);
-        //    });
-
-        //console.log(`Added ${results.length} results to the DOM`); 
     }
-}, 300);
 
+    console.log(`Added ${results.length} results to the DOM`);
+}
+
+searchBar.addEventListener('input', performSearch);
 function lazyLoadImages() {
     const images = resultsContainer.querySelectorAll('img[data-src]');
     const options = {
