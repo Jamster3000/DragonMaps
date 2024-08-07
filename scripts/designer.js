@@ -226,20 +226,15 @@ function setupEventListeners() {
         }
         if (e.target.tagName === 'BUTTON' || e.target.tagName === "I") {
             const selectedTool = e.target.getAttribute('data-tool');
-            console.log('Tool clicked:', selectedTool, 'Current tool:', currentTool);
-
             currentTool = selectedTool;
-            console.log('New current tool:', currentTool);
 
             document.querySelectorAll('#toolbox button').forEach(btn => {
                 btn.classList.remove('active');
             });
             e.target.classList.add('active');
-            console.log('Added active class to', selectedTool);
 
             showToolOptions(currentTool, e.target);
             updateCursor();
-            console.log('Updated cursor for tool:', currentTool);
         }
     });
 
@@ -1360,16 +1355,27 @@ function rightPanel() {
 
 
     // Load assets from the right panel
-    function loadAssets(category, assets) {
+     function loadAssets(category, assets) {
         let container = document.querySelector(`#assets-section .asset-category:nth-child(${category}) .category-content`);
         assets.forEach(asset => {
+            let resultItem = document.createElement('div');
+            resultItem.classList.add('result-item');
+    
             let img = document.createElement('img');
+            img.className = "image-results";
             img.src = asset.url;
             img.alt = asset.name;
-            img.title = asset.name;
-            img.draggable = true; // Make the image draggable
+            img.title = `${asset.name} - Drag to add to canvas`;
+            img.draggable = true;
+            img.style.maxWidth = "100px";
+            img.style.margin = "5px";
+            img.style.border = "1px solid #FF4500";
+    
+            // Add drag start event listener
             img.addEventListener('dragstart', onDragStart);
-            container.appendChild(img);
+    
+            resultItem.appendChild(img);
+            container.appendChild(resultItem);
         });
     }
 
