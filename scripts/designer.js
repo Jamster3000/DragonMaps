@@ -93,8 +93,7 @@ function preloadImages(urls) {
     }));
 }
 
-//debounce: delay before the search actually searches the input
-function debounce(func, delay){
+function debounce(func, delay) {
     let timeoutId;
     return function (...args) {
         clearTimeout(timeoutId)
@@ -106,12 +105,11 @@ const memoizedSearch = (() => {
     const cache = new Map();
     return (query) => {
         if (cache.has(query)) {
-            return Promise.resolve(cache.get(query));
+            return cache.get(query);
         }
-        return search(query).then(result => {
-            cache.set(query, result);
-            return result;
-        });
+        const result = search(query);
+        cache.set(query, result);
+        return result;
     };
 })();
 
@@ -121,39 +119,40 @@ const performSearch = debounce(() => {
     resultsContainer.innerHTML = ''; // Clear previous results
 
     if (query !== "") {
-        memoizedSearch(query).then(results => {
-            const fragment = document.createDocumentFragment();
-            results.forEach(result => {
-                const resultItem = document.createElement('div');
-                resultItem.classList.add('result-item');
-                const img = new Image();
-                img.className = "image-results";
-                img.alt = 'Search result image';
-                img.style.border = "1px solid #FF4500";
-                img.title = 'Drag to reorder';
-                img.draggable = true;
-                img.decoding = "asynchronous";
-                img.dataset.src = result.url;
-                img.addEventListener('dragstart', onDragStart);
-                
-                resultItem.appendChild(img);
-                fragment.appendChild(resultItem);
-            });
-            resultsContainer.appendChild(fragment);
-            lazyLoadImages();
-
-            // Preload the first 10 images
-            preloadImages(results.slice(0, 10).map(result => result.url))
-                .then(preloadedUrls => {
-                    console.log('Preloaded images:', preloadedUrls);
-                })
-                .catch(failedUrls => {
-                    console.error('Failed to preload some images:', failedUrls);
-                });
+        const results = memoizedSearch(query);
+        const fragment = document.createDocumentFragment();
+        results.forEach(result => {
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('result-item');
+            const img = new Image();
+            img.className = "image-results";
+            img.alt = 'Search result image';
+            img.style.border = "1px solid #FF4500";
+            img.title = 'Drag to reorder';
+            img.draggable = true;
+            img.decoding = "asynchronous";
+            img.dataset.src = result.url;
+            img.addEventListener('dragstart', onDragStart);
+            
+            // Add placeholder
+            img.src = 'path/to/placeholder.gif';
+            
+            resultItem.appendChild(img);
+            fragment.appendChild(resultItem);
         });
+        resultsContainer.appendChild(fragment);
+        lazyLoadImages();
+
+        // Preload the first 10 images
+        preloadImages(results.slice(0, 10).map(result => result.url))
+            .then(preloadedUrls => {
+                console.log('Preloaded images:', preloadedUrls);
+            })
+            .catch(failedUrls => {
+                console.error('Failed to preload some images:', failedUrls);
+            });
     }
 }, 300);
-
 
 function lazyLoadImages() {
     const images = resultsContainer.querySelectorAll('img[data-src]');
@@ -166,17 +165,11 @@ function lazyLoadImages() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const img = entry.target;
-                // Load thumbnail first
-                img.src = img.dataset.thumb;
-                img.onload = () => {
-                    // Then load full image
-                    const fullImg = new Image();
-                    fullImg.src = img.dataset.src;
-                    fullImg.onload = () => {
-                        img.src = fullImg.src;
-                        img.removeAttribute('data-src');
-                        img.removeAttribute('data-thumb');
-                    };
+                const fullImg = new Image();
+                fullImg.src = img.dataset.src;
+                fullImg.onload = () => {
+                    img.src = fullImg.src;
+                    img.removeAttribute('data-src');
                 };
                 observer.unobserve(img);
             }
@@ -185,7 +178,8 @@ function lazyLoadImages() {
     images.forEach(img => observer.observe(img));
 }
 
-        
+searchBar.addEventListener('input', performSearch);
+
 // Search on input change
 searchBar.addEventListener('input', performSearch);
 
