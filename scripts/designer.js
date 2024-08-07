@@ -849,31 +849,6 @@ function loadSearch() {
     console.log(searchData);
 }
 
-const invertedIndex = {};
-
-function buildInvertedIndex() {
-    for (let itemKey in searchData) {
-        if (searchData.hasOwnProperty(itemKey)) {
-            const itemData = searchData[itemKey];
-            for (let url in itemData) {
-                if (itemData.hasOwnProperty(url)) {
-                    const keywords = itemData[url];
-                    for (let keyword of keywords) {
-                        const lowerKeyword = keyword.toLowerCase();
-                        if (!invertedIndex[lowerKeyword]) {
-                            invertedIndex[lowerKeyword] = new Set();
-                        }
-                        invertedIndex[lowerKeyword].add(url);
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Call this function once when initializing your app
-buildInvertedIndex();
-
 function search(query) {
     const results = [];
     const lowerQuery = query.toLowerCase();
@@ -884,38 +859,17 @@ function search(query) {
             for (let url in itemData) {
                 if (itemData.hasOwnProperty(url)) {
                     const keywords = itemData[url];
-                    if (keywords.some(keyword => keyword.toLowerCase().includes(lowerQuery))) {
+                    if (keywords.some(keyword => {
+                        const lowerKeyword = keyword.toLowerCase();
+                        return lowerKeyword.includes(lowerQuery) || lowerQuery.includes(lowerKeyword);
+                    })) {
                         results.push({ url, keywords });
                     }
                 }
             }
         }
     }
-    
-    console.log(`Search for "${query}" returned ${results.length} results`); // Debugging line
     return results;
-}
-
-function calculateRelevanceScore(queryWords, keywords) {
-    let score = 0;
-    const lowerKeywords = keywords.map(k => k.toLowerCase());
-
-    for (let queryWord of queryWords) {
-        // Exact match
-        if (lowerKeywords.includes(queryWord)) {
-            score += 10;
-        } else {
-            // Partial match
-            for (let keyword of lowerKeywords) {
-                if (keyword.includes(queryWord)) {
-                    score += 5;
-                    break;
-                }
-            }
-        }
-    }
-
-    return score;
 }
 
 function addText(e) {
