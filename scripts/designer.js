@@ -113,9 +113,9 @@ const memoizedSearch = (() => {
     };
 })();
 
-function performSearch() {
+const performSearch = debounce(() => {
     const query = searchBar.value.trim();
-    const results = search(query);
+    const results = memoizedSearch(query);
     
     searchResults.style.display = query === "" ? "none" : "block";
     resultsContainer.innerHTML = ''; // Clear previous results
@@ -128,14 +128,15 @@ function performSearch() {
             img.src = result.url;
             img.alt = 'Search result image';
             img.style.border = "1px solid #FF4500";
-            img.style.maxWidth = "100px"; // Set a max width for debugging
-            img.style.margin = "5px"; // Add some margin for spacing
+            img.style.maxWidth = "100px";
+            img.style.margin = "5px";
             resultsContainer.appendChild(img);
         });
     }
 
     console.log(`Added ${results.length} results to the DOM`);
-}
+}, 300); // 300ms delay
+
 
 searchBar.addEventListener('input', performSearch);
 function lazyLoadImages() {
