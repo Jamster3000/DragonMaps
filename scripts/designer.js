@@ -114,6 +114,7 @@ const memoizedSearch = (() => {
 const performSearch = debounce(() => {
     const query = searchBar.value.trim();
     const results = memoizedSearch(query);
+    isEditingText = true;
     
     searchResults.style.display = query === "" ? "none" : "block";
     resultsContainer.innerHTML = ''; // Clear previous results
@@ -232,7 +233,6 @@ function setupEventListeners() {
 
             document.querySelectorAll('#toolbox button').forEach(btn => {
                 btn.classList.remove('active');
-                console.log('Removed active class from', btn.getAttribute('data-tool'));
             });
             e.target.classList.add('active');
             console.log('Added active class to', selectedTool);
@@ -852,7 +852,6 @@ function loadSearch() {
             }
         }
     }
-    console.log(searchData);
 }
 
 function search(query) {
