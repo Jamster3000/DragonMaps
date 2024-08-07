@@ -129,7 +129,7 @@ const performSearch = debounce(() => {
             img.style.margin = "5px";
             
             // Add a loading placeholder
-            img.src = 'path/to/placeholder.gif';
+            img.src = '../assets/images/loading.gif';
             
             resultsContainer.appendChild(img);
 
