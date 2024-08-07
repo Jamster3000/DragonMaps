@@ -161,7 +161,7 @@ function lazyLoadImages() {
 }
         
 // Search on input change
-searchBar.addEventListener('input', permormSearch);
+searchBar.addEventListener('input', performSearch);
 
 //Shows the search results when clicking on the search bar assuming there is something that has been searched and not cleared.
 searchBar.addEventListener('focus', () => {
