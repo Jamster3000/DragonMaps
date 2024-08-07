@@ -176,8 +176,6 @@ function lazyLoadImages() {
     images.forEach(img => observer.observe(img));
 }
 
-searchBar.addEventListener('input', performSearch);
-
 // Search on input change
 searchBar.addEventListener('input', performSearch);
 
