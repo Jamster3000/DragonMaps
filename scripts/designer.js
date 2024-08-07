@@ -137,18 +137,18 @@ const performSearch = debounce(() => {
             fragment.appendChild(resultItem);
         });
         resultsContainer.appendChild(fragment);
-        lazyLoadImages();
+        //lazyLoadImages();
 
         // Preload the first 10 images
-        preloadImages(results.slice(0, 10).map(result => result.url))
-            .then(preloadedUrls => {
-                console.log('Preloaded images:', preloadedUrls);
-            })
-            .catch(failedUrls => {
-                console.error('Failed to preload some images:', failedUrls);
-            });
+        //preloadImages(results.slice(0, 10).map(result => result.url))
+        //    .then(preloadedUrls => {
+        //        console.log('Preloaded images:', preloadedUrls);
+        //    })
+        //    .catch(failedUrls => {
+        //        console.error('Failed to preload some images:', failedUrls);
+        //    });
 
-        console.log(`Added ${results.length} results to the DOM`); 
+        //console.log(`Added ${results.length} results to the DOM`); 
     }
 }, 300);
 
