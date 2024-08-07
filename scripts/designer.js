@@ -106,79 +106,85 @@ const memoizedSearch = (() => {
     const cache = new Map();
     return (query) => {
         if (cache.has(query)) {
-            return cache.get(query);
+            return Promise.resolve(cache.get(query));
         }
-        const result = search(query);
-        cache.set(query, result);
-        return result;
+        return search(query).then(result => {
+            cache.set(query, result);
+            return result;
+        });
     };
 })();
 
 const performSearch = debounce(() => {
     const query = searchBar.value.trim();
-    const results = memoizedSearch(query);
-
-    isEditingText = true;
-
     searchResults.style.display = query === "" ? "none" : "block";
     resultsContainer.innerHTML = ''; // Clear previous results
 
-    preloadImages(results.slice(0, 10).map(result => result.url))
-        .then(preloadedUrls => {
-            console.log('Preloaded images:', preloadedUrls);
-        })
-        .catch(failedUrls => {
-            console.error('Failed to preload some images:', failedUrls);
-        });
-    
     if (query !== "") {
-        const fragment = document.createDocumentFragment();
+        memoizedSearch(query).then(results => {
+            const fragment = document.createDocumentFragment();
+            results.forEach(result => {
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('result-item');
+                const img = new Image();
+                img.className = "image-results";
+                img.alt = 'Search result image';
+                img.style.border = "1px solid #FF4500";
+                img.title = 'Drag to reorder';
+                img.draggable = true;
+                img.decoding = "asynchronous";
+                img.dataset.src = result.url;
+                img.addEventListener('dragstart', onDragStart);
+                
+                resultItem.appendChild(img);
+                fragment.appendChild(resultItem);
+            });
+            resultsContainer.appendChild(fragment);
+            lazyLoadImages();
 
-        results.forEach(result => {
-            const resultItem = document.createElement('div');
-            resultItem.classList.add('result-item');
-
-            const img = new Image();
-            img.className = "image-results";
-            img.alt = 'Search result image';
-            img.style.border = "1px solid #FF4500";
-            img.title = 'Drag to reorder';
-            img.draggable = true;
-            img.decoding="asynchronous"
-            img.dataset.src = result.url; // For lazy loading
-            img.addEventListener('dragstart', onDragStart);
-
-            resultItem.appendChild(img);
-            fragment.appendChild(resultItem);
+            // Preload the first 10 images
+            preloadImages(results.slice(0, 10).map(result => result.url))
+                .then(preloadedUrls => {
+                    console.log('Preloaded images:', preloadedUrls);
+                })
+                .catch(failedUrls => {
+                    console.error('Failed to preload some images:', failedUrls);
+                });
         });
-
-        resultsContainer.appendChild(fragment);
-        lazyLoadImages();
     }
 }, 300);
 
-// Lazy loading
+
 function lazyLoadImages() {
     const images = resultsContainer.querySelectorAll('img[data-src]');
     const options = {
         root: null,
-        rootMargin: '0px',
+        rootMargin: '200px', // Start loading images 200px before they enter the viewport
         threshold: 0.1
     };
-
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const img = entry.target;
-                img.src = img.dataset.src;
-                img.removeAttribute('data-src');
+                // Load thumbnail first
+                img.src = img.dataset.thumb;
+                img.onload = () => {
+                    // Then load full image
+                    const fullImg = new Image();
+                    fullImg.src = img.dataset.src;
+                    fullImg.onload = () => {
+                        img.src = fullImg.src;
+                        img.removeAttribute('data-src');
+                        img.removeAttribute('data-thumb');
+                    };
+                };
                 observer.unobserve(img);
             }
         });
     }, options);
-
     images.forEach(img => observer.observe(img));
 }
+
         
 // Search on input change
 searchBar.addEventListener('input', performSearch);
