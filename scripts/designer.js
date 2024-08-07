@@ -21,12 +21,15 @@ let isShowingContextMenu = false;
 let isRightMouseDown = false;
 let rightClickStartPos = null;
 let rightClickStartTime = null;
+let isEditingText = false;
 const MOVE_THRESHOLD = 5; // pixels
 const CLICK_DURATION_THRESHOLD = 200; // milliseconds
 let shortcutsLink = document.getElementById('shortcuts');
 let shortcutsOverlay = document.getElementById('shortcuts-overlay');
 let closeShortcuts = document.getElementById('close-shortcuts');
 let shortcutsTable = document.getElementById('shortcuts-table');
+let searchData = {};
+let dropIndicator;
 
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('canvas-container');
@@ -52,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
     shortcut_draggable();
     rightPanel(); //manages the right panel, toggle, and everything included in the right panel
     popup_draggable();//makes the popup tool box draggable
+    loadSearch();
 });
 
 //listens for the right click menu
@@ -69,6 +73,66 @@ document.addEventListener('click', function () {
     hideContextMenu();
 })
 
+//searches for each character input
+const searchBar = document.getElementById('search-bar');
+const searchResults = document.getElementById('search-results');
+const resultsContainer = document.getElementById('image-grid');
+
+// Search on input change
+searchBar.addEventListener('input', () => {
+    isEditingText = true;
+    const query = searchBar.value.trim();
+    const results = search(query);
+
+    if (query === "") {
+        searchResults.style.display = "none";
+    } else {
+        searchResults.style.display = "block";
+        resultsContainer.innerHTML = ''; // Clear previous results
+    }
+
+    results.forEach(result => {
+        const resultItem = document.createElement('div');
+        resultItem.classList.add('result-item');
+
+        const url = result.url;
+
+        // Create image element
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = "image-results";
+        img.alt = 'Search result image';
+        img.style.border = "1px solid #FF4500"
+        img.title = 'Drag to reorder'; // Adjust as needed
+        img.draggable = true;
+        img.addEventListener('dragstart', onDragStart);
+        img.onerror = () => {
+            console.error('Failed to load image:', url);
+        };
+
+        resultItem.appendChild(img);
+        resultsContainer.appendChild(resultItem);
+    });
+});
+
+//Shows the search results when clicking on the search bar assuming there is something that has been searched and not cleared.
+searchBar.addEventListener('focus', () => {
+    if (searchBar.value === "") {
+        console.log("show");
+        searchResults.style.display = "none";
+    } else {
+        searchResults.style.display = "block";
+    }
+});
+
+//hides the search result when clicking off it
+document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!searchBar.contains(target) && !searchResults.contains(target)) {
+        searchResults.style.display = "none";
+    }
+});
+
 //hides the right click menu
 window.addEventListener('click', () => {
     menuNode.style.display = 'none';
@@ -80,25 +144,56 @@ window.addEventListener('resize', positionToolboxPopup);
 //all the other even listerns for eventListener or stages
 function setupEventListeners() {
     const toolbox = document.getElementById('toolbox');
-    const popupToolBox = document.getElementById('popup-toolbox');
 
     toolbox.addEventListener('click', function (e) {
-        if (e.target.tagName === 'BUTTON') {
+        console.log('Toolbox clicked', e.target.tagName);
+        if (isEditingText) {
+            console.log('Ignoring click due to text editing');
+            return;
+        }
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === "I") {
             const selectedTool = e.target.getAttribute('data-tool');
-            if (currentTool === selectedTool) {
-                // Deselect the tool
-                currentTool = '';
-                e.target.classList.remove('active');
-                popupToolBox.style.display = 'none';
-            } else {
-                // Select the new tool
-                currentTool = selectedTool;
-                document.querySelectorAll('#toolbox button').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                showToolOptions(currentTool, e.target);
-            }
+            console.log('Tool clicked:', selectedTool, 'Current tool:', currentTool);
+
+            currentTool = selectedTool;
+            console.log('New current tool:', currentTool);
+
+            document.querySelectorAll('#toolbox button').forEach(btn => {
+                btn.classList.remove('active');
+                console.log('Removed active class from', btn.getAttribute('data-tool'));
+            });
+            e.target.classList.add('active');
+            console.log('Added active class to', selectedTool);
+
+            showToolOptions(currentTool, e.target);
+            updateCursor();
+            console.log('Updated cursor for tool:', currentTool);
         }
     });
+
+    function updateCursor() {
+        switch (currentTool) {
+            case 'draw':
+                stage.container().style.cursor = 'crosshair';
+                break;
+            case 'erase':
+                stage.container().style.cursor = 'url(eraser-cursor.png), auto';
+                break;
+            case 'text':
+                stage.container().style.cursor = 'text';
+                break;
+            case 'shape':
+                stage.container().style.cursor = 'crosshair';
+                break;
+            default:
+                stage.container().style.cursor = 'default';
+        }
+    }
+
+    function hideToolOptions() {
+        const popupToolbox = document.getElementById('popup-toolbox');
+        popupToolbox.style.display = 'none';
+    }
 
     stage.content.addEventListener('contextmenu', function (e) {
         e.preventDefault();
@@ -187,22 +282,24 @@ function onDrop(e) {
     e.preventDefault();
     const imageUrl = e.dataTransfer.getData('text');
 
-    // Get the stage's container's bounding rectangle
+    // Get the stage's container and its bounding rectangle
     const stageContainer = stage.container();
     const stageRect = stageContainer.getBoundingClientRect();
 
     // Calculate the drop position relative to the stage
-    const dropX = ((e.clientX - 40) - stageRect.left - stage.x()) / stage.scaleX();
-    const dropY = ((e.clientY - 40) - stageRect.top - stage.y()) / stage.scaleY();
+    const dropX = (e.clientX - stageRect.left - stage.x()) / stage.scaleX();
+    const dropY = (e.clientY - stageRect.top - stage.y()) / stage.scaleY();
 
     // Create a new Konva Image
     const imageObj = new Image();
     imageObj.onload = function () {
         const konvaImage = new Konva.Image({
+            image: imageObj,
+            draggable: true,
             x: dropX,
             y: dropY,
-            image: imageObj,
-            draggable: true
+            offsetX: this.width / 2,
+            offsetY: this.height / 2
         });
 
         // Add the image to the layer
@@ -300,24 +397,27 @@ function updateCanvas() {
 
     for (let i = 0; i <= currentActionIndex; i++) {
         const action = actionHistory[i];
-        if (action.type === 'draw' || action.type === 'erase') {
-            const line = new Konva.Line({
-                points: action.points,
-                stroke: action.color,
-                strokeWidth: action.size,
-                globalCompositeOperation: action.type === 'erase' ? 'destination-out' : 'source-over',
-                lineCap: 'round',
-                lineJoin: 'round'
-            });
-            layer.add(line);
-        } else if (action.type === 'fill') {
-            layer.add(action.shape);
-        } else if (action.type === 'addImage') {
-            layer.add(action.image);
+        switch (action.type) {
+            case 'draw':
+            case 'erase':
+                const line = new Konva.Line({
+                    points: action.points,
+                    stroke: action.color,
+                    strokeWidth: action.size,
+                    globalCompositeOperation: action.type === 'erase' ? 'destination-out' : 'source-over',
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                });
+                layer.add(line);
+                break;
+            case 'addText':
+            case 'addShape':
+            case 'addImage':
+                layer.add(action.node);
+                break;
         }
     }
     layer.batchDraw();
-    console.log("Canvas updated, currentActionIndex:", currentActionIndex);
 }
 
 //toggles the grid visibiliy
@@ -393,15 +493,10 @@ function positionToolboxPopup() {
     const offset = 30; // Adjust this value as needed
     popup.style.left = `${toolboxRect.right + offset}px`;
     popup.style.top = `${toolboxRect.top}px`;
-
-    // Debugging info
-    console.log('Toolbox Rect:', toolboxRect);
-    console.log('Popup Position:', popup.style.left, popup.style.top);
 }
 
 //hides the right click menu
 function hideContextMenu() {
-    console.log("Hiding context menu");
     const menuNode = document.getElementById('menu');
     menuNode.style.display = 'none';
     isShowingContextMenu = false;
@@ -436,31 +531,6 @@ function showContextMenu(e) {
     menuNode.style.left = `${e.evt.clientX}px`;
 
     isShowingContextMenu = true;
-}
-
-function addText(e) {
-    // Add text at the clicked position
-    console.log('Add text');
-}
-
-function addShape(e) {
-    // Add a shape at the clicked position
-    console.log('Add shape');
-}
-
-function paste(e) {
-    // Paste copied content at the clicked position
-    console.log('Paste');
-}
-
-function selectAll() {
-    // Select all elements on the canvas
-    console.log('Select all');
-}
-
-function clearAll() {
-    // Clear all elements on the canvas
-    console.log('Clear all');
 }
 
 
@@ -516,17 +586,14 @@ function handleKeyDown(e) {
         switch (e.key.toLowerCase()) {
             case 'f':
                 e.preventDefault();
-                console.log('Alt+F pressed');
                 toggleMenu('file');
                 return;
             case 'e':
                 e.preventDefault();
-                console.log('Alt+E pressed');
                 toggleMenu('edit');
                 return;
             case 'v':
                 e.preventDefault();
-                console.log('Alt+V pressed');
                 toggleMenu('view');
                 return;
             case 'g':
@@ -672,6 +739,10 @@ function handleMouseDown(e) {
     } else if (e.evt.button === 0) { // Left mouse button
         if (currentTool === 'draw' || currentTool === 'erase') {
             startDrawing(e);
+        } else if (currentTool === 'text') {
+            addText(e);
+        } else if (currentTool === 'shape') {
+            addShape(e);
         }
     }
 }
@@ -680,6 +751,230 @@ function handleMouseDown(e) {
 //==============================
 //tools and features
 //==============================
+
+function paste() {
+    console.log("nothing here");
+}
+function loadSearch() {
+    const storageData = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key);
+        try {
+            storageData[key] = JSON.parse(value);
+        } catch (e) {
+            storageData[key] = value;
+        }
+    }
+
+    for (let key in storageData) {
+        if (storageData.hasOwnProperty(key)) {
+            const items = storageData[key];
+            for (let item of items) {
+                if (item.url && item.keywords) {
+                    if (!searchData[key]) {
+                        searchData[key] = {};
+                    }
+                    searchData[key][item.url] = item.keywords;
+                }
+            }
+        }
+    }
+    console.log(searchData);
+}
+
+function search(query) {
+    const results = [];
+
+    for (let itemKey in searchData) {
+        if (searchData.hasOwnProperty(itemKey)) {
+            const itemData = searchData[itemKey];
+
+            for (let url in itemData) {
+                if (itemData.hasOwnProperty(url)) {
+                    const keywords = itemData[url];
+
+                    if (keywords.some(keyword => keyword.toLowerCase().includes(query.toLowerCase()))) {
+                        results.push({ url, keywords })
+                    }
+                }
+            }
+        }
+    }
+
+    return results;
+}
+
+function addText(e) {
+    const pos = getRelativePointerPosition(layer);
+    const textNode = new Konva.Text({
+        x: pos.x,
+        y: pos.y,
+        text: 'Type here',
+        fontSize: parseInt(document.getElementById('text-size').value),
+        fontFamily: document.getElementById('text-font').value,
+        fill: document.getElementById('text-color').value,
+        draggable: true,
+        width: 200
+    });
+
+    layer.add(textNode);
+    layer.draw();
+
+    // Create textarea over canvas
+    const textPosition = textNode.absolutePosition();
+    const areaPosition = {
+        x: stage.container().offsetLeft + textPosition.x,
+        y: stage.container().offsetTop + textPosition.y,
+    };
+
+    const textarea = document.createElement('textarea');
+    document.body.appendChild(textarea);
+    textarea.value = textNode.text();
+    textarea.style.position = 'absolute';
+    textarea.style.top = areaPosition.y + 'px';
+    textarea.style.left = areaPosition.x + 'px';
+    textarea.style.width = textNode.width() + 'px';
+    textarea.style.height = textNode.height() + 'px';
+    textarea.style.fontSize = textNode.fontSize() + 'px';
+    textarea.style.fontFamily = textNode.fontFamily();
+    textarea.style.color = '#000000'; // Hard-coded color value for testing
+    textarea.style.backgroundColor = 'blue';
+    textarea.style.border = '1px solid #8A2BE2';
+    textarea.style.borderRadius = '4px';
+    textarea.style.padding = '4px';
+    textarea.style.outline = 'none';
+    textarea.style.resize = 'none';
+
+    isEditingText = true;
+    textarea.focus();
+
+    textarea.addEventListener('input', function () {
+        textNode.text(textarea.value);
+        layer.draw();
+    });
+
+    textarea.addEventListener('blur', function () {
+        textNode.text(textarea.value);
+        layer.draw();
+        document.body.removeChild(textarea);
+        isEditingText = false;
+    });
+
+    // Double-click to edit
+    textNode.on('dblclick', function () {
+        const textarea = document.createElement('textarea');
+        document.body.appendChild(textarea);
+
+        const textPosition = this.absolutePosition();
+        textarea.style.position = 'absolute';
+        textarea.style.top = (textPosition.y-40 + stage.container().offsetTop) + 'px';
+        textarea.style.left = (textPosition.x + stage.container().offsetLeft) + 'px';
+        textarea.style.width = this.width()*1.15 + 'px';
+        textarea.style.background = '#B19CD9';
+
+        textarea.value = this.text();
+        textarea.focus();
+
+        textarea.addEventListener('input', () => {
+            this.text(textarea.value);
+            layer.draw();
+        });
+
+        textarea.addEventListener('blur', () => {
+            this.text(textarea.value);
+            layer.draw();
+            document.body.removeChild(textarea);
+        });
+    });
+
+    recordAction({
+        type: 'addText',
+        node: textNode
+    });
+}
+
+function addShape(e) {
+    const startPos = getRelativePointerPosition(layer);
+    let shape;
+    const shapeType = document.getElementById('shape-type').value;
+    const commonProps = {
+        x: startPos.x,
+        y: startPos.y,
+        fill: document.getElementById('shape-fill').value,
+        stroke: document.getElementById('shape-stroke').value,
+        strokeWidth: parseInt(document.getElementById('shape-stroke-width').value),
+        draggable: false
+    };
+
+    switch (shapeType) {
+        case 'Rectangle':
+            shape = new Konva.Rect({
+                ...commonProps,
+                width: 1,
+                height: 1
+            });
+            break;
+        case 'Circle':
+            shape = new Konva.Circle({
+                ...commonProps,
+                radius: 1
+            });
+            break;
+        case 'Triangle':
+            shape = new Konva.RegularPolygon({
+                ...commonProps,
+                sides: 3,
+                radius: 1
+            });
+            break;
+    }
+
+    layer.add(shape);
+    layer.draw();
+
+    function onMouseMove(e) {
+        const pos = getRelativePointerPosition(layer);
+        let snapToGridEnabled = document.getElementById('shape-snap').checked || e.evt.shiftkey;
+        let endPos = snapToGridEnabled ? snapToGrid(pos.x, pos.y) : pos;
+
+        const width = Math.abs(endPos.x - startPos.x);
+        const height = Math.abs(endPos.y - startPos.y);
+
+        if (shapeType === 'Rectangle') {
+            shape.width(width);
+            shape.height(height);
+            shape.position({
+                x: Math.min(startPos.x, endPos.x),
+                y: Math.min(startPos.y, endPos.y)
+            });
+        } else if (shapeType === 'Circle') {
+            const radius = Math.sqrt(width * width + height * height) / 2;
+            shape.radius(radius);
+        } else if (shapeType === 'Triangle') {
+            const radius = Math.sqrt(width * width + height * height) / 2;
+            shape.radius(radius);
+        }
+
+        layer.batchDraw();
+    }
+
+    function onMouseUp() {
+        stage.off('mousemove', onMouseMove);
+        stage.off('mouseup', onMouseUp);
+
+        shape.draggable(true);
+
+        recordAction({
+            type: 'addShape',
+            node: shape
+        });
+    }
+
+    stage.on('mousemove', onMouseMove);
+    stage.on('mouseup', onMouseUp);
+}
+
 
 function shortcut_draggable() {
     const shortcut = document.querySelector(".overlay-content");
@@ -790,8 +1085,6 @@ function stopDrawing() {
             size: lastLine.strokeWidth()
         });
     }
-
-    console.log(actionHistory);
 }
 
 //toggles toolbox visibility on click
@@ -878,6 +1171,65 @@ function getToolOptions(tool) {
                 type: 'checkbox'
             }
             ];
+        case 'text':
+            return [
+                {
+                    id: 'text-content',
+                    label: 'Text',
+                    type: 'text',
+                    value: 'Enter text'
+                },
+                {
+                    id: 'text-font',
+                    label: 'Font',
+                    type: 'select',
+                    options: ['Arial', 'Verdana', 'Times New Roman', 'Courier']
+                },
+                {
+                    id: 'text-size',
+                    label: 'Size',
+                    type: 'number',
+                    value: 16
+                },
+                {
+                    id: 'text-color',
+                    label: 'Color',
+                    type: 'color',
+                    value: '#000000'
+                }
+            ];
+        case 'shape':
+            return [
+                {
+                    id: 'shape-type',
+                    label: 'Shape',
+                    type: 'select',
+                    options: ['Rectangle', 'Circle', 'Triangle']
+                },
+                {
+                    id: 'shape-fill',
+                    label: 'Fill Color',
+                    type: 'color',
+                    value: '#ffffff'
+                },
+                {
+                    id: 'shape-stroke',
+                    label: 'Stroke Color',
+                    type: 'color',
+                    value: '#000000'
+                },
+                {
+                    id: 'shape-stroke-width',
+                    label: 'Stroke Width',
+                    type: 'number',
+                    value: 2
+                },
+                {
+                    id: 'shape-snap',
+                    label: 'Snap to Grid',
+                    type: 'checkbox'
+                }
+            ];
         default:
             return [];
     }
@@ -885,7 +1237,6 @@ function getToolOptions(tool) {
 
 //undo feature
 function undo() {
-    console.log("Undo pressed, currentActionIndex:", currentActionIndex);
     if (currentActionIndex >= 0) {
         currentActionIndex--;
         updateCanvas();
@@ -894,7 +1245,6 @@ function undo() {
 
 //redo reature
 function redo() {
-    console.log("Redo pressed, currentActionIndex:", currentActionIndex);
     if (currentActionIndex < actionHistory.length - 1) {
         currentActionIndex++;
         updateCanvas();
@@ -903,7 +1253,6 @@ function redo() {
 
 //recording the user's action which can be used to undo or redo
 function recordAction(action) {
-    console.log("Recording action:", action);
     actionHistory = actionHistory.slice(0, currentActionIndex + 1);
     actionHistory.push(action);
     currentActionIndex++;
