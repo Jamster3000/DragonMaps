@@ -82,15 +82,13 @@ const searchBar = document.getElementById('search-bar');
 const searchResults = document.getElementById('search-results');
 const resultsContainer = document.getElementById('image-grid');
 
-function preloadImages(urls) {
-    return Promise.all(urls.map(url => {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve(url);
-            img.onerror = () => reject(url);
-            img.src = url;
-        });
-    }));
+function preloadImage(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(url);
+        img.onerror = () => reject(url);
+        img.src = url;
+    });
 }
 
 function debounce(func, delay) {
@@ -125,17 +123,30 @@ const performSearch = debounce(() => {
     if (query !== "") {
         results.forEach(result => {
             const img = document.createElement('img');
-            img.src = result.url;
             img.alt = 'Search result image';
             img.style.border = "1px solid #FF4500";
             img.style.maxWidth = "100px";
             img.style.margin = "5px";
+            
+            // Add a loading placeholder
+            img.src = 'path/to/placeholder.gif';
+            
             resultsContainer.appendChild(img);
+
+            // Preload the actual image
+            preloadImage(result.url)
+                .then(() => {
+                    img.src = result.url;
+                })
+                .catch(() => {
+                    console.error(`Failed to load image: ${result.url}`);
+                    img.src = 'path/to/error-image.png';
+                });
         });
     }
 
     console.log(`Added ${results.length} results to the DOM`);
-}, 300); // 300ms delay
+}, 300);
 
 
 searchBar.addEventListener('input', performSearch);
