@@ -144,6 +144,7 @@ const performSearch = debounce(() => {
             img.style.border = "1px solid #FF4500";
             img.title = 'Drag to reorder';
             img.draggable = true;
+            img.decoding="asynchronous"
             img.dataset.src = result.url; // For lazy loading
             img.addEventListener('dragstart', onDragStart);
 
