@@ -122,16 +122,26 @@ const performSearch = debounce(() => {
 
     if (query !== "") {
         results.forEach(result => {
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('result-item');
+
             const img = document.createElement('img');
+            img.className = "image-results";
             img.alt = 'Search result image';
             img.style.border = "1px solid #FF4500";
             img.style.maxWidth = "100px";
             img.style.margin = "5px";
+            img.title = 'Drag to reorder';
+            img.draggable = true;
             
             // Add a loading placeholder
-            img.src = '../assets/images/loading.gif';
+            img.src = 'path/to/placeholder.gif';
             
-            resultsContainer.appendChild(img);
+            // Add drag start event listener
+            img.addEventListener('dragstart', onDragStart);
+
+            resultItem.appendChild(img);
+            resultsContainer.appendChild(resultItem);
 
             // Preload the actual image
             preloadImage(result.url)
