@@ -1354,30 +1354,22 @@ function rightPanel() {
     });
 
 
-    // Load assets from the right panel
-     function loadAssets(category, assets) {
-        let container = document.querySelector(`#assets-section .asset-category:nth-child(${category}) .category-content`);
-        assets.forEach(asset => {
-            let resultItem = document.createElement('div');
-            resultItem.classList.add('result-item');
-    
-            let img = document.createElement('img');
-            img.className = "image-results";
-            img.src = asset.url;
-            img.alt = asset.name;
-            img.title = `${asset.name} - Drag to add to canvas`;
-            img.draggable = true;
-            img.style.maxWidth = "100px";
-            img.style.margin = "5px";
-            img.style.border = "1px solid #FF4500";
-    
-            // Add drag start event listener
-            img.addEventListener('dragstart', onDragStart);
-    
-            resultItem.appendChild(img);
-            container.appendChild(resultItem);
-        });
-    }
+// Load assets from the right panel
+function loadAssets(category, assets) {
+    let container = document.querySelector(`#assets-section .asset-category:nth-child(${category}) .category-content`);
+    assets.forEach(asset => {
+        let img = document.createElement('img');
+        img.src = asset.url;
+        img.alt = asset.name;
+        img.title = asset.name;
+        img.draggable = true;
+        img.style.maxWidth = "100px";
+        img.style.margin = "5px";
+        img.style.border = "1px solid #FF4500";
+        img.addEventListener('dragstart', onDragStart);
+        container.appendChild(img);
+    });
+}
 
     //feature to export the finished battlemap onto the user's device
     document.getElementById('export-image').addEventListener('click', function () {
