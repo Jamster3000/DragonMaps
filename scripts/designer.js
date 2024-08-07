@@ -147,6 +147,8 @@ const performSearch = debounce(() => {
             .catch(failedUrls => {
                 console.error('Failed to preload some images:', failedUrls);
             });
+
+        console.log(`Added ${results.length} results to the DOM`); 
     }
 }, 300);
 
@@ -873,37 +875,25 @@ function buildInvertedIndex() {
 buildInvertedIndex();
 
 function search(query) {
-    const queryWords = query.toLowerCase().split(/\s+/).filter(word => word.length > 0);
-    const candidateUrls = new Set();
     const results = [];
+    const lowerQuery = query.toLowerCase();
 
-    // Find candidate URLs
-    for (let queryWord of queryWords) {
-        for (let keyword in invertedIndex) {
-            if (keyword.includes(queryWord)) {
-                for (let url of invertedIndex[keyword]) {
-                    candidateUrls.add(url);
+    for (let itemKey in searchData) {
+        if (searchData.hasOwnProperty(itemKey)) {
+            const itemData = searchData[itemKey];
+            for (let url in itemData) {
+                if (itemData.hasOwnProperty(url)) {
+                    const keywords = itemData[url];
+                    if (keywords.some(keyword => keyword.toLowerCase().includes(lowerQuery))) {
+                        results.push({ url, keywords });
+                    }
                 }
             }
         }
     }
-
-    // Score candidate URLs
-    for (let url of candidateUrls) {
-        let score = 0;
-        for (let itemKey in searchData) {
-            if (searchData[itemKey][url]) {
-                const keywords = searchData[itemKey][url];
-                score += calculateRelevanceScore(queryWords, keywords);
-                if (score > 0) {
-                    results.push({ url, keywords, score });
-                }
-                break;
-            }
-        }
-    }
-
-    return results.sort((a, b) => b.score - a.score);
+    
+    console.log(`Search for "${query}" returned ${results.length} results`); // Debugging line
+    return results;
 }
 
 function calculateRelevanceScore(queryWords, keywords) {
