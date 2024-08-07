@@ -348,6 +348,7 @@ function onDragOver(e) {
 function onDrop(e) {
     e.preventDefault();
     const imageUrl = e.dataTransfer.getData('text');
+    console.log(imageUrl);
 
     // Get the stage's container and its bounding rectangle
     const stageContainer = stage.container();
