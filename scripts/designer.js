@@ -1775,7 +1775,7 @@ function checkImageOnCanvas() {
         document.getElementById('export-image').disabled = false;
         document.getElementById('export-json').disabled = false;
     } else {
-        //document.getElementById('export-image').disabled = true;
-        //document.getElementById('export-json').disabled = true;
+        document.getElementById('export-image').disabled = true;
+        document.getElementById('export-json').disabled = true;
     }
 }
