@@ -65,20 +65,6 @@ button {
         background-color: var(--accent-color);
     }
 
-/* Magical Background */
-.magical-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%), radial-gradient(circle at 20% 20%, rgba(255, 107, 107, 0.05) 0%, transparent 30%), radial-gradient(circle at 80% 80%, rgba(255, 69, 0, 0.05) 0%, transparent 30%);
-    background-size: 100% 100%, 50% 50%, 75% 75%;
-    background-repeat: no-repeat;
-    animation: backgroundShimmer 20s infinite alternate;
-    z-index: -1;
-}
-
 @keyframes backgroundShimmer {
     0% {
         background-position: 0% 0%;
@@ -245,7 +231,7 @@ footer {
     top: 80px;
     left: -100px;
     width: 50px;
-    height: 80%;
+    height: auto;
     color: white;
     transition: left 0.3s ease-in-out;
     z-index: 1000;
@@ -281,7 +267,8 @@ footer {
     justify-content: center;
     width: 40px;
     height: 40px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    margin-left: 5px;
     background-color: var(--primary-color);
     color: var(--text-color);
     border: none;
@@ -385,8 +372,8 @@ footer {
 #right-panel {
     position: fixed;
     top: 50px;
-    right: -30%;
-    width: 30%;
+    right: -25%;
+    width: 25%;
     height: calc(100% - 70px);
     background-color: var(--background-color);
     border-left: 1px solid var(--primary-color);
@@ -434,7 +421,7 @@ footer {
     }
 
     #toggle-right-panel.panel-open {
-        right: 490px;
+        right: 405px;
     }
 
 .panel-section {
@@ -503,20 +490,16 @@ button {
 }
 
 .category-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
 }
 
     .category-content img {
-        width: 60%;
-        max-width: 300px; /* Adjust this value as needed */
+        width: 100%; 
+        max-width: 150px;
         height: auto;
-        margin-bottom: 20px;
-        margin-left: 85px;
-        cursor: pointer;
-        transition: transform 0.3s ease;
+        object-fit: cover
     }
 
         .category-content img:hover {

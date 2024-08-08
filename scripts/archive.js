@@ -64,6 +64,7 @@ function loadImages(imageData) {
             let imgElement = document.createElement('img');
             imgElement.src = img.thumbnail;
             imgElement.alt = `Image by ${creator}`;
+            imgElement.draggable = true;
             imgElement.dataset.fullSrc = img.url;
             imgElement.addEventListener('click', loadFullImage);
             contentDiv.appendChild(imgElement);

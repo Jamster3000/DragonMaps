@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="../styles/designer.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.6.0/fabric.min.js"></script>
+
     <script src="https://unpkg.com/konva@8.4.2/konva.min.js"></script>
 </head>
 <body class="designer-page">
@@ -57,7 +59,7 @@
     <main id="designer-container">
         <button id="toggle-toolbox" class="toggle-button">&#9668;&#9668;</button>
         <div id="toolbox" class="toolbox-overlay">
-            <h2>Tools</h2>
+            <h2 style="font-size: 22px;">Tools</h2>
             <button data-tool="draw" title="Draw"><i data-tool="draw" class="fas fa-pencil-alt"></i></button>
             <button data-tool="erase" title="Erase"><i data-tool="erase" class="fas fa-eraser"></i></button>
             <button data-tool="text" title="Text"><i data-tool="text" class="fa-solid fa-font"></i></button>
