@@ -90,6 +90,7 @@ const resultsContainer = document.getElementById('image-grid');
 function preloadImage(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
+        img.crossOrigin = 'Anonymous';
         img.onload = () => resolve(url);
         img.onerror = () => reject(url);
         img.src = url;
@@ -174,6 +175,7 @@ function lazyLoadImages() {
             if (entry.isIntersecting) {
                 const img = entry.target;
                 const fullImg = new Image();
+                fullImg.crossOrigin = 'Anonymous';
                 fullImg.src = img.dataset.src;
                 fullImg.onload = () => {
                     img.src = fullImg.src;
@@ -388,6 +390,7 @@ function onDrop(e) {
 
     // Create a new Konva Image
     const imageObj = new Image();
+    imageObj.crossOrigin = 'Anonymous';
     imageObj.onload = function () {
         const konvaImage = new Konva.Image({
             image: imageObj,
