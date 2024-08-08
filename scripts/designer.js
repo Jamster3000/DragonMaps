@@ -34,6 +34,8 @@ let searchData = {};
 let dropIndicator;
 const transformers = [];
 let currentTransformer;
+let imagePresenceCallback;
+let imageNode = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('canvas-container');
@@ -61,6 +63,9 @@ document.addEventListener('DOMContentLoaded', function () {
     popup_draggable();//makes the popup tool box draggable
     loadSearch();
     loadCustomFont();//load in any custom imported fonts that are saved in cache
+
+
+    setInterval(checkImageOnCanvas, 100);
 });
 
 //listens for the right click menu
@@ -296,6 +301,8 @@ function setupEventListeners() {
     stageContainer.addEventListener('dragover', onDragOver);
     stageContainer.addEventListener('drop', onDrop);
 
+    
+
     document.getElementById('new-map-option').addEventListener('click', showNewMapOverlay);
     document.getElementById('toggle-toolbox').addEventListener('click', toggleToolbox);
     document.addEventListener('keydown', handleKeyDown);
@@ -365,9 +372,6 @@ function hideShortcuts() {
 // asset management on canvas
 //==================
 //allows images to be dragged and moved about on the canvas
-function onDragStart(e) {
-    e.dataTransfer.setData('text/plain', e.target.src);
-}
 
 //allows for dropping images
 function onDragOver(e) {
@@ -375,54 +379,47 @@ function onDragOver(e) {
 }
 
 //when the image ahs been dropped
+function onDragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.id);
+}
+
+function onDragOver(e) {
+    e.preventDefault();
+}
+
 function onDrop(e) {
     e.preventDefault();
 
-    const imageUrl = e.dataTransfer.getData('text');
+    const elementId = e.dataTransfer.getData('text/plain');
+    const draggedElement = document.getElementById(elementId);
 
-    // Get the stage's container and its bounding rectangle
-    const stageContainer = stage.container();
-    const stageRect = stageContainer.getBoundingClientRect();
+    if (draggedElement && draggedElement.id === 'watermark') {
+        // Get the stage's container and its bounding rectangle
+        const stageContainer = stage.container();
+        const stageRect = stageContainer.getBoundingClientRect();
 
-    // Calculate the drop position relative to the stage
-    const dropX = (e.clientX - stageRect.left - stage.x()) / stage.scaleX();
-    const dropY = (e.clientY - stageRect.top - stage.y()) / stage.scaleY();
+        // Calculate the drop position relative to the stage
+        const dropX = (e.clientX - stageRect.left - stage.x()) / stage.scaleX();
+        const dropY = (e.clientY - stageRect.top - stage.y()) / stage.scaleY();
 
-    // Create a new Konva Image
-    const imageObj = new Image();
-    imageObj.crossOrigin = 'Anonymous';
-    imageObj.onload = function () {
+        // Create a new Konva Image
         const konvaImage = new Konva.Image({
-            image: imageObj,
+            image: draggedElement,
             draggable: true,
             x: dropX,
             y: dropY,
-            offsetX: this.width / 2,
-            offsetY: this.height / 2
+            id: "konva-watermark",
+            offsetX: draggedElement.width / 2,
+            offsetY: draggedElement.height / 2,
+            width: 150,
+            height: 150,
+            crossOrigin: 'anonymous'
         });
 
-        // Create a transformer
-        const transformer = new Konva.Transformer({
-            nodes: [konvaImage],
-            // Optional: customize appearance
-            borderStroke: 'blue',
-            borderStrokeWidth: 2,
-            padding: 10,
-            resizeEnabled: true,
-            rotateEnabled: true,
-            anchorCornerRadius: 50,
-            anchorSize: 14,
-            shouldOverdrawWholeArea: true,
-            rotateAnchorOffset: 60,
-            enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
-            rotationSnapTolerance: 10,
-        });
-
-        // Add the image and transformer to the layer
+        // Add the image to the layer and record the action
         layer.add(konvaImage);
-        layer.add(transformer);
+        layer.draw();
 
-        // Record the action for undo/redo
         recordAction({
             type: 'addImage',
             image: konvaImage
@@ -446,11 +443,123 @@ function onDrop(e) {
         });
 
         // Set transformer for the new image
+        const transformer = new Konva.Transformer({
+            nodes: [konvaImage],
+            // Optional: customize appearance
+            borderStroke: 'blue',
+            borderStrokeWidth: 2,
+            padding: 10,
+            resizeEnabled: true,
+            rotateEnabled: true,
+            anchorCornerRadius: 50,
+            anchorSize: 14,
+            shouldOverdrawWholeArea: true,
+            rotateAnchorOffset: 60,
+            enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
+            rotationSnapTolerance: 10,
+        });
+
+        const minSize = 150;
+        const maxSize = 30000;
+
+        transformer.on('transform', () => {
+            // Limit the scale
+            const scaleX = konvaImage.scaleX();
+            const scaleY = konvaImage.scaleY();
+
+            const width = konvaImage.width() * scaleX;
+            const height = konvaImage.height() * scaleY;
+
+            // Calculate new sizes respecting the limits
+            const newWidth = Math.max(minSize, Math.min(maxSize, width));
+            const newHeight = Math.max(minSize, Math.min(maxSize, height));
+
+            // Apply the new size while keeping the aspect ratio
+            konvaImage.scaleX(newWidth / konvaImage.width());
+            konvaImage.scaleY(newHeight / konvaImage.height());
+        });
+
+        layer.add(transformer);
         transformer.nodes([konvaImage]);
         currentTransformer = transformer;
         layer.batchDraw();
-    };
-    imageObj.src = imageUrl;
+    } else {
+        const imageUrl = e.dataTransfer.getData('text');
+
+        // Get the stage's container and its bounding rectangle
+        const stageContainer = stage.container();
+        const stageRect = stageContainer.getBoundingClientRect();
+
+        // Calculate the drop position relative to the stage
+        const dropX = (e.clientX - stageRect.left - stage.x()) / stage.scaleX();
+        const dropY = (e.clientY - stageRect.top - stage.y()) / stage.scaleY();
+
+        // Create a new Konva Image
+        const imageObj = new Image();
+        imageObj.crossOrigin = 'Anonymous';
+        imageObj.onload = function () {
+            const konvaImage = new Konva.Image({
+                image: imageObj,
+                draggable: true,
+                x: dropX,
+                y: dropY,
+                offsetX: this.width / 2,
+                offsetY: this.height / 2,
+                crossOrigin: 'anonymous',
+            });
+
+            // Create a transformer
+            const transformer = new Konva.Transformer({
+                nodes: [konvaImage],
+                // Optional: customize appearance
+                borderStroke: 'blue',
+                borderStrokeWidth: 2,
+                padding: 10,
+                resizeEnabled: true,
+                rotateEnabled: true,
+                anchorCornerRadius: 50,
+                anchorSize: 14,
+                shouldOverdrawWholeArea: true,
+                rotateAnchorOffset: 60,
+                enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
+                rotationSnapTolerance: 10,
+            });
+
+            // Add the image and transformer to the layer
+            layer.add(konvaImage);
+            layer.add(transformer);
+
+            // Record the action for undo/redo
+            recordAction({
+                type: 'addImage',
+                image: konvaImage
+            });
+
+            // Set up click event for image
+            konvaImage.on('click', function (evt) {
+                // Deselect the previous transformer if there is one
+                if (currentTransformer) {
+                    currentTransformer.nodes([]); // Remove the transformer from the previous image
+                    layer.batchDraw();
+                }
+
+                // Set the transformer to the clicked image
+                transformer.nodes([konvaImage]);
+                currentTransformer = transformer;
+                layer.batchDraw();
+
+                // Stop event propagation to avoid stage click
+                evt.cancelBubble = true;
+            });
+
+            // Set transformer for the new image
+            transformer.nodes([konvaImage]);
+            currentTransformer = transformer;
+            layer.batchDraw();
+        };
+        imageObj.src = imageUrl;
+
+    }
 }
 
 
@@ -800,7 +909,6 @@ function handleKeyDown(e) {
                 break;
             case 'shift':
                 try {
-                    console.log("yay");
                     document.getElementById(`${currentTool}-snap`).checked = true;
                     break;
                 } catch (TypeError) { }
@@ -1434,8 +1542,6 @@ function addText(e) {
 
     // Load the font before adding the text node
     document.fonts.load(`16px ${fontName}`).then(() => {
-        console.log(`Font ${fontName} loaded for adding text.`);
-
         const textNode = new Konva.Text({
             x: pos.x,
             y: pos.y,
@@ -1540,7 +1646,6 @@ function createTextEditor(textNode) {
 
 
 function loadGoogleFont() {
-    console.log("somethings happening");
     const fontName = document.getElementById('import-google-font').value;
     if (fontName && !searchData[fontName]) {
         const link = document.createElement('link');
@@ -1561,7 +1666,6 @@ function loadGoogleFont() {
 
         // Ensure the font is loaded
         document.fonts.load(`16px ${fontName}`).then(() => {
-            console.log(`Font ${fontName} loaded.`);
         });
     }
 }
@@ -1585,6 +1689,17 @@ function rightPanel() {
         toggleRightPanelButton.classList.toggle('panel-open');
 
         if (rightPanel.classList.contains('visible')) {
+            const watermarkImage = document.getElementById('watermark');
+
+            watermarkImage.className = "image-results";
+            watermarkImage.alt = 'Search result image';
+            watermarkImage.style.border = "1px solid #FF4500";
+            watermarkImage.style.maxWidth = "100px";
+            watermarkImage.style.margin = "5px";
+            watermarkImage.title = 'Drag to place on grid';
+            watermarkImage.draggable = true;
+            watermarkImage.addEventListener('dragstart', onDragStart);
+            
             toggleRightPanelButton.innerHTML = '&#9658;&#9658;';
         } else {
             toggleRightPanelButton.innerHTML = '&#9668;&#9668;';
@@ -1603,31 +1718,25 @@ function rightPanel() {
     });
 
     //feature to export the finished battlemap onto the user's device
+    // Get the export button
     document.getElementById('export-image').addEventListener('click', function (e) {
         e.preventDefault(); // Prevent any default action
-
         // Ensure all layers are drawn before exporting
         stage.draw();
-
         // Generate a data URL of the current state of the canvas
         const dataURL = stage.toDataURL({
             pixelRatio: 3, // Adjust the pixel ratio for image quality
         });
-
         // Create a hidden link element
         const link = document.createElement('a');
         link.href = dataURL;
         link.download = 'battlemap.png'; // Set the name of the downloaded file
-
         // Append the link to the body (it won't be visible)
         document.body.appendChild(link);
-
         // Programmatically click the link to trigger the download
         link.click();
-
         // Remove the link from the document
         document.body.removeChild(link);
-
         console.log('Exporting as image...');
     });
 
@@ -1657,5 +1766,16 @@ function loadCustomFont() {
                 fontSelect.appendChild(option);
             } catch (TypeError) { }
         }
+    }
+}
+
+function checkImageOnCanvas() {
+    const foundImage = layer.find('#konva-watermark');
+    if (foundImage.length > 0) {
+        document.getElementById('export-image').disabled = false;
+        document.getElementById('export-json').disabled = false;
+    } else {
+        //document.getElementById('export-image').disabled = true;
+        //document.getElementById('export-json').disabled = true;
     }
 }

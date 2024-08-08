@@ -65,15 +65,12 @@ button {
         background-color: var(--accent-color);
     }
 
-@keyframes backgroundShimmer {
-    0% {
-        background-position: 0% 0%;
+    button:disabled {
+        background-color: #555; /* A darker, muted color to indicate disabled state */
+        color: #aaa; /* Lighter text color for disabled state */
+        cursor: not-allowed; /* Change cursor to indicate the button is not clickable */
+        opacity: 0.4; /* Slightly transparent to indicate disabled */
     }
-
-    100% {
-        background-position: 100% 100%;
-    }
-}
 
 /* Header and Navigation */
 header, .designer-header {
@@ -597,6 +594,12 @@ button {
         padding: 2px 4px;
         font-family: monospace;
     }
+
+#export-image,
+#export-json, 
+#add-layer{
+    width: 100% !important;
+}
 
 /*search bar*/
 .search-bar {
