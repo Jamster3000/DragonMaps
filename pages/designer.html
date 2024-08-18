@@ -6,13 +6,16 @@
     <meta name="description" content="Create and share epic D&D battlemaps with DragonMaps. Design your maps with our easy-to-use online tool.">
     <title>DragonMaps - D&D Battlemap Creator</title>
     <link rel="stylesheet" href="../styles/designer.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.6.0/fabric.min.js"></script>
 
-    <script src="https://unpkg.com/konva@8.4.2/konva.min.js"></script>
+    <script src="https://unpkg.com/konva@8.4.2/konva.min.js" defer></script>
 </head>
 <body class="designer-page">
+    <noscript>
+        <p>JavaScript is required to use this application. Please enable JavaScript in your browser settings.</p>
+    </noscript>
+
     <div id="menu"></div>
     <header class="designer-header">
         <nav>
@@ -21,7 +24,7 @@
                 <div class="logo"><a href="/" style="color: #FF6B6B; text-decoration: none;">DragonMaps Designer</a></div>
             </div>
 
-            <div class="menu-container nav-right">
+            <nav class="menu-container nav-right">
                 <input style="margin-right: 40px;" id="search-bar" class="search-bar" type="text" placeholder="Search assets" name="search">
 
                 <div id="file-menu" class="dropdown">
@@ -53,7 +56,7 @@
                         <a href="tutorials.html" id="tutorals" title="See DragonMaps tutorials: (ALT+U)">Tutorial</a>
                     </div>
                 </div>
-            </div>
+            </nav>
         </nav>
     </header>
     <main id="designer-container">
@@ -102,7 +105,9 @@
                 <h3 class="section-header">Export <span class="toggle-icon">▼</span></h3>
                 <div class="section-content">
                     <div class="asset-item">
-                        <img src="../apple.jpg" data-full-src="../apple.jpg" alt="watermark" draggable="true" id="watermark">
+                        <picture>
+                            <img src="../apple.jpg" data-full-src="../apple.jpg" alt="watermark" draggable="true" id="watermark" loading="lazy">
+                        </picture>
                     </div>
                     <button id="export-image" title="Export your creation as an image">Export as Image</button>
                     <button id="export-json" title="Export your image as a super special data structured format. You can use this to open your map back into dragonMaps.">Export as JSON</button>
@@ -118,7 +123,13 @@
             </div>
         </div>
     </main>
-    <script src="../scripts/designer.js"></script>
-    <script src="../scripts/archive.js"></script>
+
+    <div id="loading-indicator" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading more images...</p>
+    </div>
+
+    <script src="../scripts/designer.js" defer></script>
+    <script src="../scripts/archive.js" defer></script>
 </body>
 </html>

@@ -36,6 +36,8 @@ const transformers = [];
 let currentTransformer;
 let imagePresenceCallback;
 let imageNode = null;
+let currentPage = 1;
+const resultsPerPage = 20;
 
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('canvas-container');
@@ -110,87 +112,113 @@ function debounce(func, delay) {
     };
 }
 
-const memoizedSearch = (() => {
-    const cache = new Map();
-    return (query) => {
-        if (cache.has(query)) {
-            return cache.get(query);
+class LRUCache {
+    constructor(capacity) {
+        this.capacity = capacity;
+        this.cache = new Map();
+    }
+
+    get(key) {
+        if (!this.cache.has(key)) return undefined;
+        const value = this.cache.get(key);
+        this.cache.delete(key);
+        this.cache.set(key, value);
+        return value;
+    }
+
+    put(key, value) {
+        if (this.cache.has(key)) this.cache.delete(key);
+        else if (this.cache.size >= this.capacity) {
+            this.cache.delete(this.cache.keys().next().value);
         }
-        const result = search(query);
-        cache.set(query, result);
-        return result;
-    };
-})();
+        this.cache.set(key, value);
+    }
+}
+
+const searchCache = new LRUCache(800); // Adjust capacity as needed
+
+const memoizedSearch = (query) => {
+    if (searchCache.get(query)) {
+        return searchCache.get(query);
+    }
+    const result = search(query);
+    searchCache.put(query, result);
+    return result;
+};
 
 const performSearch = debounce(() => {
     const query = searchBar.value.trim();
     const results = memoizedSearch(query);
     isEditingText = true;
-    
+
     searchResults.style.display = query === "" ? "none" : "block";
     resultsContainer.innerHTML = ''; // Clear previous results
 
     if (query !== "") {
-        results.forEach(result => {
-            const resultItem = document.createElement('div');
-            resultItem.classList.add('result-item');
+        currentPage = 1; // Reset page count for new search
+        loadMoreResults(results);
 
-            const img = document.createElement('img');
-            img.className = "image-results";
-            img.alt = 'Search result image';
-            img.style.border = "1px solid #FF4500";
-            img.style.maxWidth = "100px";
-            img.style.margin = "5px";
-            img.title = 'Drag to place on grid';
-            img.draggable = true;
-            
-            // Add a loading placeholder
-            img.src = '../assets/images/loading.gif';
-            
-            // Add drag start event listener
-            img.addEventListener('dragstart', onDragStart);
-
-            resultItem.appendChild(img);
-            resultsContainer.appendChild(resultItem);
-
-            // Preload the actual image
-            preloadImage(result.url)
-                .then(() => {
-                    img.src = result.url;
-                })
-                .catch(() => {
-                    console.error(`Failed to load image: ${result.url}`);
-                    img.src = 'path/to/error-image.png';
-                });
-        });
+        // Add sentinel for infinite scrolling
+        const sentinel = document.createElement('div');
+        sentinel.id = 'sentinel';
+        resultsContainer.appendChild(sentinel);
+        resultsObserver.observe(sentinel);
     }
 }, 300);
 
+function loadMoreResults(results) {
+    const startIndex = (currentPage - 1) * resultsPerPage;
+    const endIndex = startIndex + resultsPerPage;
+    const pageResults = results.slice(startIndex, endIndex);
+
+    pageResults.forEach(result => {
+        const resultItem = document.createElement('div');
+        resultItem.classList.add('result-item');
+
+        const img = document.createElement('img');
+        img.className = "image-results";
+        img.alt = 'Search result image';
+        img.style.border = "1px solid #FF4500";
+        img.style.maxWidth = "100px";
+        img.style.margin = "5px";
+        img.title = 'Drag to place on grid';
+        img.draggable = true;
+
+        // Use data-src for lazy loading
+        img.dataset.src = result.url;
+
+        // Add a loading placeholder
+        img.src = '../assets/images/loading.gif';
+
+        // Add drag start event listener
+        img.addEventListener('dragstart', onDragStart);
+
+        resultItem.appendChild(img);
+        resultsContainer.appendChild(resultItem);
+    });
+
+    currentPage++;
+    lazyLoadImages();
+}
 
 searchBar.addEventListener('input', performSearch);
 function lazyLoadImages() {
     const images = resultsContainer.querySelectorAll('img[data-src]');
-    const options = {
-        root: null,
-        rootMargin: '200px', // Start loading images 200px before they enter the viewport
-        threshold: 0.1
-    };
-    const observer = new IntersectionObserver((entries, observer) => {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const img = entry.target;
-                const fullImg = new Image();
-                fullImg.crossOrigin = 'Anonymous';
-                fullImg.src = img.dataset.src;
-                fullImg.onload = () => {
-                    img.src = fullImg.src;
+                img.src = img.dataset.src;
+                img.onload = () => {
                     img.removeAttribute('data-src');
+                    img.classList.add('loaded');
                 };
-                observer.unobserve(img);
+                imageObserver.unobserve(img);
             }
         });
-    }, options);
-    images.forEach(img => observer.observe(img));
+    }, { rootMargin: '200px 0px' });
+
+    images.forEach(img => imageObserver.observe(img));
 }
 
 // Search on input change
@@ -210,6 +238,14 @@ searchBar.addEventListener('focus', () => {
 searchBar.addEventListener('blur', () => {
     isSearchBarFocused = false;
 });
+
+const resultsObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+        const query = searchBar.value.trim();
+        const results = memoizedSearch(query);
+        loadMoreResults(results);
+    }
+}, { rootMargin: '100px' });
 
 //hides the search result when clicking off it
 document.addEventListener('click', (event) => {
@@ -1644,7 +1680,6 @@ function createTextEditor(textNode) {
     }
 }
 
-
 function loadGoogleFont() {
     const fontName = document.getElementById('import-google-font').value;
     if (fontName && !searchData[fontName]) {
@@ -1669,7 +1704,6 @@ function loadGoogleFont() {
         });
     }
 }
-
 
 //recording the user's action which can be used to undo or redo
 function recordAction(action) {
@@ -1739,9 +1773,6 @@ function rightPanel() {
         document.body.removeChild(link);
         console.log('Exporting as image...');
     });
-
-
-
 
     //export the battlemap to json or similar
     document.getElementById('export-json').addEventListener('click', function () {
