@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // List of markdown files
     const posts = [
+        '19-8-2024-DragonMap Update.md',
         '24-7-2024-Welcome.md'
     ];
 
