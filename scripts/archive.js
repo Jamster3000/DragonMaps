@@ -1,5 +1,5 @@
 ﻿const ITEMS_PER_PAGE = 100;
-let currentPage = 1;
+const currentPage = 1;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
