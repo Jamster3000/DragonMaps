@@ -1,42 +1,31 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const postsContainer = document.getElementById('posts-container');
-    const postsFolder = '../posts'; // Folder where markdown files are stored
+async function renderPosts() {
+    const postFiles = ['19-8-2024-DragonMap Update.md', '24-7-2024-Welcome.md'];
+    
+    console.log('Post files to process:', postFiles);
 
-    // List of markdown files
-    const posts = [
-        '19-8-2024-DragonMap Update.md',
-        '24-7-2024-Welcome.md'
-    ];
+    // Sort files by date (newest first)
+    postFiles.sort((a, b) => extractDateFromFilename(b) - extractDateFromFilename(a));
+    
+    console.log('Sorted post files:', postFiles);
 
-    // Create an array of promises for fetching the markdown files
-    const fetchPromises = posts.map(post => {
-        const filePath = `${postsFolder}/${post}`;
-        return fetch(filePath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Could not fetch ${filePath}`);
-                }
-                return response.text();
-            })
-            .then(content => ({
-                post,
-                content
-            }))
-            .catch(error => console.error('Error fetching markdown file:', error));
-    });
-
-    // Once all fetch requests are completed, process the markdown files
-    Promise.all(fetchPromises)
-        .then(results => {
-            results.forEach(({ post, content }) => {
-                // Convert markdown to HTML using marked
-                const postElement = document.createElement('div');
-                postElement.className = 'post';
-                postElement.innerHTML = `
-                    <h2>${post.replace('.md', '')}</h2>
-                    <div>${marked(content)}</div>
-                `;
-                postsContainer.appendChild(postElement);
-            });
-        });
-});
+    for (const file of postFiles) {
+        try {
+            console.log('Fetching file:', file);
+            const markdown = await fetchMarkdownFile(file);
+            console.log('Markdown content:', markdown.substring(0, 100) + '...'); // Log first 100 characters
+            const html = marked.parse(markdown);
+            const postElement = document.createElement('div');
+            const date = extractDateFromFilename(file);
+            postElement.innerHTML = `
+                <div class="update-post-container">
+                    <div class="post-date">${date.toLocaleDateString()}</div>
+                    ${html}
+                </div>
+            `;
+            console.log('Appending post element for:', file);
+            postsContainer.appendChild(postElement);
+        } catch (error) {
+            console.error(`Error loading ${file}:`, error);
+        }
+    }
+}
