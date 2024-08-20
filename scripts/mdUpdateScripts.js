@@ -8,17 +8,27 @@ document.addEventListener('DOMContentLoaded', function() {
         '24-7-2024-Welcome.md'
     ];
 
-    posts.forEach(post => {
+    // Create an array of promises for fetching the markdown files
+    const fetchPromises = posts.map(post => {
         const filePath = `${postsFolder}/${post}`;
-
-        fetch(filePath)
+        return fetch(filePath)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Could not fetch ${filePath}`);
                 }
                 return response.text();
             })
-            .then(content => {
+            .then(content => ({
+                post,
+                content
+            }))
+            .catch(error => console.error('Error fetching markdown file:', error));
+    });
+
+    // Once all fetch requests are completed, process the markdown files
+    Promise.all(fetchPromises)
+        .then(results => {
+            results.forEach(({ post, content }) => {
                 // Convert markdown to HTML using marked
                 const postElement = document.createElement('div');
                 postElement.className = 'post';
@@ -27,8 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div>${marked(content)}</div>
                 `;
                 postsContainer.appendChild(postElement);
-            })
-            .catch(error => console.error('Error fetching markdown file:', error));
-    });
+            });
+        });
 });
-
