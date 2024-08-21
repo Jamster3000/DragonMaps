@@ -1,14 +1,10 @@
-# testWebSite
+# DragonMaps©
 
-### Ideas to make this work without costing anything
-- Use github for the front end and javascript for the dynamic of it
-- Use cloudflare workers API for processing huge amount of data (use only when optimization fails)
-- Noun project for icons API (maybe?)
-- use pathfinding.js for smart walls (avoiding objects whilst drawing a wall, terrain generation?)
-- canvas as the core for the map area konva for optimization and being able to make things interactable
-- use hammer.js to make it mobile friendly
-- shadows: three.js?
-- drag and drop functionality: interact.js for other features too?
-- For my personally made maps, tokens, assets, etc I will use archieve.org as there is no limit on storage and the API can be used to get and upload images
-- Consider using paper.js for snapping objects to grid?
-- use html2canvas to export?
+DragonMaps is a free to use battlemap maker with Tabletop Role Playing games specifically in mind. WHen I say for TTRPG's I mean virtual Tabletops such as Roll20, Foundry, and the awesome **__Cauldron VTT__**. There are a lot of plans for this, so far, there is little to nothing that makes DragonMaps unique or even interesting (Besides the funky colour theme).  Whether you're crafting an epic encounter or working on designing a detailed world, DragonMaps© provides a user-friendly platform to create and bring your maps to life.
+
+##### Table of Contents  
+[Headers](#headers)  
+[Emphasis](#emphasis)  
+...snip...    
+<a name="headers"/>
+## Headers
