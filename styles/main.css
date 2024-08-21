@@ -42,6 +42,10 @@ body::before {
     100% { background-position: 100% 100%; }
 }
 
+a {
+    color: var(--nav-link-color);
+}
+
 header, footer {
     background-color: var(--header-color);
     color: var(--text-color);
@@ -129,10 +133,6 @@ h3{
     font-size: 1.5rem;
     text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
     animation: headerGlow 4s infinite alternate;
-}
-
-a {
-    color: var(--nav-link-color);
 }
 
 @keyframes headerGlow {
