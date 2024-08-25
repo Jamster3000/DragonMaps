@@ -1,6 +1,28 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
+<style>
+  /* Custom Scrollbar Style */
+  ::-webkit-scrollbar {
+      width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+      background: var(--background-color);
+  }
+
+  ::-webkit-scrollbar-thumb {
+      background-color: var(--primary-color);
+      border-radius: 6px;
+      border: 3px solid var(--background-color);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+      background-color: var(--accent-color);
+  }
+</style>
+  
 <head>
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -23,7 +45,19 @@
 
   <main>
     <seciton id="hero">
-      <iframe width="640px" height="480px" src="https://forms.office.com/e/y6mia6a1c9?embed=true" frameborder="0" marginwidth="0" marginheight="0" style="border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
+       <iframe 
+          width="800px" 
+          height="440px" 
+          src="https://forms.office.com/e/y6mia6a1c9?embed=true" 
+          frameborder="0" 
+          marginwidth="0" 
+          marginheight="0" 
+          style="border: none; max-width:100%; max-height:100vh; scrollbar-width: thin;" 
+          allowfullscreen 
+          webkitallowfullscreen 
+          mozallowfullscreen 
+          msallowfullscreen>
+      </iframe>
     </section>
   </main>
 
