@@ -267,99 +267,163 @@ window.addEventListener('resize', positionToolboxPopup);
 //all the other even listerns for eventListener or stages
 function setupEventListeners() {
     const toolbox = document.getElementById('toolbox');
-
-    toolbox.addEventListener('click', function (e) {
-        if (isEditingText) {
-            return;
-        }
-
-        let targetElement = e.target;
-
-        // Ensure the target element is the button
-        if (e.target.tagName === 'I') {
-            targetElement = e.target.parentElement;
-        }
-
-        if (targetElement.tagName === 'BUTTON') {
-            const selectedTool = targetElement.getAttribute('data-tool');
-
-            if (targetElement.classList.contains('active')) {
-                targetElement.classList.remove('active');
-                currentTool = null;
-                hideToolOptions();
-                updateCursor();
-                updateShapesDraggable();
-            } else {
-                document.querySelectorAll('#toolbox button').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                targetElement.classList.add('active');
-                currentTool = selectedTool;
-                showToolOptions(currentTool, targetElement);
-                updateCursor();
-                updateShapesDraggable();
-            }
-        }
-    });
-
-    // Ensure these elements exist before adding event listeners
     const newMapOption = document.getElementById('new-map-option');
+    const toggleToolboxButton = document.getElementById('toggle-toolbox');
     const undoMenuItem = document.getElementById('undo-menu-item');
     const redoMenuItem = document.getElementById('redo-menu-item');
     const showGridMenuItem = document.getElementById('show-grid-menu-item');
 
-    if (newMapOption) newMapOption.addEventListener('click', showNewMapOverlay);
-    if (undoMenuItem) undoMenuItem.addEventListener('click', undo);
-    if (redoMenuItem) redoMenuItem.addEventListener('click', redo);
-    if (showGridMenuItem) showGridMenuItem.addEventListener('click', toggleGrid);
-}
+    // Check if toolbox exists before adding event listeners
+    if (toolbox) {
+        toolbox.addEventListener('click', function (e) {
+            if (isEditingText) {
+                return;
+            }
 
+            let targetElement = e.target;
 
-    function hideToolOptions() {
-        const popupToolbox = document.getElementById('popup-toolbox');
-        popupToolbox.style.display = 'none';
+            // Ensure the target element is the button
+            if (e.target.tagName === 'I') {
+                targetElement = e.target.parentElement;
+            }
+
+            if (targetElement.tagName === 'BUTTON') {
+                const selectedTool = targetElement.getAttribute('data-tool');
+
+                if (targetElement.classList.contains('active')) {
+                    targetElement.classList.remove('active');
+                    currentTool = null; // Reset the current tool
+                    hideToolOptions(); // Hide tool options if needed
+                    updateCursor(); // Update cursor based on tool
+                    updateShapesDraggable(); // Update shape draggable status
+                } else {
+                    document.querySelectorAll('#toolbox button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    targetElement.classList.add('active');
+                    currentTool = selectedTool;
+                    showToolOptions(currentTool, targetElement);
+                    updateCursor();
+                    updateShapesDraggable();
+                }
+            }
+        });
     }
 
-    stage.content.addEventListener('contextmenu', function (e) {
-        e.preventDefault();
-    });
+    // Ensure these elements exist before adding event listeners
+    if (newMapOption) {
+        newMapOption.addEventListener('click', showNewMapOverlay);
+    }
 
-    stage.on('contextmenu', function (e) {
-        e.evt.preventDefault();
-    });
+    if (toggleToolboxButton) {
+        toggleToolboxButton.addEventListener('click', toggleToolbox);
+    }
 
-    stage.on('click', function () {
-        hideContextMenu();
-    });
+    if (undoMenuItem) {
+        undoMenuItem.addEventListener('click', undo);
+    }
 
-    // Handle mouse events
-    stage.on('mousedown', handleMouseDown);
-    stage.on('mousemove', handleMouseMove);
-    stage.on('mouseup', handleMouseUp);
-    stage.on('wheel', handleZoom);
+    if (redoMenuItem) {
+        redoMenuItem.addEventListener('click', redo);
+    }
 
-    stage.on('click', function () {
-        if (currentTransformer) {
-            currentTransformer.nodes([]); // Remove the transformer from the currently selected image
-            currentTransformer = null; // Clear the current transformer reference
-            layer.batchDraw();
+    if (showGridMenuItem) {
+        showGridMenuItem.addEventListener('click', toggleGrid);
+    }
+
+    // Adding event listeners to the stage
+    if (stage) {
+        stage.content.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        stage.on('contextmenu', function (e) {
+            e.evt.preventDefault();
+        });
+
+        stage.on('click', function () {
+            hideContextMenu();
+        });
+
+        // Handle mouse events on the stage
+        stage.on('mousedown', handleMouseDown);
+        stage.on('mousemove', handleMouseMove);
+        stage.on('mouseup', handleMouseUp);
+        stage.on('wheel', handleZoom);
+
+        // Handle clicking on stage to remove transformer
+        stage.on('click', function () {
+            if (currentTransformer) {
+                currentTransformer.nodes([]); // Remove the transformer from the currently selected image
+                currentTransformer = null; // Clear the current transformer reference
+                layer.batchDraw();
+            }
+        });
+
+        const stageContainer = stage.container();
+        if (stageContainer) {
+            stageContainer.addEventListener('dragover', onDragOver);
+            stageContainer.addEventListener('drop', onDrop);
+        }
+    }
+
+    // Handle document-wide click events to hide context menus and search results
+    document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!searchBar.contains(target) && !searchResults.contains(target)) {
+            searchResults.style.display = "none";
+            isEditingText = false;
+        }
+
+        if (activeMenu && !document.getElementById(`${activeMenu}-menu`).contains(target)) {
+            toggleMenu(activeMenu);
         }
     });
 
-    const stageContainer = stage.container();
-    stageContainer.addEventListener('dragover', onDragOver);
-    stageContainer.addEventListener('drop', onDrop);
+    // Hide right-click menu
+    window.addEventListener('click', () => {
+        if (menuNode) {
+            menuNode.style.display = 'none';
+        }
+    });
 
-    
+    // Resize toolbox popup on window resize
+    window.addEventListener('resize', positionToolboxPopup);
 
-    document.getElementById('new-map-option').addEventListener('click', showNewMapOverlay);
-    document.getElementById('toggle-toolbox').addEventListener('click', toggleToolbox);
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-    document.getElementById('undo-menu-item').addEventListener('click', undo);
-    document.getElementById('redo-menu-item').addEventListener('click', redo);
-    document.getElementById('show-grid-menu-item').addEventListener('click', toggleGrid);
+    // Export functionality
+    const exportImageButton = document.getElementById('export-image');
+    const exportJsonButton = document.getElementById('export-json');
+
+    if (exportImageButton) {
+        exportImageButton.addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent any default action
+            // Ensure all layers are drawn before exporting
+            stage.draw();
+            // Generate a data URL of the current state of the canvas
+            const dataURL = stage.toDataURL({
+                pixelRatio: 3, // Adjust the pixel ratio for image quality
+            });
+            // Create a hidden link element
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = 'battlemap.png'; // Set the name of the downloaded file
+            // Append the link to the body (it won't be visible)
+            document.body.appendChild(link);
+            // Programmatically click the link to trigger the download
+            link.click();
+            // Remove the link from the document
+            document.body.removeChild(link);
+            console.log('Exporting as image...');
+        });
+    }
+
+    if (exportJsonButton) {
+        exportJsonButton.addEventListener('click', function () {
+            console.log('Exporting as JSON...');
+        });
+    }
 }
+
 
 function updateCursor() {
     switch (currentTool) {
