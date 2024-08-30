@@ -71,14 +71,14 @@
     <main id="designer-container">
         <button id="toggle-toolbox" aria-label="Toggle toolbox" class="toggle-button">&#9668;&#9668;</button>
         <div id="toolbox" class="toolbox-overlay">
-            <h2 style="font-size: 22px;">Tools</h2>
+            <p style="font-size: 22px;">Tools</p>
             <button data-tool="draw" title="Draw"><i data-tool="draw" class="fas fa-pencil-alt" role="presentation"></i></button>
             <button data-tool="erase" title="Erase"><i data-tool="erase" class="fas fa-eraser" role="presentation"></i></button>
             <button data-tool="text" title="Text"><i data-tool="text" class="fa-solid fa-font" role="presentation"></i></button>
             <button data-tool="shape" title="Shape"><i data-tool="shape" class="fa-solid fa-shapes" role="presentation"></i></button>
         </div>
         <div id="popup-toolbox" title="Hold click and drag to move this window" class="popup-toolbox">
-            <h3>Tool Options</h3>
+            <p style="font-size: 20px;">Tool Options</p>
             <div id="tool-options"></div>
         </div>
 
@@ -95,7 +95,7 @@
         <button id="toggle-right-panel">&#9668;&#9668;</button>
         <aside id="right-panel">
             <div class="panel-section" id="layers-section">
-                <h3 class="section-header">Layers <span class="toggle-icon">▼</span></h3>
+                <p style="font-size: 20px;" class="section-header">Layers <span class="toggle-icon">▼</span></p>
                 <div class="section-content">
                     <ul id="layer-list">
                         <!-- Layers will be added here dynamically -->
@@ -105,13 +105,13 @@
             </div>
 
             <div class="panel-section" id="assets-section">
-                <h3 class="section-header">Assets <span class="toggle-icon">▼</span></h3>
+                <p style="font-size: 20px;" class="section-header">Assets <span class="toggle-icon">▼</span></p>
                 <div class="section-content">
                 </div>
             </div>
 
             <div class="panel-section" id="export-section">
-                <h3 class="section-header">Export <span class="toggle-icon">▼</span></h3>
+                <p style="font-size: 20px;" class="section-header">Export <span class="toggle-icon">▼</span></p>
                 <div class="section-content">
                     <div class="asset-item">
                         <picture>
@@ -127,7 +127,7 @@
 
         <div id="shortcuts-overlay" class="overlay">
             <div class="overlay-content">
-                <h2>Keyboard Shortcuts</h2>
+                <p style="font-size: 30px;">Keyboard Shortcuts</p>
                 <table id="shortcuts-table"></table>
                 <button id="close-shortcuts">Close</button>
             </div>
