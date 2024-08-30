@@ -1793,44 +1793,79 @@ function rightPanel() {
     const rightPanel = document.getElementById('right-panel');
     const toggleRightPanelButton = document.getElementById('toggle-right-panel');
 
-    toggleRightPanelButton.addEventListener('click', toggleRightPanel);
+    if (toggleRightPanelButton) {
+        toggleRightPanelButton.addEventListener('click', toggleRightPanel);
+    }
 
     function toggleRightPanel() {
-        rightPanel.classList.toggle('visible');
-        toggleRightPanelButton.classList.toggle('panel-open');
-        if (rightPanel.classList.contains('visible')) {
-            toggleRightPanelButton.innerHTML = '&#9658;&#9658;';
-        } else {
-            toggleRightPanelButton.innerHTML = '&#9668;&#9668;';
+        if (rightPanel) {
+            rightPanel.classList.toggle('visible');
+            toggleRightPanelButton.classList.toggle('panel-open');
+
+            if (rightPanel.classList.contains('visible')) {
+                const watermarkImage = document.getElementById('watermark');
+                
+                if (watermarkImage) {
+                    watermarkImage.className = "image-results";
+                    watermarkImage.alt = 'Search result image';
+                    watermarkImage.style.border = "1px solid #FF4500";
+                    watermarkImage.style.maxWidth = "100px";
+                    watermarkImage.style.margin = "5px";
+                    watermarkImage.title = 'Drag to place on grid';
+                    watermarkImage.draggable = true;
+                    watermarkImage.addEventListener('dragstart', onDragStart);
+                }
+                
+                toggleRightPanelButton.innerHTML = '&#9658;&#9658;';
+            } else {
+                toggleRightPanelButton.innerHTML = '&#9668;&#9668;';
+            }
         }
     }
 
-    document.querySelectorAll('.section-header, .category-header').forEach(header => {
-        header.addEventListener('click', function () {
-            this.classList.toggle('active');
-            let content = this.nextElementSibling;
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-            let icon = this.querySelector('.toggle-icon');
-            icon.textContent = icon.textContent === '▼' ? '▲' : '▼';
+    if (rightPanel) {
+        document.querySelectorAll('.section-header, .category-header').forEach(header => {
+            header.addEventListener('click', function () {
+                this.classList.toggle('active');
+                let content = this.nextElementSibling;
+                if (content) {
+                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                    let icon = this.querySelector('.toggle-icon');
+                    if (icon) {
+                        icon.textContent = icon.textContent === '▼' ? '▲' : '▼';
+                    }
+                }
+            });
         });
-    });
+    }
 
-    document.getElementById('export-image').addEventListener('click', function (e) {
-        e.preventDefault();
-        stage.draw();
-        const dataURL = stage.toDataURL({ pixelRatio: 3 });
-        const link = document.createElement('a');
-        link.href = dataURL;
-        link.download = 'battlemap.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        console.log('Exporting as image...');
-    });
+    const exportImageButton = document.getElementById('export-image');
+    const exportJsonButton = document.getElementById('export-json');
 
-    document.getElementById('export-json').addEventListener('click', function () {
-        console.log('Exporting as JSON...');
-    });
+    if (exportImageButton) {
+        exportImageButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (stage) {
+                stage.draw();
+                const dataURL = stage.toDataURL({
+                    pixelRatio: 3,
+                });
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = 'battlemap.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                console.log('Exporting as image...');
+            }
+        });
+    }
+
+    if (exportJsonButton) {
+        exportJsonButton.addEventListener('click', function () {
+            console.log('Exporting as JSON...');
+        });
+    }
 }
 
 
