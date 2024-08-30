@@ -22,6 +22,8 @@
     <noscript>
         <p>JavaScript is required to use this application. Please enable JavaScript in your browser settings.</p>
     </noscript>
+    <a href="#designer-container" class="skip-link">Skip to main content</a>
+    <a href="#menu" class="skip-link">Skip to menu</a>
 
     <div id="menu"></div>
     <header class="designer-header">
@@ -35,7 +37,7 @@
                 <input style="margin-right: 40px;" id="search-bar" class="search-bar" type="text" placeholder="Search assets" name="search">
 
                 <div id="file-menu" class="dropdown">
-                    <button class="dropbtn">File</button>
+                    <button class="dropbtn" aria-haspopup="true" aria-expanded="false">File</button>
                     <div class="dropdown-content">
                         <a href="#" id="new-map-option" title="New Map, clearing the existing creation: (ALT+n)">New</a>
                         <a href="#" title="open a map that has already been exported via Json">Open</a>
@@ -67,13 +69,13 @@
         </nav>
     </header>
     <main id="designer-container">
-        <button id="toggle-toolbox" class="toggle-button">&#9668;&#9668;</button>
+        <button id="toggle-toolbox" aria-label="Toggle toolbox" class="toggle-button">&#9668;&#9668;</button>
         <div id="toolbox" class="toolbox-overlay">
             <h2 style="font-size: 22px;">Tools</h2>
-            <button data-tool="draw" title="Draw"><i data-tool="draw" class="fas fa-pencil-alt"></i></button>
-            <button data-tool="erase" title="Erase"><i data-tool="erase" class="fas fa-eraser"></i></button>
-            <button data-tool="text" title="Text"><i data-tool="text" class="fa-solid fa-font"></i></button>
-            <button data-tool="shape" title="Shape"><i data-tool="shape" class="fa-solid fa-shapes"></i></button>
+            <button data-tool="draw" title="Draw"><i data-tool="draw" class="fas fa-pencil-alt" role="presentation"></i></button>
+            <button data-tool="erase" title="Erase"><i data-tool="erase" class="fas fa-eraser" role="presentation"></i></button>
+            <button data-tool="text" title="Text"><i data-tool="text" class="fa-solid fa-font" role="presentation"></i></button>
+            <button data-tool="shape" title="Shape"><i data-tool="shape" class="fa-solid fa-shapes" role="presentation"></i></button>
         </div>
         <div id="popup-toolbox" title="Hold click and drag to move this window" class="popup-toolbox">
             <h3>Tool Options</h3>
@@ -113,7 +115,7 @@
                 <div class="section-content">
                     <div class="asset-item">
                         <picture>
-                            <img src="../apple.jpg" data-full-src="../apple.jpg" alt="watermark" draggable="true" id="watermark" loading="lazy">
+                            <img src="../apple.jpg" data-full-src="../apple.jpg" alt="Watermark image" draggable="true" id="watermark" loading="lazy">
                         </picture>
                     </div>
                     <button id="export-image" title="Export your creation as an image">Export as Image</button>
