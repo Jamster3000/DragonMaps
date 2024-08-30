@@ -285,10 +285,10 @@ function setupEventListeners() {
 
             if (targetElement.classList.contains('active')) {
                 targetElement.classList.remove('active');
-                currentTool = null; // Reset the current tool
-                hideToolOptions(); // Hide tool options if needed
-                updateCursor();//no idea what this does.
-                updateShapesDraggable();//makes shapes draggable whilst no tools are selected
+                currentTool = null;
+                hideToolOptions();
+                updateCursor();
+                updateShapesDraggable();
             } else {
                 document.querySelectorAll('#toolbox button').forEach(btn => {
                     btn.classList.remove('active');
@@ -301,6 +301,19 @@ function setupEventListeners() {
             }
         }
     });
+
+    // Ensure these elements exist before adding event listeners
+    const newMapOption = document.getElementById('new-map-option');
+    const undoMenuItem = document.getElementById('undo-menu-item');
+    const redoMenuItem = document.getElementById('redo-menu-item');
+    const showGridMenuItem = document.getElementById('show-grid-menu-item');
+
+    if (newMapOption) newMapOption.addEventListener('click', showNewMapOverlay);
+    if (undoMenuItem) undoMenuItem.addEventListener('click', undo);
+    if (redoMenuItem) redoMenuItem.addEventListener('click', redo);
+    if (showGridMenuItem) showGridMenuItem.addEventListener('click', toggleGrid);
+}
+
 
     function hideToolOptions() {
         const popupToolbox = document.getElementById('popup-toolbox');
