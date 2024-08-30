@@ -40,7 +40,7 @@ a {
 }
 
 #menu {
-    display: none;
+    display: block;
     position: absolute;
     width: 150px;
     background-color: var(--primary-color);
