@@ -21,6 +21,10 @@ body {
     flex-direction: column;
 }
 
+a {
+    color: var(--nav-link-color);
+}
+
 #menu {
     display: none;
     position: absolute;
