@@ -1721,26 +1721,13 @@ function rightPanel() {
     function toggleRightPanel() {
         rightPanel.classList.toggle('visible');
         toggleRightPanelButton.classList.toggle('panel-open');
-
         if (rightPanel.classList.contains('visible')) {
-            const watermarkImage = document.getElementById('watermark');
-
-            watermarkImage.className = "image-results";
-            watermarkImage.alt = 'Search result image';
-            watermarkImage.style.border = "1px solid #FF4500";
-            watermarkImage.style.maxWidth = "100px";
-            watermarkImage.style.margin = "5px";
-            watermarkImage.title = 'Drag to place on grid';
-            watermarkImage.draggable = true;
-            watermarkImage.addEventListener('dragstart', onDragStart);
-            
             toggleRightPanelButton.innerHTML = '&#9658;&#9658;';
         } else {
             toggleRightPanelButton.innerHTML = '&#9668;&#9668;';
         }
     }
 
-    /*deals with the assets section of the right panel*/
     document.querySelectorAll('.section-header, .category-header').forEach(header => {
         header.addEventListener('click', function () {
             this.classList.toggle('active');
@@ -1751,35 +1738,24 @@ function rightPanel() {
         });
     });
 
-    //feature to export the finished battlemap onto the user's device
-    // Get the export button
     document.getElementById('export-image').addEventListener('click', function (e) {
-        e.preventDefault(); // Prevent any default action
-        // Ensure all layers are drawn before exporting
+        e.preventDefault();
         stage.draw();
-        // Generate a data URL of the current state of the canvas
-        const dataURL = stage.toDataURL({
-            pixelRatio: 3, // Adjust the pixel ratio for image quality
-        });
-        // Create a hidden link element
+        const dataURL = stage.toDataURL({ pixelRatio: 3 });
         const link = document.createElement('a');
         link.href = dataURL;
-        link.download = 'battlemap.png'; // Set the name of the downloaded file
-        // Append the link to the body (it won't be visible)
+        link.download = 'battlemap.png';
         document.body.appendChild(link);
-        // Programmatically click the link to trigger the download
         link.click();
-        // Remove the link from the document
         document.body.removeChild(link);
         console.log('Exporting as image...');
     });
 
-    //export the battlemap to json or similar
     document.getElementById('export-json').addEventListener('click', function () {
-        // Implement JSON export logic
         console.log('Exporting as JSON...');
     });
 }
+
 
 function loadCustomFont() {
     for (let fontName in searchData) {
