@@ -1,144 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "nqsq1gjza7");
-  </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Create and share epic D&D battlemaps with DragonMaps. Design your maps with our easy-to-use online tool.">
     <title>DragonMaps - D&D Battlemap Creator</title>
+    
+    <!-- External CSS and Fonts -->
     <link rel="stylesheet" href="../styles/designer.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
+    
+    <!-- JavaScript Libraries -->
     <script src="https://unpkg.com/konva@8.4.2/konva.min.js" defer></script>
+
+    <!-- Microsoft Clarity Tracking Script -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "nqsq1gjza7");
+    </script>
 </head>
 <body class="designer-page">
+    <!-- NoScript Warning -->
     <noscript>
         <p>JavaScript is required to use this application. Please enable JavaScript in your browser settings.</p>
     </noscript>
+
+    <!-- Skip Links -->
     <a href="#designer-container" class="skip-link">Skip to main content</a>
     <a href="#menu" class="skip-link">Skip to menu</a>
 
-    <div id="menu"></div>
+    <!-- Header and Navigation -->
     <header class="designer-header">
-        <nav>
-
+        <nav aria-label="Main navigation">
             <div class="nav-left">
-                <div class="logo"><a href="/" style="color: #FF6B6B; text-decoration: none;">DragonMaps Designer</a></div>
+                <div class="logo">
+                    <a href="/" style="color: #FF6B6B; text-decoration: none;" aria-label="DragonMaps Designer Home">
+                        DragonMaps Designer
+                    </a>
+                </div>
             </div>
 
-            <nav class="menu-container nav-right">
-                <input style="margin-right: 40px;" id="search-bar" class="search-bar" type="text" placeholder="Search assets" name="search">
+            <div class="menu-container nav-right">
+                <label for="search-bar" class="sr-only">Search Assets</label>
+                <input id="search-bar" class="search-bar" type="text" placeholder="Search assets" name="search" aria-label="Search assets">
 
+                <!-- File Menu -->
                 <div id="file-menu" class="dropdown">
                     <button class="dropbtn" aria-haspopup="true" aria-expanded="false">File</button>
-                    <div class="dropdown-content">
-                        <a href="#" id="new-map-option" title="New Map, clearing the existing creation: (ALT+n)">New</a>
-                        <a href="#" title="open a map that has already been exported via Json">Open</a>
-                        <a href="#" title="Import your own selection of assets. This will be kept stored on your device and will need to be reimported if you clear your devices cache.">Import</a>
+                    <div class="dropdown-content" role="menu">
+                        <a href="#" id="new-map-option" title="New Map, clearing the existing creation: (ALT+n)" role="menuitem">New</a>
+                        <a href="#" title="Open a map that has already been exported via Json" role="menuitem">Open</a>
+                        <a href="#" title="Import your own selection of assets. This will be kept stored on your device and will need to be reimported if you clear your device's cache." role="menuitem">Import</a>
                     </div>
                 </div>
+
+                <!-- Edit Menu -->
                 <div id="edit-menu" class="dropdown">
-                    <button class="dropbtn">Edit</button>
-                    <div class="dropdown-content">
-                        <a id="undo-menu-item" title="CTRL+Z" href="#">Undo</a>
-                        <a id="redo-menu-item" title="CTRL+Y" href="#">Redo</a>
-                        <a id="grid-settings" title="Customize the grid to your liking" href="#">Grid Settings</a>
+                    <button class="dropbtn" aria-haspopup="true" aria-expanded="false">Edit</button>
+                    <div class="dropdown-content" role="menu">
+                        <a id="undo-menu-item" title="CTRL+Z" href="#" role="menuitem">Undo</a>
+                        <a id="redo-menu-item" title="CTRL+Y" href="#" role="menuitem">Redo</a>
+                        <a id="grid-settings" title="Customize the grid to your liking" href="#" role="menuitem">Grid Settings</a>
                     </div>
                 </div>
+
+                <!-- View Menu -->
                 <div id="view-menu" class="dropdown">
-                    <button class="dropbtn">View</button>
-                    <div class="dropdown-content">
-                        <a id="show-grid-menu-item" title="Toggle the grid visibility: (ALT+G)" href="#">Show Grid</a>
+                    <button class="dropbtn" aria-haspopup="true" aria-expanded="false">View</button>
+                    <div class="dropdown-content" role="menu">
+                        <a id="show-grid-menu-item" title="Toggle the grid visibility: (ALT+G)" href="#" role="menuitem">Show Grid</a>
                     </div>
                 </div>
+
+                <!-- Help Menu -->
                 <div id="help-menu" class="dropdown">
-                    <button class="dropbtn">Help</button>
-                    <div class="dropdown-content">
-                        <a hred="#" id="shortcuts" title="List of shortcuts for the DragonMap Designer: (ALT+S)">Shortcuts</a>
-                        <a href="tutorials.html" id="tutorals" title="See DragonMaps tutorials: (ALT+U)">Tutorial</a>
+                    <button class="dropbtn" aria-haspopup="true" aria-expanded="false">Help</button>
+                    <div class="dropdown-content" role="menu">
+                        <a href="#" id="shortcuts" title="List of shortcuts for the DragonMap Designer: (ALT+S)" role="menuitem">Shortcuts</a>
+                        <a href="tutorials.html" id="tutorials" title="See DragonMaps tutorials: (ALT+U)" role="menuitem">Tutorial</a>
                     </div>
                 </div>
-            </nav>
+            </div>
         </nav>
     </header>
+
+    <!-- Main Content -->
     <main id="designer-container">
-        <button id="toggle-toolbox" aria-label="Toggle toolbox" class="toggle-button">&#9668;&#9668;</button>
-        <div id="toolbox" class="toolbox-overlay">
+        <!-- Toolbox Toggle Button -->
+        <button id="toggle-toolbox" aria-label="Toggle toolbox" class="toggle-button" aria-expanded="false" aria-controls="toolbox">&#9668;&#9668;</button>
+
+        <!-- Toolbox Overlay -->
+        <div id="toolbox" class="toolbox-overlay" aria-hidden="true">
             <p style="font-size: 22px;">Tools</p>
-            <button data-tool="draw" title="Draw"><i data-tool="draw" class="fas fa-pencil-alt" role="presentation"></i></button>
-            <button data-tool="erase" title="Erase"><i data-tool="erase" class="fas fa-eraser" role="presentation"></i></button>
-            <button data-tool="text" title="Text"><i data-tool="text" class="fa-solid fa-font" role="presentation"></i></button>
-            <button data-tool="shape" title="Shape"><i data-tool="shape" class="fa-solid fa-shapes" role="presentation"></i></button>
+            <button data-tool="draw" title="Draw" aria-label="Draw tool"><i data-tool="draw" class="fas fa-pencil-alt" role="presentation"></i></button>
+            <button data-tool="erase" title="Erase" aria-label="Erase tool"><i data-tool="erase" class="fas fa-eraser" role="presentation"></i></button>
+            <button data-tool="text" title="Text" aria-label="Text tool"><i data-tool="text" class="fa-solid fa-font" role="presentation"></i></button>
+            <button data-tool="shape" title="Shape" aria-label="Shape tool"><i data-tool="shape" class="fa-solid fa-shapes" role="presentation"></i></button>
         </div>
-        <div id="popup-toolbox" title="Hold click and drag to move this window" class="popup-toolbox">
+
+        <!-- Popup Toolbox -->
+        <div id="popup-toolbox" title="Hold click and drag to move this window" class="popup-toolbox" aria-label="Tool Options">
             <p style="font-size: 1.17em;">Tool Options</p>
             <div id="tool-options"></div>
         </div>
 
-        <section id="canvas-container">
+        <!-- Canvas Container -->
+        <section id="canvas-container" aria-label="Drawing canvas area">
             <!-- Konva will create its own canvas elements here from the script/designer.js -->
         </section>
 
-        <div id="toolbar-popup"></div>
+        <!-- Toolbar Popup -->
+        <div id="toolbar-popup" aria-live="polite" aria-atomic="true"></div>
 
-        <div class="search-results" id="search-results">
-            <div class="image-grid" id="image-grid"></div>
+        <!-- Search Results Section -->
+        <div class="search-results" id="search-results" aria-live="polite">
+            <div class="image-grid" id="image-grid" role="list"></div>
         </div>
 
-        <button id="toggle-right-panel">&#9668;&#9668;</button>
-        <aside id="right-panel">
+        <!-- Right Panel Toggle Button -->
+        <button id="toggle-right-panel" aria-label="Toggle right panel" aria-expanded="false" aria-controls="right-panel">&#9668;&#9668;</button>
+
+        <!-- Right Panel -->
+        <aside id="right-panel" aria-labelledby="right-panel-header">
             <div class="panel-section" id="layers-section">
-                <p style="font-size: 1.17em;" class="section-header">Layers <span class="toggle-icon">▼</span></p>
+                <p style="font-size: 1.17em;" class="section-header" id="layers-section-header">Layers <span class="toggle-icon">▼</span></p>
                 <div class="section-content">
-                    <ul id="layer-list">
+                    <ul id="layer-list" aria-labelledby="layers-section-header" role="list">
                         <!-- Layers will be added here dynamically -->
                     </ul>
-                    <button id="add-layer" title="Create a new layer, this will not remove anything you've previously done.">Add Layer</button>
+                    <button id="add-layer" title="Create a new layer; this will not remove anything you've previously done." aria-label="Add new layer">Add Layer</button>
                 </div>
             </div>
 
             <div class="panel-section" id="assets-section">
-                <p style="font-size: 1.17em;" class="section-header">Assets <span class="toggle-icon">▼</span></p>
-                <div class="section-content">
-                </div>
+                <p style="font-size: 1.17em;" class="section-header" id="assets-section-header">Assets <span class="toggle-icon">▼</span></p>
+                <div class="section-content" aria-labelledby="assets-section-header"></div>
             </div>
 
             <div class="panel-section" id="export-section">
-                <p style="font-size: 1.17em;" class="section-header">Export <span class="toggle-icon">▼</span></p>
-                <div class="section-content">
+                <p style="font-size: 1.17em;" class="section-header" id="export-section-header">Export <span class="toggle-icon">▼</span></p>
+                <div class="section-content" aria-labelledby="export-section-header">
                     <div class="asset-item">
                         <picture>
                             <img src="../apple.jpg" data-full-src="../apple.jpg" alt="Watermark image" draggable="true" id="watermark" loading="lazy">
                         </picture>
                     </div>
-                    <button id="export-image" title="Export your creation as an image">Export as Image</button>
-                    <button id="export-json" title="Export your image as a super special data structured format. You can use this to open your map back into dragonMaps.">Export as JSON</button>
-                    <p style="font-size: 11px; text-align: center;">Before exporting take a look at <a href="attribution">attribution</a> for yourself for any assets you might have used.</p>
+                    <button id="export-image" title="Export your creation as an image" aria-label="Export as Image">Export as Image</button>
+                    <button id="export-json" title="Export your image as a super special data structured format. You can use this to open your map back into DragonMaps." aria-label="Export as JSON">Export as JSON</button>
+                    <p style="font-size: 11px; text-align: center;">Before exporting, take a look at the <a href="attribution" aria-label="Attribution page">attribution</a> for any assets you might have used.</p>
                 </div>
             </div>
         </aside>
 
-        <div id="shortcuts-overlay" class="overlay">
+        <!-- Shortcuts Overlay -->
+        <div id="shortcuts-overlay" class="overlay" role="dialog" aria-labelledby="shortcuts-overlay-header">
             <div class="overlay-content">
-                <p style="font-size: 1.5em;">Keyboard Shortcuts</p>
-                <table id="shortcuts-table"></table>
-                <button id="close-shortcuts">Close</button>
+                <p id="shortcuts-overlay-header" style="font-size: 1.5em;">Keyboard Shortcuts</p>
+                <table id="shortcuts-table" role="table"></table>
+                <button id="close-shortcuts" aria-label="Close Keyboard Shortcuts dialog">Close</button>
             </div>
         </div>
     </main>
 
-    <div id="loading-indicator" style="display: none;">
-        <div class="spinner"></div>
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" style="display: none;" role="status" aria-live="polite">
+        <div class="spinner" role="alert" aria-busy="true"></div>
         <p>Loading more images...</p>
     </div>
 
+    <!-- Additional Scripts -->
     <script src="../scripts/designer.js" defer></script>
     <script src="../scripts/archive.js" defer></script>
 </body>
