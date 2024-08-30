@@ -159,6 +159,58 @@ button:hover {
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
 }
 
+.popup {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #1A1A2E;
+    border: 2px solid #8A2BE2;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.2);
+    z-index: 1000;
+    max-width: 300px;
+    transition: opacity 0.3s ease-in-out;
+    color: #E0E0E0;
+}
+
+.popup-content {
+    margin-bottom: 15px;
+}
+
+    .popup-content h2 {
+        color: #FF6B6B;
+        margin-top: 0;
+    }
+
+.close-btn {
+    color: #B19CD9;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+    .close-btn:hover {
+        color: #FF4500;
+    }
+
+.cta-button {
+    background-color: #8A2BE2;
+    color: #E0E0E0;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .cta-button:hover {
+        background-color: #FF4500;
+    }
+
 /* Webkit Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 12px;

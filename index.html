@@ -19,13 +19,41 @@
 <body>
   <div id="header-placeholder"></div>
   <main>
-    <section id="hero">
-      <h1>Create Epic D&D Battlemaps</h1>
-      <p>Design, share, and bring your adventures to life!</p>
-      <button href="pages/designer">Start Creating</button>
-    </section>
-    
+      <section id="hero">
+          <h1>Create Epic D&D Battlemaps</h1>
+          <p>Design, share, and bring your adventures to life!</p>
+          <button href="pages/designer">Start Creating</button>
+      </section>
+
+      <div id="popup" class="popup">
+          <span class="close-btn" onclick="closePopup()">&times;</span>
+          <div class="popup-content">
+              <h2>We Value Your Feedback!</h2>
+              <p>Help us improve your experience. Would you mind taking a quick survey about our website?</p>
+              <a href="s/pages/opinion-form" class="cta-button" onclick="closePopup()">Take Survey</a>
+          </div>
+      </div>
   </main>
   <div id="footer-placeholder"></div>
 </body>
 </html>
+<script>
+    function showPopup() {
+        const popup = document.getElementById('popup');
+        popup.style.display = 'block';
+        setTimeout(() => {
+            popup.style.opacity = '1';
+        }, 10);
+    }
+
+    function closePopup() {
+        const popup = document.getElementById('popup');
+        popup.style.opacity = '0';
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 300);
+    }
+
+    // Show popup after 5 seconds
+    setTimeout(showPopup, 5000);
+</script>
