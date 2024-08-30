@@ -38,6 +38,27 @@
 </body>
 </html>
 <script>
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
     function showPopup() {
         const popup = document.getElementById('popup');
         popup.style.display = 'block';
@@ -52,8 +73,12 @@
         setTimeout(() => {
             popup.style.display = 'none';
         }, 300);
+        setCookie('feedback_popup_shown', 'true', 30); // Set cookie for 30 days
     }
 
-    // Show popup after 5 seconds
-    setTimeout(showPopup, 5000);
+    // Check if the popup has been shown in the last 30 days
+    if (!getCookie('feedback_popup_shown')) {
+        // Show popup after 15 seconds if it hasn't been shown recently
+        setTimeout(showPopup, 15000);
+    }
 </script>
