@@ -66,8 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
     loadSearch();
     loadCustomFont();//load in any custom imported fonts that are saved in cache
 
-
-    setInterval(checkImageOnCanvas, 100);
+    setInterval(checkImageOnCanvas, 10);
 });
 
 //listens for the right click menu
@@ -1890,11 +1889,19 @@ function loadCustomFont() {
 
 function checkImageOnCanvas() {
     const foundImage = layer.find('#konva-watermark');
-    if (foundImage.length > 0) {
-        document.getElementById('export-image').disabled = false;
-        document.getElementById('export-json').disabled = false;
+    const exportImageButton = document.getElementById('export-image');
+    const exportJsonButton = document.getElementById('export-json');
+
+    // Check if elements exist before modifying properties
+    if (exportImageButton && exportJsonButton) {
+        if (foundImage.length > 0) {
+            exportImageButton.disabled = false;
+            exportJsonButton.disabled = false;
+        } else {
+            exportImageButton.disabled = true;
+            exportJsonButton.disabled = true;
+        }
     } else {
-        document.getElementById('export-image').disabled = true;
-        document.getElementById('export-json').disabled = true;
+        console.error('Export buttons not found in the DOM');
     }
 }
