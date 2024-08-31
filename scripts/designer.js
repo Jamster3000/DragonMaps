@@ -501,7 +501,7 @@ function onDragOver(e) {
 
 function onDrop(e) {
     e.preventDefault();
-
+    console.log(e.dataTransfer);
     const elementId = e.dataTransfer.getData('text/plain');
     const draggedElement = document.getElementById(elementId);
 

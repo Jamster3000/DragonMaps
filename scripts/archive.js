@@ -54,7 +54,7 @@ async function getItemDetails(item) {
                 creator: creator,
                 license: license,
                 keywords: keywords,
-                thumbnail: `https://archive.org/download/${item.identifier}/${file.name}?width=200`
+                thumbnail: `https://archive.org/download/${item.identifier}/${file.name}`
             }));
 
         localStorage.setItem(cacheKey, JSON.stringify(images));
