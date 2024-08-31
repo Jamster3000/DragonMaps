@@ -1905,3 +1905,18 @@ function checkImageOnCanvas() {
         console.error('Export buttons not found in the DOM');
     }
 }
+
+const imageObj = new Image();
+imageObj.crossOrigin = 'Anonymous';
+imageObj.onload = function () {
+    const canvas = document.createElement('canvas');
+    canvas.width = imageObj.width;
+    canvas.height = imageObj.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(imageObj, 0, 0);
+    document.body.appendChild(canvas); // Add canvas to the document for testing
+};
+imageObj.onerror = function () {
+    console.error('Failed to load the WebP image.');
+};
+imageObj.src = 'https://ia801903.us.archive.org/31/items/Firepit/Firepit.webp';
