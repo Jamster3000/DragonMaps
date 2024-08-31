@@ -501,20 +501,20 @@ function onDragOver(e) {
 
 function onDrop(e) {
     e.preventDefault();
-    console.log(e.dataTransfer);
+    console.log('Drop event:', e);
     const elementId = e.dataTransfer.getData('text/plain');
     const draggedElement = document.getElementById(elementId);
 
+    // Get the stage's container and its bounding rectangle
+    const stageContainer = stage.container();
+    const stageRect = stageContainer.getBoundingClientRect();
+
+    // Calculate the drop position relative to the stage
+    const dropX = (e.clientX - stageRect.left - stage.x()) / stage.scaleX();
+    const dropY = (e.clientY - stageRect.top - stage.y()) / stage.scaleY();
+
     if (draggedElement && draggedElement.id === 'watermark') {
-        // Get the stage's container and its bounding rectangle
-        const stageContainer = stage.container();
-        const stageRect = stageContainer.getBoundingClientRect();
-
-        // Calculate the drop position relative to the stage
-        const dropX = (e.clientX - stageRect.left - stage.x()) / stage.scaleX();
-        const dropY = (e.clientY - stageRect.top - stage.y()) / stage.scaleY();
-
-        // Create a new Konva Image
+        // Create a new Konva Image using the dragged element
         const konvaImage = new Konva.Image({
             image: draggedElement,
             draggable: true,
@@ -537,27 +537,22 @@ function onDrop(e) {
             image: konvaImage
         });
 
-        // Set up click event for image
+        // Set up click event for the image
         konvaImage.on('click', function (evt) {
-            // Deselect the previous transformer if there is one
             if (currentTransformer) {
-                currentTransformer.nodes([]); // Remove the transformer from the previous image
+                currentTransformer.nodes([]);
                 layer.batchDraw();
             }
 
-            // Set the transformer to the clicked image
             transformer.nodes([konvaImage]);
             currentTransformer = transformer;
             layer.batchDraw();
 
-            // Stop event propagation to avoid stage click
             evt.cancelBubble = true;
         });
 
-        // Set transformer for the new image
         const transformer = new Konva.Transformer({
             nodes: [konvaImage],
-            // Optional: customize appearance
             borderStroke: 'blue',
             borderStrokeWidth: 2,
             padding: 10,
@@ -575,18 +570,15 @@ function onDrop(e) {
         const maxSize = 30000;
 
         transformer.on('transform', () => {
-            // Limit the scale
             const scaleX = konvaImage.scaleX();
             const scaleY = konvaImage.scaleY();
 
             const width = konvaImage.width() * scaleX;
             const height = konvaImage.height() * scaleY;
 
-            // Calculate new sizes respecting the limits
             const newWidth = Math.max(minSize, Math.min(maxSize, width));
             const newHeight = Math.max(minSize, Math.min(maxSize, height));
 
-            // Apply the new size while keeping the aspect ratio
             konvaImage.scaleX(newWidth / konvaImage.width());
             konvaImage.scaleY(newHeight / konvaImage.height());
         });
@@ -596,83 +588,87 @@ function onDrop(e) {
         currentTransformer = transformer;
         layer.batchDraw();
     } else {
+        // Handle case where the image URL is provided
         const imageUrl = e.dataTransfer.getData('text');
 
-        // Get the stage's container and its bounding rectangle
-        const stageContainer = stage.container();
-        const stageRect = stageContainer.getBoundingClientRect();
+        // Check if the image URL is a WebP image
+        if (imageUrl.endsWith('.webp')) {
+            // Convert WebP URL to PNG URL
+            const pngUrl = imageUrl.replace('.webp', '.png');
 
-        // Calculate the drop position relative to the stage
-        const dropX = (e.clientX - stageRect.left - stage.x()) / stage.scaleX();
-        const dropY = (e.clientY - stageRect.top - stage.y()) / stage.scaleY();
+            // Load the PNG image
+            const img = new Image();
+            img.crossOrigin = 'Anonymous'; // Ensure CORS is handled
+            img.onload = function () {
+                // Create a Konva Image from the PNG image
+                const konvaImage = new Konva.Image({
+                    image: img,
+                    draggable: true,
+                    x: dropX,
+                    y: dropY,
+                    offsetX: img.width / 2,
+                    offsetY: img.height / 2,
+                });
 
-        // Create a new Konva Image
-        const imageObj = new Image();
-        imageObj.crossOrigin = 'Anonymous';
-        imageObj.onload = function () {
-            const konvaImage = new Konva.Image({
-                image: imageObj,
-                draggable: true,
-                x: dropX,
-                y: dropY,
-                offsetX: this.width / 2,
-                offsetY: this.height / 2,
-                crossOrigin: 'anonymous',
-            });
+                const transformer = new Konva.Transformer({
+                    nodes: [konvaImage],
+                    borderStroke: 'blue',
+                    borderStrokeWidth: 2,
+                    padding: 10,
+                    resizeEnabled: true,
+                    rotateEnabled: true,
+                    anchorCornerRadius: 50,
+                    anchorSize: 14,
+                    shouldOverdrawWholeArea: true,
+                    rotateAnchorOffset: 60,
+                    enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
+                    rotationSnapTolerance: 10,
+                });
 
-            // Create a transformer
-            const transformer = new Konva.Transformer({
-                nodes: [konvaImage],
-                // Optional: customize appearance
-                borderStroke: 'blue',
-                borderStrokeWidth: 2,
-                padding: 10,
-                resizeEnabled: true,
-                rotateEnabled: true,
-                anchorCornerRadius: 50,
-                anchorSize: 14,
-                shouldOverdrawWholeArea: true,
-                rotateAnchorOffset: 60,
-                enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
-                rotationSnapTolerance: 10,
-            });
+                layer.add(konvaImage);
+                layer.add(transformer);
 
-            // Add the image and transformer to the layer
-            layer.add(konvaImage);
-            layer.add(transformer);
+                recordAction({
+                    type: 'addImage',
+                    image: konvaImage
+                });
 
-            // Record the action for undo/redo
-            recordAction({
-                type: 'addImage',
-                image: konvaImage
-            });
+                konvaImage.on('click', function (evt) {
+                    if (currentTransformer) {
+                        currentTransformer.nodes([]);
+                        layer.batchDraw();
+                    }
 
-            // Set up click event for image
-            konvaImage.on('click', function (evt) {
-                // Deselect the previous transformer if there is one
-                if (currentTransformer) {
-                    currentTransformer.nodes([]); // Remove the transformer from the previous image
+                    transformer.nodes([konvaImage]);
+                    currentTransformer = transformer;
                     layer.batchDraw();
-                }
 
-                // Set the transformer to the clicked image
+                    evt.cancelBubble = true;
+                });
+
                 transformer.nodes([konvaImage]);
                 currentTransformer = transformer;
                 layer.batchDraw();
+                stage.batchDraw();
 
-                // Stop event propagation to avoid stage click
-                evt.cancelBubble = true;
-            });
+                console.log('PNG image added to canvas successfully');
+            };
 
-            // Set transformer for the new image
-            transformer.nodes([konvaImage]);
-            currentTransformer = transformer;
-            layer.batchDraw();
-        };
-        imageObj.src = imageUrl;
+            img.onerror = function (error) {
+                console.error('Error loading PNG image:', error);
+                // Optionally, handle fallback here
+            };
 
+            // Start loading the PNG image
+            img.src = pngUrl;
+        } else {
+            // Handle non-WebP image URLs (if needed)
+            console.warn('The image URL is not a WebP image.');
+        }
     }
 }
+
+
 
 
 
