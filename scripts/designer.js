@@ -591,87 +591,94 @@ function onDrop(e) {
         // Handle case where the image URL is provided
         const imageUrl = e.dataTransfer.getData('text');
 
-        // Check if the image URL is a WebP image
-        if (imageUrl.endsWith('.webp')) {
-            // Convert WebP URL to PNG URL
-            const pngUrl = imageUrl.replace('.webp', '.png');
+        // Show loading indicator
+        const loadingText = new Konva.Text({
+            x: dropX,
+            y: dropY,
+            text: 'Loading...',
+            fontSize: 20,
+            fill: 'black'
+        });
+        layer.add(loadingText);
+        layer.batchDraw();
 
-            // Load the PNG image
-            const img = new Image();
-            img.crossOrigin = 'Anonymous'; // Ensure CORS is handled
-            img.onload = function () {
-                // Create a Konva Image from the PNG image
+        // Load the image
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // Ensure CORS is handled
+        img.onload = function () {
+            // Remove loading indicator
+            loadingText.destroy();
+
+            requestAnimationFrame(() => {
+                // Create a Konva Image from the loaded image
                 const konvaImage = new Konva.Image({
                     image: img,
                     draggable: true,
                     x: dropX,
                     y: dropY,
-                    offsetX: img.width / 2,
-                    offsetY: img.height / 2,
                 });
 
-                const transformer = new Konva.Transformer({
-                    nodes: [konvaImage],
-                    borderStroke: 'blue',
-                    borderStrokeWidth: 2,
-                    padding: 10,
-                    resizeEnabled: true,
-                    rotateEnabled: true,
-                    anchorCornerRadius: 50,
-                    anchorSize: 14,
-                    shouldOverdrawWholeArea: true,
-                    rotateAnchorOffset: 60,
-                    enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
-                    rotationSnapTolerance: 10,
-                });
+                konvaImage.on('load', function() {
+                    // Set offset after image has loaded
+                    konvaImage.offsetX(konvaImage.width() / 2);
+                    konvaImage.offsetY(konvaImage.height() / 2);
+                    
+                    layer.add(konvaImage);
 
-                layer.add(konvaImage);
-                layer.add(transformer);
+                    const transformer = new Konva.Transformer({
+                        nodes: [konvaImage],
+                        borderStroke: 'blue',
+                        borderStrokeWidth: 2,
+                        padding: 10,
+                        resizeEnabled: true,
+                        rotateEnabled: true,
+                        anchorCornerRadius: 50,
+                        anchorSize: 14,
+                        shouldOverdrawWholeArea: true,
+                        rotateAnchorOffset: 60,
+                        enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
+                        rotationSnapTolerance: 10,
+                    });
 
-                recordAction({
-                    type: 'addImage',
-                    image: konvaImage
-                });
+                    layer.add(transformer);
 
-                konvaImage.on('click', function (evt) {
-                    if (currentTransformer) {
-                        currentTransformer.nodes([]);
+                    recordAction({
+                        type: 'addImage',
+                        image: konvaImage
+                    });
+
+                    konvaImage.on('click', function (evt) {
+                        if (currentTransformer) {
+                            currentTransformer.nodes([]);
+                            layer.batchDraw();
+                        }
+
+                        transformer.nodes([konvaImage]);
+                        currentTransformer = transformer;
                         layer.batchDraw();
-                    }
+
+                        evt.cancelBubble = true;
+                    });
 
                     transformer.nodes([konvaImage]);
                     currentTransformer = transformer;
                     layer.batchDraw();
-
-                    evt.cancelBubble = true;
                 });
+            });
 
-                transformer.nodes([konvaImage]);
-                currentTransformer = transformer;
-                layer.batchDraw();
-                stage.batchDraw();
+            console.log('Image added to canvas successfully');
+        };
 
-                console.log('PNG image added to canvas successfully');
-            };
+        img.onerror = function (error) {
+            console.error('Error loading image:', error);
+            loadingText.text('Failed to load image');
+            layer.batchDraw();
+        };
 
-            img.onerror = function (error) {
-                console.error('Error loading PNG image:', error);
-                // Optionally, handle fallback here
-            };
-
-            // Start loading the PNG image
-            img.src = pngUrl;
-        } else {
-            // Handle non-WebP image URLs (if needed)
-            console.warn('The image URL is not a WebP image.');
-        }
+        // Start loading the image
+        img.src = imageUrl;
     }
 }
-
-
-
-
-
 
 //==========================
 //Grid and canvas management
