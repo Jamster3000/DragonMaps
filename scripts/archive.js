@@ -3,7 +3,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
 async function getImageUrlsFromArchive(accountName, page = 1) {
-    const apiUrl = https://archive.org/advancedsearch.php?q=uploader:${accountName}&fl[]=identifier&fl[]=mediatype&output=json&rows=${ITEMS_PER_PAGE}&page=${page};
+    const apiUrl = `https://archive.org/advancedsearch.php?q=uploader:${accountName}&fl[]=identifier&fl[]=mediatype&output=json&rows=${ITEMS_PER_PAGE}&page=${page}`;
     try {
         const response = await fetchWithRetry(apiUrl);
         const data = await response.json();
