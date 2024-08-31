@@ -48,7 +48,7 @@ async function getItemDetails(item) {
         const keywords = data.metadata.subject;
 
         const images = data.files
-            .filter(file => file.format && ['PNG', 'WEBP'].some(format => file.format.toUpperCase().includes(format)))
+            .filter(file => file.format && ['PNG', 'webp'].some(format => file.format.toUpperCase().includes(format)))
             .map(file => ({
                 url: `https://archive.org/download/${item.identifier}/${file.name}`,
                 creator: creator,
