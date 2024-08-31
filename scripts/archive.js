@@ -1,4 +1,4 @@
-﻿const ITEMS_PER_PAGE = 100;
+const ITEMS_PER_PAGE = 100;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
@@ -19,11 +19,11 @@ async function getImageUrlsFromArchive(accountName, page = 1) {
 async function fetchWithRetry(url, retries = MAX_RETRIES) {
     try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error(HTTP error! status: ${response.status});
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return response;
     } catch (error) {
         if (retries > 0) {
-            console.log(Retrying fetch for ${url}. Attempts left: ${retries - 1});
+            console.log(`Retrying fetch for ${url}. Attempts left: ${retries - 1}`);
             await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
             return fetchWithRetry(url, retries - 1);
         } else {
@@ -46,9 +46,6 @@ async function getItemDetails(item) {
         const creator = data.metadata.creator || 'Unknown Creator';
         const license = data.metadata.licenseurl;
         const keywords = data.metadata.subject;
-
-        // Log all file names to verify WebP detection
-        console.log('Files in metadata:', data.files.map(file => file.name));
 
         const images = data.files
             .filter(file => file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.webp'))
@@ -79,15 +76,15 @@ function loadImages(imageData) {
     }, {});
 
     Object.entries(groupedImages).forEach(([creator, images]) => {
-        let categoryContainer = document.querySelector(.asset-category[data-creator="${creator}"]);
+        let categoryContainer = document.querySelector(`.asset-category[data-creator="${creator}"]`);
         if (!categoryContainer) {
             categoryContainer = document.createElement('div');
             categoryContainer.className = "asset-category";
             categoryContainer.dataset.creator = creator;
-            categoryContainer.innerHTML = 
+            categoryContainer.innerHTML = `
                 <h4 class="category-header">${creator}<span class="toggle-icon">▼</span></h4>
                 <div class="category-content" style="display:none;"></div>
-            ;
+            `;
             assetLocation.appendChild(categoryContainer);
         }
         const contentDiv = categoryContainer.querySelector('.category-content');
@@ -95,7 +92,7 @@ function loadImages(imageData) {
         images.forEach(img => {
             let imgElement = document.createElement('img');
             imgElement.dataset.src = img.thumbnail;
-            imgElement.alt = Image by ${creator};
+            imgElement.alt = `Image by ${creator}`;
             imgElement.draggable = true;
             imgElement.dataset.fullSrc = img.url;
             imgElement.addEventListener('click', loadFullImage);
@@ -167,13 +164,13 @@ function addToggleListeners() {
 
 function handleImageError(event) {
     const img = event.target;
-    console.error(Failed to load image: ${img.src});
+    console.error(`Failed to load image: ${img.src}`);
 
     if (img.src === img.dataset.fullSrc) {
         img.src = '../apple.jpg';
         img.alt = 'Image failed to load';
     } else {
-        console.log(Attempting to load full-size image: ${img.dataset.fullSrc});
+        console.log(`Attempting to load full-size image: ${img.dataset.fullSrc}`);
         img.src = img.dataset.fullSrc;
     }
 }
