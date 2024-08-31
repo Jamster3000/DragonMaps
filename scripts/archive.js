@@ -119,18 +119,25 @@ function lazyLoadImages() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const img = entry.target;
-                img.onload = function() {
-                    img.style.opacity = 1;
+                const fullSizeImg = new Image();
+                fullSizeImg.onload = function () {
+                    img.src = this.src;
+                    img.style.opacity = 0;
+                    setTimeout(() => {
+                        img.style.transition = 'opacity 0.3s ease-in';
+                        img.style.opacity = 1;
+                    }, 50);
                 };
-                img.src = img.dataset.src;
-                img.style.transition = 'opacity 0.3s ease-in';
+                fullSizeImg.src = img.dataset.src;
                 observer.unobserve(img);
             }
         });
     }, options);
 
     images.forEach(img => {
-        img.style.opacity = 0;
+        // Set a low-quality placeholder
+        img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
+        img.style.background = '#0A0A1A';
         observer.observe(img);
     });
 }
