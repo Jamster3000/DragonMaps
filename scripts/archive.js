@@ -1,4 +1,4 @@
-﻿const ITEMS_PER_PAGE = 100;
+const ITEMS_PER_PAGE = 100;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
@@ -48,7 +48,7 @@ async function getItemDetails(item) {
         const keywords = data.metadata.subject;
 
         const images = data.files
-            .filter(file => file.format && ['PNG', 'webp'].some(format => file.format.toUpperCase().includes(format)))
+            .filter(file => file.format && ['PNG', 'WEBP'].includes(file.format.toUpperCase()))
             .map(file => ({
                 url: `https://archive.org/download/${item.identifier}/${file.name}`,
                 creator: creator,
@@ -229,6 +229,8 @@ function hideLoadingIndicator() {
 
 // Usage
 const accountName = 'jrbaines.04@gmail.com';
+let currentPage = 1;
+let allImagesLoaded = false;
 getImageUrlsFromArchive(accountName)
     .then(loadImages)
     .catch(error => console.error('Error:', error));
