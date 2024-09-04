@@ -1851,6 +1851,13 @@ function recordAction(action) {
     currentActionIndex++;
 }
 
+function shortcut_draggable() {
+    const shortcut = document.querySelector(".overlay-content");
+    if (shortcut) {
+        dragElement(shortcut);
+    }
+}
+
 function rightPanel() {
     const rightPanel = document.getElementById('right-panel');
     const toggleRightPanelButton = document.getElementById('toggle-right-panel');
