@@ -15,6 +15,7 @@ body {
     line-height: 1.6;
     background-color: var(--background-color);
     color: var(--text-color);
+    position: relative;
     margin: 0;
     padding: 0;
 }
@@ -52,14 +53,6 @@ header, footer {
     border-bottom: 2px solid var(--primary-color);
 }
 
-header {
-    text-align: center; /* Ensure the header text is centered */
-}
-
-footer {
-    text-align: center; /* Ensure the footer text is centered */
-}
-
 nav {
     display: flex;
     justify-content: space-between;
@@ -94,7 +87,7 @@ nav ul li a:hover {
     text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
 }
 
-.logo a:link {
+.logo a:link{
     color: var(--secondary-color);
     text-decoration: none;
 }
@@ -108,7 +101,6 @@ main {
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
     animation: contentFadeIn 1s ease-out;
-    text-align: center; /* Center text within the main content */
 }
 
 @keyframes contentFadeIn {
@@ -116,24 +108,31 @@ main {
     to { opacity: 1; transform: translateY(0); }
 }
 
-h1, h2, h3 {
+h1{
     font-family: 'Cinzel', serif;
     color: var(--secondary-color);
     margin-bottom: 1.5rem;
+    font-size: 2.5rem;
     text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
     animation: headerGlow 4s infinite alternate;
 }
 
-h1 {
-    font-size: 2.5rem;
-}
-
-h2 {
+h2{
+    font-family: 'Cinzel', serif;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
     font-size: 2rem;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    animation: headerGlow 4s infinite alternate;
 }
 
-h3 {
+h3{
+    font-family: 'Cinzel', serif;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
     font-size: 1.5rem;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    animation: headerGlow 4s infinite alternate;
 }
 
 @keyframes headerGlow {
@@ -174,17 +173,16 @@ button:hover {
     max-width: 300px;
     transition: opacity 0.3s ease-in-out;
     color: #E0E0E0;
-    text-align: center; /* Center text within the popup */
 }
 
 .popup-content {
     margin-bottom: 15px;
 }
 
-.popup-content h2 {
-    color: #FF6B6B;
-    margin-top: 0;
-}
+    .popup-content h2 {
+        color: #FF6B6B;
+        margin-top: 0;
+    }
 
 .close-btn {
     color: #B19CD9;
@@ -195,9 +193,9 @@ button:hover {
     transition: color 0.2s;
 }
 
-.close-btn:hover {
-    color: #FF4500;
-}
+    .close-btn:hover {
+        color: #FF4500;
+    }
 
 .cta-button {
     background-color: #8A2BE2;
@@ -209,9 +207,9 @@ button:hover {
     transition: background-color 0.2s;
 }
 
-.cta-button:hover {
-    background-color: #FF4500;
-}
+    .cta-button:hover {
+        background-color: #FF4500;
+    }
 
 .disclosure {
     background-color: var(--header-color);
@@ -239,6 +237,7 @@ button:hover {
     color: var(--secondary-color);
     text-decoration: underline;
 }
+
 
 /* Webkit Scrollbar Styles */
 ::-webkit-scrollbar {
