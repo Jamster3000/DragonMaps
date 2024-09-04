@@ -8,6 +8,8 @@
     --text-color: #E0E0E0;
     --nav-link-color: #B19CD9;
     --accent-color: #FF4500;
+    --transition-duration: 0.3s;
+    --box-shadow-color: rgba(0, 0, 0, 0.2);
 }
 
 body {
@@ -28,12 +30,12 @@ body::before {
     width: 100%;
     height: 100%;
     background-image: 
-        radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 20% 20%, rgba(255, 107, 107, 0.05) 0%, transparent 30%),
-        radial-gradient(circle at 80% 80%, rgba(255, 69, 0, 0.05) 0%, transparent 30%);
+        radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 20% 20%, rgba(255, 107, 107, 0.1) 0%, transparent 30%),
+        radial-gradient(circle at 80% 80%, rgba(255, 69, 0, 0.1) 0%, transparent 30%);
     background-size: 100% 100%, 50% 50%, 75% 75%;
     background-repeat: no-repeat;
-    animation: backgroundShimmer 20s infinite alternate;
+    animation: backgroundShimmer 25s infinite alternate;
     z-index: -1;
 }
 
@@ -44,6 +46,18 @@ body::before {
 
 a {
     color: var(--nav-link-color);
+    text-shadow: none;
+    transition: color var(--transition-duration) ease;
+}
+
+a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+a:focus {
+    outline: 2px dashed var(--accent-color);
+    outline-offset: 4px;
 }
 
 header, footer {
@@ -73,7 +87,7 @@ nav ul li {
 nav ul li a {
     color: var(--nav-link-color);
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color var(--transition-duration) ease;
 }
 
 nav ul li a:hover {
@@ -87,7 +101,7 @@ nav ul li a:hover {
     text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
 }
 
-.logo a:link{
+.logo a:link {
     color: var(--secondary-color);
     text-decoration: none;
 }
@@ -108,31 +122,24 @@ main {
     to { opacity: 1; transform: translateY(0); }
 }
 
-h1{
+h1, h2, h3 {
     font-family: 'Cinzel', serif;
     color: var(--secondary-color);
     margin-bottom: 1.5rem;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    animation: headerGlow 4s infinite alternate;
+}
+
+h1 {
     font-size: 2.5rem;
-    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
-    animation: headerGlow 4s infinite alternate;
 }
 
-h2{
-    font-family: 'Cinzel', serif;
-    color: var(--secondary-color);
-    margin-bottom: 1.5rem;
+h2 {
     font-size: 2rem;
-    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
-    animation: headerGlow 4s infinite alternate;
 }
 
-h3{
-    font-family: 'Cinzel', serif;
-    color: var(--secondary-color);
-    margin-bottom: 1.5rem;
+h3 {
     font-size: 1.5rem;
-    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
-    animation: headerGlow 4s infinite alternate;
 }
 
 @keyframes headerGlow {
@@ -140,7 +147,7 @@ h3{
     100% { text-shadow: 0 0 25px rgba(255, 107, 107, 0.6); }
 }
 
-button {
+button, .cta-button {
     font-family: 'Cinzel', serif;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -148,15 +155,20 @@ button {
     font-size: 1.1rem;
     background-color: var(--primary-color);
     color: var(--text-color);
-    transition: all 0.3s ease;
+    transition: all var(--transition-duration) ease;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
 }
 
-button:hover {
+button:hover, .cta-button:hover {
     background-color: var(--accent-color);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+}
+
+button:focus, .cta-button:focus, a:focus {
+    outline: 2px dashed var(--accent-color);
+    outline-offset: 4px;
 }
 
 .popup {
@@ -164,28 +176,28 @@ button:hover {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #1A1A2E;
-    border: 2px solid #8A2BE2;
+    background-color: var(--header-color);
+    border: 2px solid var(--primary-color);
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(138, 43, 226, 0.2);
     z-index: 1000;
     max-width: 300px;
-    transition: opacity 0.3s ease-in-out;
-    color: #E0E0E0;
+    transition: opacity var(--transition-duration) ease-in-out;
+    color: var(--text-color);
 }
 
 .popup-content {
     margin-bottom: 15px;
 }
 
-    .popup-content h2 {
-        color: #FF6B6B;
-        margin-top: 0;
-    }
+.popup-content h2 {
+    color: var(--secondary-color);
+    margin-top: 0;
+}
 
 .close-btn {
-    color: #B19CD9;
+    color: var(--nav-link-color);
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -193,23 +205,9 @@ button:hover {
     transition: color 0.2s;
 }
 
-    .close-btn:hover {
-        color: #FF4500;
-    }
-
-.cta-button {
-    background-color: #8A2BE2;
-    color: #E0E0E0;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+.close-btn:hover {
+    color: var(--accent-color);
 }
-
-    .cta-button:hover {
-        background-color: #FF4500;
-    }
 
 .disclosure {
     background-color: var(--header-color);
