@@ -55,11 +55,6 @@ a:hover {
     text-decoration: underline;
 }
 
-a:focus {
-    outline: 2px dashed var(--accent-color);
-    outline-offset: 4px;
-}
-
 header, footer {
     background-color: var(--header-color);
     color: var(--text-color);
@@ -147,7 +142,7 @@ h3 {
     100% { text-shadow: 0 0 25px rgba(255, 107, 107, 0.6); }
 }
 
-button, .cta-button {
+button {
     font-family: 'Cinzel', serif;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -158,12 +153,13 @@ button, .cta-button {
     transition: all var(--transition-duration) ease;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+    outline: none;
 }
 
-button:hover, .cta-button:hover {
+button:hover {
     background-color: var(--accent-color);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+    box-shadow: 0 5px 15px var(--accent-color);
 }
 
 button:focus, .cta-button:focus, a:focus {
@@ -209,13 +205,27 @@ button:focus, .cta-button:focus, a:focus {
     color: var(--accent-color);
 }
 
+.cta-button {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color var(--transition-duration) ease;
+}
+
+.cta-button:hover {
+    background-color: var(--accent-color);
+}
+
 .disclosure {
     background-color: var(--header-color);
     padding: 15px;
     border-radius: 8px;
     text-align: center;
     margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px var(--box-shadow-color);
 }
 
 .disclosure p {
@@ -236,7 +246,6 @@ button:focus, .cta-button:focus, a:focus {
     text-decoration: underline;
 }
 
-
 /* Webkit Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 12px;
@@ -254,4 +263,79 @@ button:focus, .cta-button:focus, a:focus {
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--accent-color);
+}
+
+/* New Additions */
+
+/* Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-center {
+    justify-content: center;
+    align-items: center;
+}
+
+.m-0 {
+    margin: 0;
+}
+
+.p-0 {
+    padding: 0;
+}
+
+/* Section Hover Effects */
+.feature-item, .testimonial {
+    transition: transform var(--transition-duration) ease, box-shadow var(--transition-duration) ease;
+}
+
+.feature-item:hover, .testimonial:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px var(--box-shadow-color);
+}
+
+/* Fade-In Animation */
+.fade-in {
+    opacity: 0;
+    animation: fadeInUp 1s forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+        margin: 1rem;
+    }
+
+    h1, h2, h3 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .cta-button, button {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .popup {
+        max-width: 90%;
+        bottom: 10px;
+        right: 10px;
+    }
 }
