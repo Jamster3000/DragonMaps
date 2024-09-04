@@ -8,8 +8,6 @@
     --text-color: #E0E0E0;
     --nav-link-color: #B19CD9;
     --accent-color: #FF4500;
-    --transition-duration: 0.3s;
-    --box-shadow-color: rgba(0, 0, 0, 0.2);
 }
 
 body {
@@ -20,6 +18,9 @@ body {
     position: relative;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 body::before {
@@ -30,12 +31,12 @@ body::before {
     width: 100%;
     height: 100%;
     background-image: 
-        radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.2) 0%, transparent 50%),
-        radial-gradient(circle at 20% 20%, rgba(255, 107, 107, 0.1) 0%, transparent 30%),
-        radial-gradient(circle at 80% 80%, rgba(255, 69, 0, 0.1) 0%, transparent 30%);
+        radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 20% 20%, rgba(255, 107, 107, 0.05) 0%, transparent 30%),
+        radial-gradient(circle at 80% 80%, rgba(255, 69, 0, 0.05) 0%, transparent 30%);
     background-size: 100% 100%, 50% 50%, 75% 75%;
     background-repeat: no-repeat;
-    animation: backgroundShimmer 25s infinite alternate;
+    animation: backgroundShimmer 20s infinite alternate;
     z-index: -1;
 }
 
@@ -46,13 +47,6 @@ body::before {
 
 a {
     color: var(--nav-link-color);
-    text-shadow: none;
-    transition: color var(--transition-duration) ease;
-}
-
-a:hover {
-    color: var(--accent-color);
-    text-decoration: underline;
 }
 
 header, footer {
@@ -60,11 +54,12 @@ header, footer {
     color: var(--text-color);
     padding: 1rem;
     border-bottom: 2px solid var(--primary-color);
+    width: 100%;
 }
 
 nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 }
 
@@ -82,7 +77,7 @@ nav ul li {
 nav ul li a {
     color: var(--nav-link-color);
     text-decoration: none;
-    transition: color var(--transition-duration) ease;
+    transition: color 0.3s ease;
 }
 
 nav ul li a:hover {
@@ -96,7 +91,7 @@ nav ul li a:hover {
     text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
 }
 
-.logo a:link {
+.logo a:link{
     color: var(--secondary-color);
     text-decoration: none;
 }
@@ -110,6 +105,7 @@ main {
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
     animation: contentFadeIn 1s ease-out;
+    text-align: center;
 }
 
 @keyframes contentFadeIn {
@@ -120,21 +116,23 @@ main {
 h1, h2, h3 {
     font-family: 'Cinzel', serif;
     color: var(--secondary-color);
-    margin-bottom: 1.5rem;
     text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
-    animation: headerGlow 4s infinite alternate;
+    margin-bottom: 1.5rem;
 }
 
 h1 {
     font-size: 2.5rem;
+    animation: headerGlow 4s infinite alternate;
 }
 
 h2 {
     font-size: 2rem;
+    animation: headerGlow 4s infinite alternate;
 }
 
 h3 {
     font-size: 1.5rem;
+    animation: headerGlow 4s infinite alternate;
 }
 
 @keyframes headerGlow {
@@ -150,21 +148,15 @@ button {
     font-size: 1.1rem;
     background-color: var(--primary-color);
     color: var(--text-color);
-    transition: all var(--transition-duration) ease;
+    transition: all 0.3s ease;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
-    outline: none;
 }
 
 button:hover {
     background-color: var(--accent-color);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px var(--accent-color);
-}
-
-button:focus, .cta-button:focus, a:focus {
-    outline: 2px dashed var(--accent-color);
-    outline-offset: 4px;
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
 }
 
 .popup {
@@ -172,15 +164,16 @@ button:focus, .cta-button:focus, a:focus {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: var(--header-color);
-    border: 2px solid var(--primary-color);
+    background-color: #1A1A2E;
+    border: 2px solid #8A2BE2;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(138, 43, 226, 0.2);
     z-index: 1000;
     max-width: 300px;
-    transition: opacity var(--transition-duration) ease-in-out;
-    color: var(--text-color);
+    transition: opacity 0.3s ease-in-out;
+    color: #E0E0E0;
+    text-align: center;
 }
 
 .popup-content {
@@ -188,12 +181,12 @@ button:focus, .cta-button:focus, a:focus {
 }
 
 .popup-content h2 {
-    color: var(--secondary-color);
+    color: #FF6B6B;
     margin-top: 0;
 }
 
 .close-btn {
-    color: var(--nav-link-color);
+    color: #B19CD9;
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -202,21 +195,21 @@ button:focus, .cta-button:focus, a:focus {
 }
 
 .close-btn:hover {
-    color: var(--accent-color);
+    color: #FF4500;
 }
 
 .cta-button {
-    background-color: var(--primary-color);
-    color: var(--text-color);
+    background-color: #8A2BE2;
+    color: #E0E0E0;
     border: none;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color var(--transition-duration) ease;
+    transition: background-color 0.2s;
 }
 
 .cta-button:hover {
-    background-color: var(--accent-color);
+    background-color: #FF4500;
 }
 
 .disclosure {
@@ -225,7 +218,7 @@ button:focus, .cta-button:focus, a:focus {
     border-radius: 8px;
     text-align: center;
     margin-top: 20px;
-    box-shadow: 0 4px 8px var(--box-shadow-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .disclosure p {
@@ -263,79 +256,4 @@ button:focus, .cta-button:focus, a:focus {
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--accent-color);
-}
-
-/* New Additions */
-
-/* Utility Classes */
-.text-center {
-    text-align: center;
-}
-
-.flex {
-    display: flex;
-}
-
-.flex-center {
-    justify-content: center;
-    align-items: center;
-}
-
-.m-0 {
-    margin: 0;
-}
-
-.p-0 {
-    padding: 0;
-}
-
-/* Section Hover Effects */
-.feature-item, .testimonial {
-    transition: transform var(--transition-duration) ease, box-shadow var(--transition-duration) ease;
-}
-
-.feature-item:hover, .testimonial:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px var(--box-shadow-color);
-}
-
-/* Fade-In Animation */
-.fade-in {
-    opacity: 0;
-    animation: fadeInUp 1s forwards;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    main {
-        padding: 1rem;
-        margin: 1rem;
-    }
-
-    h1, h2, h3 {
-        font-size: 1.8rem;
-        margin-bottom: 1rem;
-    }
-
-    .cta-button, button {
-        font-size: 1rem;
-        padding: 0.5rem 1rem;
-    }
-
-    .popup {
-        max-width: 90%;
-        bottom: 10px;
-        right: 10px;
-    }
 }
