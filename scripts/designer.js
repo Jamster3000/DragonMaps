@@ -38,6 +38,8 @@ let imagePresenceCallback;
 let imageNode = null;
 let currentPage = 1;
 const resultsPerPage = 20;
+const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+const isWindows = navigator.platform.toUpperCase().indexOf('WIN') >= 0;
 
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('canvas-container');
@@ -289,7 +291,8 @@ function setupEventListeners() {
             if (targetElement.tagName === 'BUTTON') {
                 const selectedTool = targetElement.getAttribute('data-tool');
 
-                if (targetElement.classList.contains('active')) {
+                // Deselect the current tool if the same tool is clicked again
+                if (selectedTool === currentTool) {
                     targetElement.classList.remove('active');
                     currentTool = null; // Reset the current tool
                     hideToolOptions(); // Hide tool options if needed
@@ -951,7 +954,7 @@ function handleKeyDown(e) {
         }
     }
 
-    if (e.altKey) {
+    if ((!isMac && e.altKey) || (isMac && e.metaKey) || (isWindows && e.altKey)) {addS
         switch (e.key.toLowerCase()) {
             case 'f':
                 e.preventDefault();
@@ -1001,7 +1004,7 @@ function handleKeyDown(e) {
     var isFontFocused = (document.activeElement === fontInput);
     var isEditing = (document.activeElement === editArea);
 
-    if (!e.altKey && !isFocused && !isFontFocused && !isEditing) {
+    if ((!isMac && e.altKey) || (isMac && e.metaKey) || (isWindows && e.altKey)) {
         switch (e.key.toLowerCase()) {
             case 'd':
                 selectTool('draw');
@@ -1197,49 +1200,56 @@ function addShape(e) {
     let shape;
     const shapeType = document.getElementById('shape-type').value;
     const strokeWidth = parseInt(document.getElementById('shape-stroke-width').value);
-    const snapInput = document.getElementById('shape-snap');
-
-    function snapToGrid(x, y) {
-        return {
-            x: Math.round(x / gridSize) * gridSize,
-            y: Math.round(y / gridSize) * gridSize
-        };
-    }
+    const fillColor = document.getElementById('shape-fill').value;
+    const strokeColor = document.getElementById('shape-stroke').value;
+    const snapToGrid = document.getElementById('shape-snap').checked || e.evt.shiftKey;
 
     switch (shapeType) {
         case 'Rectangle':
             shape = new Konva.Rect({
-                x: snapToGrid(startPos.x, startPos.y).x,
-                y: snapToGrid(startPos.x, startPos.y).y,
+                x: startPos.x,
+                y: startPos.y,
                 width: gridSize,
                 height: gridSize,
-                fill: document.getElementById('shape-fill').value,
-                stroke: document.getElementById('shape-stroke').value,
+                fill: fillColor,
+                stroke: strokeColor,
                 strokeWidth: strokeWidth,
-                draggable: false
+                draggable: true,
             });
             break;
         case 'Circle':
             shape = new Konva.Circle({
-                x: snapToGrid(startPos.x, startPos.y).x,
-                y: snapToGrid(startPos.x, startPos.y).y,
+                x: startPos.x,
+                y: startPos.y,
                 radius: gridSize / 2,
-                fill: document.getElementById('shape-fill').value,
-                stroke: document.getElementById('shape-stroke').value,
+                fill: fillColor,
+                stroke: strokeColor,
                 strokeWidth: strokeWidth,
-                draggable: false
+                draggable: true,
             });
             break;
         case 'Triangle':
             shape = new Konva.RegularPolygon({
-                x: snapToGrid(startPos.x, startPos.y).x,
-                y: snapToGrid(startPos.x, startPos.y).y,
+                x: startPos.x,
+                y: startPos.y,
                 sides: 3,
                 radius: gridSize / 2,
-                fill: document.getElementById('shape-fill').value,
-                stroke: document.getElementById('shape-stroke').value,
+                fill: fillColor,
+                stroke: strokeColor,
                 strokeWidth: strokeWidth,
-                draggable: false
+                draggable: true,
+            });
+            break;
+        case 'Pentagon':
+            shape = new Konva.RegularPolygon({
+                x: startPos.x,
+                y: startPos.y,
+                sides: 5,
+                radius: gridSize / 2,
+                fill: fillColor,
+                stroke: strokeColor,
+                strokeWidth: strokeWidth,
+                draggable: true,
             });
             break;
     }
@@ -1247,69 +1257,121 @@ function addShape(e) {
     layer.add(shape);
     layer.draw();
 
-    function onMouseMove(e) {
-        const pos = getRelativePointerPosition(layer);
-        const snapToGridEnabled = snapInput.checked || e.evt.shiftKey;
-        let endPos = snapToGridEnabled ? snapToGrid(pos.x, pos.y) : pos;
-
-        const width = Math.abs(endPos.x - startPos.x);
-        const height = Math.abs(endPos.y - startPos.y);
-
-        // Update shape based on type
-        if (shapeType === 'Rectangle') {
-            const snappedStartPos = snapToGrid(startPos.x, startPos.y);
-            shape.width(Math.max(gridSize, width));
-            shape.height(Math.max(gridSize, height));
-            shape.position({
-                x: Math.min(snappedStartPos.x, endPos.x),
-                y: Math.min(snappedStartPos.y, endPos.y)
-            });
-        } else if (shapeType === 'Circle') {
-            const radius = Math.max(gridSize / 2, Math.sqrt(width * width + height * height) / 2);
-            shape.radius(radius);
-            shape.position({
-                x: snapToGrid(pos.x, pos.y).x,
-                y: snapToGrid(pos.x, pos.y).y
-            });
-        } else if (shapeType === 'Triangle') {
-            const radius = Math.max(gridSize / 2, Math.sqrt(width * width + height * height) / 2);
-            shape.radius(radius);
-            shape.position({
-                x: snapToGrid(pos.x, pos.y).x,
-                y: snapToGrid(pos.x, pos.y).y
-            });
-        }
-
-        layer.batchDraw();
-    }
-
-    function onMouseUp() {
-        stage.off('mousemove', onMouseMove);
-        stage.off('mouseup', onMouseUp);
-        shape.draggable(true);
-        recordAction({
-            type: 'addShape',
-            node: shape
-        });
-    }
-
-    stage.on('mousemove', onMouseMove);
-    stage.on('mouseup', onMouseUp);
-}
-
-function updateShapesDraggable() {
-    layer.find('Rect, Circle, RegularPolygon').forEach(shape => {
-        shape.draggable(currentTool !== 'shape');
+    // Record the action for undo/redo
+    recordAction({
+        type: 'addShape',
+        node: shape,
     });
+
+    // Add event listeners for shape movement and transformation
+    shape.on('dragmove', () => {
+        layer.batchDraw();
+    });
+    shape.on('transformer.transform', () => {
+        layer.batchDraw();
+    });
+
+    // Create the transformer and add it to the layer
+    const transformer = new Konva.Transformer({
+        node: shape,
+        borderStroke: 'blue',
+        borderStrokeWidth: 2,
+        padding: 10,
+        resizeEnabled: true,
+        rotateEnabled: true,
+        anchorCornerRadius: 50,
+        anchorSize: 14,
+        shouldOverdrawWholeArea: true,
+        rotateAnchorOffset: 60,
+        enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
+        rotationSnapTolerance: 10,
+    });
+    layer.add(transformer);
+
+    if (currentTransformer) {
+        currentTransformer.nodes([]);
+    }
+    currentTransformer = transformer;
+    currentTransformer.nodes([currentTransformer.getNodes()[0]]);
+    layer.batchDraw();
 }
 
-function shortcut_draggable() {
-    const shortcut = document.querySelector(".overlay-content");
-    if (shortcut) {
-        dragElement(shortcut);
+function handleShapeResize(e) {
+    if (currentTransformer && e.target === currentTransformer.getNodes()[0]) {
+        // The user is trying to resize a shape, so we don't want to create a new one
+        return;
+    } else {
+        // The user is not trying to resize a shape, so we can proceed with creating a new one
+        addShape(e);
     }
 }
 
+function addSquare(e) {
+    const startPos = getRelativePointerPosition(layer);
+    const shape = new Konva.Rect({
+        x: startPos.x,
+        y: startPos.y,
+        width: gridSize,
+        height: gridSize,
+        fill: fillColor,
+        stroke: strokeColor,
+        strokeWidth: strokeWidth,
+        draggable: true,
+    });
+
+    layer.add(shape);
+    layer.draw();
+
+    // Record the action for undo/redo
+    recordAction({
+        type: 'addShape',
+        node: shape,
+    });
+
+    // Add event listeners for shape movement and transformation
+    shape.on('dragmove', () => {
+        layer.batchDraw();
+    });
+    shape.on('transformer.transform', () => {
+        layer.batchDraw();
+    });
+
+    // Create the transformer and add it to the layer
+    const transformer = new Konva.Transformer({
+        node: shape,
+        borderStroke: 'blue',
+        borderStrokeWidth: 2,
+        padding: 10,
+        resizeEnabled: true,
+        rotateEnabled: true,
+        anchorCornerRadius: 50,
+        anchorSize: 14,
+        shouldOverdrawWholeArea: true,
+        rotateAnchorOffset: 60,
+        enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
+        rotationSnapTolerance: 10,
+    });
+    layer.add(transformer);
+
+    if (currentTransformer) {
+        currentTransformer.nodes([]);
+    }
+    currentTransformer = transformer;
+    currentTransformer.nodes([currentTransformer.getNodes()[0]]);
+    layer.batchDraw();
+}
+
+function addSquare(e) {
+    addShape(e);
+}
+
+function addEllipse(e) {
+    addShape(e);
+}
+
+function addPentagon(e) {
+    addShape(e);
+}
 function popup_draggable() {
     const popupToolbox = document.getElementById("toolbar-popup");
     if (popupToolbox) {
@@ -1499,6 +1561,11 @@ function showToolOptions(tool, buttonElement) {
     } catch (TypeError) { }
 }
 
+function hideToolOptions() {
+    const popupToolbox = document.getElementById('popup-toolbox');
+    popupToolbox.style.display = 'none';
+}
+
 //get the tool that has what options
 function getToolOptions(tool) {
     switch (tool) {
@@ -1596,7 +1663,7 @@ function getToolOptions(tool) {
                     id: 'shape-type',
                     label: 'Shape',
                     type: 'select',
-                    options: ['Rectangle', 'Circle', 'Triangle']
+                    options: ['Rectangle', 'Circle', 'Triangle', 'Pentagon']
                 },
                 {
                     id: 'shape-fill',
