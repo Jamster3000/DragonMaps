@@ -211,6 +211,34 @@ button:hover {
         background-color: #FF4500;
     }
 
+.disclosure {
+    background-color: var(--header-color);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.disclosure p {
+    color: var(--text-color);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.disclosure .privacy-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.disclosure .privacy-link:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+
 /* Webkit Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 12px;
