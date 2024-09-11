@@ -412,19 +412,9 @@ function setupEventListeners() {
     const exportJsonButton = document.getElementById('export-json');
 
     if (exportImageButton) {
-        exportImageButton.addEventListener('click', function (e) {
+        exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
-                // Save the current stage properties
-                const originalProps = {
-                    width: stage.width(),
-                    height: stage.height(),
-                    x: stage.x(),
-                    y: stage.y(),
-                    scaleX: stage.scaleX(),
-                    scaleY: stage.scaleY()
-                };
-    
                 // Get all shapes on the stage
                 const shapes = stage.find('Shape');
     
@@ -448,58 +438,59 @@ function setupEventListeners() {
                 const width = maxX - minX;
                 const height = maxY - minY;
     
-                // Temporarily resize and reposition the stage to fit the content
-                stage.width(width);
-                stage.height(height);
-                stage.scale({ x: 1, y: 1 });
-                stage.position({
-                    x: -minX,
-                    y: -minY
+                // Create a new temporary stage and layer
+                const tempStage = new Konva.Stage({
+                    container: 'temp-container', // Make sure to create this temporary container in your HTML
+                    width: width,
+                    height: height,
+                });
+                const tempLayer = new Konva.Layer();
+                tempStage.add(tempLayer);
+    
+                // Clone and adjust positions of shapes
+                shapes.forEach((shape) => {
+                    const clone = shape.clone();
+                    clone.position({
+                        x: clone.x() - minX,
+                        y: clone.y() - minY
+                    });
+                    tempLayer.add(clone);
                 });
     
                 // Hide the grid temporarily if it exists
-                let gridLayer = stage.findOne('.grid-layer');
+                let gridLayer = tempLayer.findOne('.grid-layer');
                 if (gridLayer) {
                     gridLayer.hide();
                 }
     
-                // Draw the stage
-                stage.draw();
+                // Draw the temporary stage
+                tempStage.draw();
     
                 // Export the image
-                const dataURL = stage.toDataURL({
+                const dataURL = tempStage.toDataURL({
                     mimeType: 'image/png',
                     quality: 1,
                     pixelRatio: 2, // Increase for higher resolution
                 });
-    
-                // Restore the grid visibility
-                if (gridLayer) {
-                    gridLayer.show();
-                }
-    
-                // Restore the original stage properties
-                stage.width(originalProps.width);
-                stage.height(originalProps.height);
-                stage.scale({
-                    x: originalProps.scaleX,
-                    y: originalProps.scaleY
-                });
-                stage.position({
-                    x: originalProps.x,
-                    y: originalProps.y
-                });
-    
-                // Redraw the stage
-                stage.draw();
     
                 // Create a link to download the image
                 const link = document.createElement('a');
                 link.href = dataURL;
                 link.download = 'battlemap.png';
                 document.body.appendChild(link);
+    
+                // Wait for the next frame to ensure the image has been rendered
+                await new Promise(resolve => requestAnimationFrame(resolve));
+    
                 link.click();
                 document.body.removeChild(link);
+    
+                // Clean up
+                tempStage.destroy();
+                const tempContainer = document.getElementById('temp-container');
+                if (tempContainer) {
+                    tempContainer.remove();
+                }
     
                 console.log('Exporting as image...');
             }
@@ -2088,19 +2079,9 @@ function rightPanel() {
     const exportJsonButton = document.getElementById('export-json');
 
     if (exportImageButton) {
-        exportImageButton.addEventListener('click', function (e) {
+        exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
-                // Save the current stage properties
-                const originalProps = {
-                    width: stage.width(),
-                    height: stage.height(),
-                    x: stage.x(),
-                    y: stage.y(),
-                    scaleX: stage.scaleX(),
-                    scaleY: stage.scaleY()
-                };
-    
                 // Get all shapes on the stage
                 const shapes = stage.find('Shape');
     
@@ -2124,58 +2105,59 @@ function rightPanel() {
                 const width = maxX - minX;
                 const height = maxY - minY;
     
-                // Temporarily resize and reposition the stage to fit the content
-                stage.width(width);
-                stage.height(height);
-                stage.scale({ x: 1, y: 1 });
-                stage.position({
-                    x: -minX,
-                    y: -minY
+                // Create a new temporary stage and layer
+                const tempStage = new Konva.Stage({
+                    container: 'temp-container', // Make sure to create this temporary container in your HTML
+                    width: width,
+                    height: height,
+                });
+                const tempLayer = new Konva.Layer();
+                tempStage.add(tempLayer);
+    
+                // Clone and adjust positions of shapes
+                shapes.forEach((shape) => {
+                    const clone = shape.clone();
+                    clone.position({
+                        x: clone.x() - minX,
+                        y: clone.y() - minY
+                    });
+                    tempLayer.add(clone);
                 });
     
                 // Hide the grid temporarily if it exists
-                let gridLayer = stage.findOne('.grid-layer');
+                let gridLayer = tempLayer.findOne('.grid-layer');
                 if (gridLayer) {
                     gridLayer.hide();
                 }
     
-                // Draw the stage
-                stage.draw();
+                // Draw the temporary stage
+                tempStage.draw();
     
                 // Export the image
-                const dataURL = stage.toDataURL({
+                const dataURL = tempStage.toDataURL({
                     mimeType: 'image/png',
                     quality: 1,
                     pixelRatio: 2, // Increase for higher resolution
                 });
-    
-                // Restore the grid visibility
-                if (gridLayer) {
-                    gridLayer.show();
-                }
-    
-                // Restore the original stage properties
-                stage.width(originalProps.width);
-                stage.height(originalProps.height);
-                stage.scale({
-                    x: originalProps.scaleX,
-                    y: originalProps.scaleY
-                });
-                stage.position({
-                    x: originalProps.x,
-                    y: originalProps.y
-                });
-    
-                // Redraw the stage
-                stage.draw();
     
                 // Create a link to download the image
                 const link = document.createElement('a');
                 link.href = dataURL;
                 link.download = 'battlemap.png';
                 document.body.appendChild(link);
+    
+                // Wait for the next frame to ensure the image has been rendered
+                await new Promise(resolve => requestAnimationFrame(resolve));
+    
                 link.click();
                 document.body.removeChild(link);
+    
+                // Clean up
+                tempStage.destroy();
+                const tempContainer = document.getElementById('temp-container');
+                if (tempContainer) {
+                    tempContainer.remove();
+                }
     
                 console.log('Exporting as image...');
             }
