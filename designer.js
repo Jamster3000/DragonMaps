@@ -413,24 +413,89 @@ function setupEventListeners() {
 
     if (exportImageButton) {
         exportImageButton.addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent any default action
-            // Ensure all layers are drawn before exporting
-            stage.draw();
-            // Generate a data URL of the current state of the canvas
-            const dataURL = stage.toDataURL({
-                pixelRatio: 3, // Adjust the pixel ratio for image quality
-            });
-            // Create a hidden link element
-            const link = document.createElement('a');
-            link.href = dataURL;
-            link.download = 'battlemap.png'; // Set the name of the downloaded file
-            // Append the link to the body (it won't be visible)
-            document.body.appendChild(link);
-            // Programmatically click the link to trigger the download
-            link.click();
-            // Remove the link from the document
-            document.body.removeChild(link);
-            console.log('Exporting as image...');
+            e.preventDefault();
+            if (stage) {
+                // Save the current stage properties
+                const originalProps = {
+                    width: stage.width(),
+                    height: stage.height(),
+                    x: stage.x(),
+                    y: stage.y(),
+                    scaleX: stage.scaleX(),
+                    scaleY: stage.scaleY()
+                };
+    
+                // Get all shapes on the stage
+                const shapes = stage.find('Shape');
+    
+                // Calculate the bounding box of all shapes
+                const box = new Konva.Box();
+                shapes.forEach((shape) => {
+                    box.merge(shape.getClientRect());
+                });
+    
+                // Add some padding
+                const padding = 20;
+                box.x -= padding;
+                box.y -= padding;
+                box.width += padding * 2;
+                box.height += padding * 2;
+    
+                // Temporarily resize and reposition the stage to fit the content
+                stage.width(box.width);
+                stage.height(box.height);
+                stage.scale({ x: 1, y: 1 });
+                stage.position({
+                    x: -box.x,
+                    y: -box.y
+                });
+    
+                // Hide the grid temporarily if it exists
+                let gridLayer = stage.findOne('.grid-layer');
+                if (gridLayer) {
+                    gridLayer.hide();
+                }
+    
+                // Draw the stage
+                stage.draw();
+    
+                // Export the image
+                const dataURL = stage.toDataURL({
+                    mimeType: 'image/png',
+                    quality: 1,
+                    pixelRatio: 2, // Increase for higher resolution
+                });
+    
+                // Restore the grid visibility
+                if (gridLayer) {
+                    gridLayer.show();
+                }
+    
+                // Restore the original stage properties
+                stage.width(originalProps.width);
+                stage.height(originalProps.height);
+                stage.scale({
+                    x: originalProps.scaleX,
+                    y: originalProps.scaleY
+                });
+                stage.position({
+                    x: originalProps.x,
+                    y: originalProps.y
+                });
+    
+                // Redraw the stage
+                stage.draw();
+    
+                // Create a link to download the image
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = 'battlemap.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+    
+                console.log('Exporting as image...');
+            }
         });
     }
 
