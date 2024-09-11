@@ -415,72 +415,40 @@ function setupEventListeners() {
         exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
-                // Save the current stage properties
-                const originalProps = {
-                    width: stage.width(),
-                    height: stage.height(),
-                    scale: stage.scale(),
-                    position: stage.position()
-                };
+                // Get the visible area of the stage
+                const visibleRect = stage.getClientRect({skipTransform: true});
     
-                // Get all shapes on the stage
-                const shapes = stage.find('Shape');
+                // Create a new canvas element
+                const canvas = document.createElement('canvas');
+                canvas.width = visibleRect.width;
+                canvas.height = visibleRect.height;
     
-                // Calculate the bounding box of all shapes
-                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                shapes.forEach((shape) => {
-                    const box = shape.getClientRect();
-                    minX = Math.min(minX, box.x);
-                    minY = Math.min(minY, box.y);
-                    maxX = Math.max(maxX, box.x + box.width);
-                    maxY = Math.max(maxY, box.y + box.height);
-                });
+                // Get the canvas context
+                const context = canvas.getContext('2d');
     
-                // Add some padding
-                const padding = 20;
-                minX -= padding;
-                minY -= padding;
-                maxX += padding;
-                maxY += padding;
-    
-                const width = maxX - minX;
-                const height = maxY - minY;
-    
-                // Temporarily resize and reposition the stage to fit the content
-                stage.width(width);
-                stage.height(height);
-                stage.scale({ x: 1, y: 1 });
-                stage.position({ x: -minX, y: -minY });
-    
-                // Hide the grid temporarily if it exists
-                let gridLayer = stage.findOne('.grid-layer');
-                if (gridLayer) {
+                // Temporarily hide the grid if it exists
+                const gridLayer = stage.findOne('.grid-layer');
+                const wasGridVisible = gridLayer && gridLayer.isVisible();
+                if (gridLayer && wasGridVisible) {
                     gridLayer.hide();
                 }
     
-                // Draw the stage
-                stage.draw();
-    
-                // Export the image
-                const dataURL = stage.toDataURL({
-                    mimeType: 'image/png',
-                    quality: 1,
-                    pixelRatio: 2 // Increase for higher resolution
+                // Draw the stage content onto the canvas
+                stage.drawScene({
+                    canvas: canvas,
+                    x: visibleRect.x,
+                    y: visibleRect.y,
+                    width: visibleRect.width,
+                    height: visibleRect.height
                 });
     
-                // Restore the original stage properties
-                stage.width(originalProps.width);
-                stage.height(originalProps.height);
-                stage.scale(originalProps.scale);
-                stage.position(originalProps.position);
-    
-                // Show the grid again if it was hidden
-                if (gridLayer) {
+                // Show the grid again if it was originally visible
+                if (gridLayer && wasGridVisible) {
                     gridLayer.show();
                 }
     
-                // Redraw the stage
-                stage.draw();
+                // Convert the canvas to a data URL
+                const dataURL = canvas.toDataURL('image/png');
     
                 // Create a link to download the image
                 const link = document.createElement('a');
@@ -488,10 +456,10 @@ function setupEventListeners() {
                 link.download = 'battlemap.png';
                 document.body.appendChild(link);
     
-                // Wait for the next frame to ensure the image has been rendered
-                await new Promise(resolve => requestAnimationFrame(resolve));
-    
+                // Trigger the download
                 link.click();
+    
+                // Clean up
                 document.body.removeChild(link);
     
                 console.log('Exporting as image...');
@@ -2084,72 +2052,40 @@ function rightPanel() {
         exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
-                // Save the current stage properties
-                const originalProps = {
-                    width: stage.width(),
-                    height: stage.height(),
-                    scale: stage.scale(),
-                    position: stage.position()
-                };
+                // Get the visible area of the stage
+                const visibleRect = stage.getClientRect({skipTransform: true});
     
-                // Get all shapes on the stage
-                const shapes = stage.find('Shape');
+                // Create a new canvas element
+                const canvas = document.createElement('canvas');
+                canvas.width = visibleRect.width;
+                canvas.height = visibleRect.height;
     
-                // Calculate the bounding box of all shapes
-                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                shapes.forEach((shape) => {
-                    const box = shape.getClientRect();
-                    minX = Math.min(minX, box.x);
-                    minY = Math.min(minY, box.y);
-                    maxX = Math.max(maxX, box.x + box.width);
-                    maxY = Math.max(maxY, box.y + box.height);
-                });
+                // Get the canvas context
+                const context = canvas.getContext('2d');
     
-                // Add some padding
-                const padding = 20;
-                minX -= padding;
-                minY -= padding;
-                maxX += padding;
-                maxY += padding;
-    
-                const width = maxX - minX;
-                const height = maxY - minY;
-    
-                // Temporarily resize and reposition the stage to fit the content
-                stage.width(width);
-                stage.height(height);
-                stage.scale({ x: 1, y: 1 });
-                stage.position({ x: -minX, y: -minY });
-    
-                // Hide the grid temporarily if it exists
-                let gridLayer = stage.findOne('.grid-layer');
-                if (gridLayer) {
+                // Temporarily hide the grid if it exists
+                const gridLayer = stage.findOne('.grid-layer');
+                const wasGridVisible = gridLayer && gridLayer.isVisible();
+                if (gridLayer && wasGridVisible) {
                     gridLayer.hide();
                 }
     
-                // Draw the stage
-                stage.draw();
-    
-                // Export the image
-                const dataURL = stage.toDataURL({
-                    mimeType: 'image/png',
-                    quality: 1,
-                    pixelRatio: 2 // Increase for higher resolution
+                // Draw the stage content onto the canvas
+                stage.drawScene({
+                    canvas: canvas,
+                    x: visibleRect.x,
+                    y: visibleRect.y,
+                    width: visibleRect.width,
+                    height: visibleRect.height
                 });
     
-                // Restore the original stage properties
-                stage.width(originalProps.width);
-                stage.height(originalProps.height);
-                stage.scale(originalProps.scale);
-                stage.position(originalProps.position);
-    
-                // Show the grid again if it was hidden
-                if (gridLayer) {
+                // Show the grid again if it was originally visible
+                if (gridLayer && wasGridVisible) {
                     gridLayer.show();
                 }
     
-                // Redraw the stage
-                stage.draw();
+                // Convert the canvas to a data URL
+                const dataURL = canvas.toDataURL('image/png');
     
                 // Create a link to download the image
                 const link = document.createElement('a');
@@ -2157,10 +2093,10 @@ function rightPanel() {
                 link.download = 'battlemap.png';
                 document.body.appendChild(link);
     
-                // Wait for the next frame to ensure the image has been rendered
-                await new Promise(resolve => requestAnimationFrame(resolve));
-    
+                // Trigger the download
                 link.click();
+    
+                // Clean up
                 document.body.removeChild(link);
     
                 console.log('Exporting as image...');
