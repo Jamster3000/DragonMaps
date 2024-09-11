@@ -417,6 +417,7 @@ function setupEventListeners() {
             if (stage) {
                 // Get all shapes on the stage
                 const shapes = stage.find('Shape');
+                console.log('Shapes found:', shapes);
     
                 // Calculate the bounding box of all shapes
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -428,6 +429,8 @@ function setupEventListeners() {
                     maxY = Math.max(maxY, box.y + box.height);
                 });
     
+                console.log('Bounding box:', { minX, minY, maxX, maxY });
+    
                 // Add some padding
                 const padding = 20;
                 minX -= padding;
@@ -437,6 +440,8 @@ function setupEventListeners() {
     
                 const width = maxX - minX;
                 const height = maxY - minY;
+    
+                console.log('New dimensions:', { width, height });
     
                 // Save current stage properties
                 const originalProps = {
@@ -453,6 +458,8 @@ function setupEventListeners() {
                 stage.scale({ x: 1, y: 1 });
                 stage.position({ x: -minX, y: -minY });
     
+                console.log('Stage resized and repositioned');
+    
                 // Temporarily hide the grid if it exists
                 const gridLayer = stage.findOne('.grid-layer');
                 const wasGridVisible = gridLayer && gridLayer.isVisible();
@@ -467,6 +474,8 @@ function setupEventListeners() {
                         quality: 1,
                         pixelRatio: 2 // Increase for higher resolution
                     });
+    
+                    console.log('Data URL generated:', dataURL);
     
                     // Create a link to download the image
                     const link = document.createElement('a');
@@ -2090,6 +2099,7 @@ function rightPanel() {
             if (stage) {
                 // Get all shapes on the stage
                 const shapes = stage.find('Shape');
+                console.log('Shapes found:', shapes);
     
                 // Calculate the bounding box of all shapes
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -2101,6 +2111,8 @@ function rightPanel() {
                     maxY = Math.max(maxY, box.y + box.height);
                 });
     
+                console.log('Bounding box:', { minX, minY, maxX, maxY });
+    
                 // Add some padding
                 const padding = 20;
                 minX -= padding;
@@ -2110,6 +2122,8 @@ function rightPanel() {
     
                 const width = maxX - minX;
                 const height = maxY - minY;
+    
+                console.log('New dimensions:', { width, height });
     
                 // Save current stage properties
                 const originalProps = {
@@ -2126,6 +2140,8 @@ function rightPanel() {
                 stage.scale({ x: 1, y: 1 });
                 stage.position({ x: -minX, y: -minY });
     
+                console.log('Stage resized and repositioned');
+    
                 // Temporarily hide the grid if it exists
                 const gridLayer = stage.findOne('.grid-layer');
                 const wasGridVisible = gridLayer && gridLayer.isVisible();
@@ -2140,6 +2156,8 @@ function rightPanel() {
                         quality: 1,
                         pixelRatio: 2 // Increase for higher resolution
                     });
+    
+                    console.log('Data URL generated:', dataURL);
     
                     // Create a link to download the image
                     const link = document.createElement('a');
