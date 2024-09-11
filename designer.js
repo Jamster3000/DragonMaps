@@ -2019,20 +2019,28 @@ function rightPanel() {
         exportImageButton.addEventListener('click', function (e) {
             e.preventDefault();
             if (stage) {
-                // Save the current stage size and position
+                // Save the current stage size, position, and scale
                 const originalWidth = stage.width();
                 const originalHeight = stage.height();
                 const originalX = stage.x();
                 const originalY = stage.y();
+                const originalScaleX = stage.scaleX();
+                const originalScaleY = stage.scaleY();
 
                 // Calculate the bounding box of all elements on the stage
                 const boundingBox = stage.getClientRect({ relativeTo: stage });
 
+                // Calculate the scale to fit the bounding box
+                const scaleX = originalWidth / boundingBox.width;
+                const scaleY = originalHeight / boundingBox.height;
+                const scale = Math.min(scaleX, scaleY);
+
                 // Resize and reposition the stage to fit the bounding box
-                stage.width(boundingBox.width);
-                stage.height(boundingBox.height);
-                stage.x(-boundingBox.x);
-                stage.y(-boundingBox.y);
+                stage.width(boundingBox.width * scale);
+                stage.height(boundingBox.height * scale);
+                stage.scale({ x: scale, y: scale });
+                stage.x(-boundingBox.x * scale);
+                stage.y(-boundingBox.y * scale);
 
                 // Draw the stage and export the image
                 stage.draw();
@@ -2040,9 +2048,10 @@ function rightPanel() {
                     pixelRatio: 3,
                 });
 
-                // Restore the original stage size and position
+                // Restore the original stage size, position, and scale
                 stage.width(originalWidth);
                 stage.height(originalHeight);
+                stage.scale({ x: originalScaleX, y: originalScaleY });
                 stage.x(originalX);
                 stage.y(originalY);
 
