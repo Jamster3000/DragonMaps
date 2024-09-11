@@ -415,16 +415,43 @@ function setupEventListeners() {
         exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
-                // Get the visible area of the stage
-                const visibleRect = stage.getClientRect({skipTransform: true});
+                // Get all shapes on the stage
+                const shapes = stage.find('Shape');
     
-                // Create a new canvas element
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.round(visibleRect.width);
-                canvas.height = Math.round(visibleRect.height);
+                // Calculate the bounding box of all shapes
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                shapes.forEach((shape) => {
+                    const box = shape.getClientRect();
+                    minX = Math.min(minX, box.x);
+                    minY = Math.min(minY, box.y);
+                    maxX = Math.max(maxX, box.x + box.width);
+                    maxY = Math.max(maxY, box.y + box.height);
+                });
     
-                // Get the canvas context
-                const context = canvas.getContext('2d');
+                // Add some padding
+                const padding = 20;
+                minX -= padding;
+                minY -= padding;
+                maxX += padding;
+                maxY += padding;
+    
+                const width = maxX - minX;
+                const height = maxY - minY;
+    
+                // Save current stage properties
+                const originalProps = {
+                    width: stage.width(),
+                    height: stage.height(),
+                    x: stage.x(),
+                    y: stage.y(),
+                    scale: stage.scale(),
+                };
+    
+                // Temporarily resize and reposition the stage
+                stage.width(width);
+                stage.height(height);
+                stage.scale({ x: 1, y: 1 });
+                stage.position({ x: -minX, y: -minY });
     
                 // Temporarily hide the grid if it exists
                 const gridLayer = stage.findOne('.grid-layer');
@@ -436,10 +463,8 @@ function setupEventListeners() {
                 try {
                     // Draw the stage content onto the canvas
                     const dataURL = stage.toDataURL({
-                        x: visibleRect.x,
-                        y: visibleRect.y,
-                        width: visibleRect.width,
-                        height: visibleRect.height,
+                        mimeType: 'image/png',
+                        quality: 1,
                         pixelRatio: 2 // Increase for higher resolution
                     });
     
@@ -459,6 +484,15 @@ function setupEventListeners() {
                 } catch (error) {
                     console.error('Error exporting image:', error);
                 } finally {
+                    // Restore original stage properties
+                    stage.width(originalProps.width);
+                    stage.height(originalProps.height);
+                    stage.scale(originalProps.scale);
+                    stage.position({
+                        x: originalProps.x,
+                        y: originalProps.y
+                    });
+    
                     // Show the grid again if it was originally visible
                     if (gridLayer && wasGridVisible) {
                         gridLayer.show();
@@ -2054,16 +2088,43 @@ function rightPanel() {
         exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
-                // Get the visible area of the stage
-                const visibleRect = stage.getClientRect({skipTransform: true});
+                // Get all shapes on the stage
+                const shapes = stage.find('Shape');
     
-                // Create a new canvas element
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.round(visibleRect.width);
-                canvas.height = Math.round(visibleRect.height);
+                // Calculate the bounding box of all shapes
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                shapes.forEach((shape) => {
+                    const box = shape.getClientRect();
+                    minX = Math.min(minX, box.x);
+                    minY = Math.min(minY, box.y);
+                    maxX = Math.max(maxX, box.x + box.width);
+                    maxY = Math.max(maxY, box.y + box.height);
+                });
     
-                // Get the canvas context
-                const context = canvas.getContext('2d');
+                // Add some padding
+                const padding = 20;
+                minX -= padding;
+                minY -= padding;
+                maxX += padding;
+                maxY += padding;
+    
+                const width = maxX - minX;
+                const height = maxY - minY;
+    
+                // Save current stage properties
+                const originalProps = {
+                    width: stage.width(),
+                    height: stage.height(),
+                    x: stage.x(),
+                    y: stage.y(),
+                    scale: stage.scale(),
+                };
+    
+                // Temporarily resize and reposition the stage
+                stage.width(width);
+                stage.height(height);
+                stage.scale({ x: 1, y: 1 });
+                stage.position({ x: -minX, y: -minY });
     
                 // Temporarily hide the grid if it exists
                 const gridLayer = stage.findOne('.grid-layer');
@@ -2075,10 +2136,8 @@ function rightPanel() {
                 try {
                     // Draw the stage content onto the canvas
                     const dataURL = stage.toDataURL({
-                        x: visibleRect.x,
-                        y: visibleRect.y,
-                        width: visibleRect.width,
-                        height: visibleRect.height,
+                        mimeType: 'image/png',
+                        quality: 1,
                         pixelRatio: 2 // Increase for higher resolution
                     });
     
@@ -2098,6 +2157,15 @@ function rightPanel() {
                 } catch (error) {
                     console.error('Error exporting image:', error);
                 } finally {
+                    // Restore original stage properties
+                    stage.width(originalProps.width);
+                    stage.height(originalProps.height);
+                    stage.scale(originalProps.scale);
+                    stage.position({
+                        x: originalProps.x,
+                        y: originalProps.y
+                    });
+    
                     // Show the grid again if it was originally visible
                     if (gridLayer && wasGridVisible) {
                         gridLayer.show();
