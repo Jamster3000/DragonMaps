@@ -19,6 +19,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 a {
@@ -40,25 +41,37 @@ a {
 }
 
 #menu {
-    display: block;
     position: absolute;
-    width: 150px;
+    z-index: 1000; /* Ensure this is higher than the z-index of other elements */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: none;
     background-color: var(--primary-color);
-    box-shadow: 0 0 5px grey;
-    border-radius: 3px;
+    border-radius: 4px;
 }
 
-    #menu button {
-        width: 100%;
-        background-color: white;
-        border: none;
-        margin: 0;
-        padding: 10px;
-    }
+#menu button:hover {
+    background-color: var(--accent-color);
+}
 
-        #menu button:hover {
-            background-color: var(--accent-color);
-        }
+.menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+/* Apply border-radius to the first and last menu items */
+.menu-item:first-child {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.menu-item:last-child {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.menu-item:hover {
+    background-color: var(--secondary-color);
+}
 
 h2 {
     font-family: 'Cinzel', serif;
@@ -649,10 +662,11 @@ button {
     border: 2px solid var(--accent-color);
     box-shadow: 50px 0 100px rgba(0, 0, 0, 0.7);
     border-radius: 5px;
-    margin-left: 950px;
+    margin-left: 60%;
     text-align: center;
     max-height: 225px;
     overflow: auto;
+    z-index: 1000;
 }
 
 .search-results img {
@@ -692,7 +706,7 @@ button {
     border-radius: 50%;
     width: 20px;
     height: 20px;
-    animation: spin 1s linear infinite;
+    animation: spin 2s linear infinite;
     margin-right: 10px;
 }
 
