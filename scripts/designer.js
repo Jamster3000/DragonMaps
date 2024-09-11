@@ -429,25 +429,32 @@ function setupEventListeners() {
                 const shapes = stage.find('Shape');
     
                 // Calculate the bounding box of all shapes
-                const box = new Konva.Box();
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
                 shapes.forEach((shape) => {
-                    box.merge(shape.getClientRect());
+                    const box = shape.getClientRect();
+                    minX = Math.min(minX, box.x);
+                    minY = Math.min(minY, box.y);
+                    maxX = Math.max(maxX, box.x + box.width);
+                    maxY = Math.max(maxY, box.y + box.height);
                 });
     
                 // Add some padding
                 const padding = 20;
-                box.x -= padding;
-                box.y -= padding;
-                box.width += padding * 2;
-                box.height += padding * 2;
+                minX -= padding;
+                minY -= padding;
+                maxX += padding;
+                maxY += padding;
+    
+                const width = maxX - minX;
+                const height = maxY - minY;
     
                 // Temporarily resize and reposition the stage to fit the content
-                stage.width(box.width);
-                stage.height(box.height);
+                stage.width(width);
+                stage.height(height);
                 stage.scale({ x: 1, y: 1 });
                 stage.position({
-                    x: -box.x,
-                    y: -box.y
+                    x: -minX,
+                    y: -minY
                 });
     
                 // Hide the grid temporarily if it exists
@@ -2098,25 +2105,32 @@ function rightPanel() {
                 const shapes = stage.find('Shape');
     
                 // Calculate the bounding box of all shapes
-                const box = new Konva.Box();
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
                 shapes.forEach((shape) => {
-                    box.merge(shape.getClientRect());
+                    const box = shape.getClientRect();
+                    minX = Math.min(minX, box.x);
+                    minY = Math.min(minY, box.y);
+                    maxX = Math.max(maxX, box.x + box.width);
+                    maxY = Math.max(maxY, box.y + box.height);
                 });
     
                 // Add some padding
                 const padding = 20;
-                box.x -= padding;
-                box.y -= padding;
-                box.width += padding * 2;
-                box.height += padding * 2;
+                minX -= padding;
+                minY -= padding;
+                maxX += padding;
+                maxY += padding;
+    
+                const width = maxX - minX;
+                const height = maxY - minY;
     
                 // Temporarily resize and reposition the stage to fit the content
-                stage.width(box.width);
-                stage.height(box.height);
+                stage.width(width);
+                stage.height(height);
                 stage.scale({ x: 1, y: 1 });
                 stage.position({
-                    x: -box.x,
-                    y: -box.y
+                    x: -minX,
+                    y: -minY
                 });
     
                 // Hide the grid temporarily if it exists
