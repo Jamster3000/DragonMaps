@@ -1,6 +1,7 @@
 const ITEMS_PER_PAGE = 100;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
+allImagesLoaded = false;
 
 async function getImageUrlsFromArchive(accountName, page = 1) {
     const apiUrl = `https://archive.org/advancedsearch.php?q=uploader:${accountName}&fl[]=identifier&fl[]=mediatype&output=json&rows=${ITEMS_PER_PAGE}&page=${page}`;
@@ -206,7 +207,6 @@ async function loadMoreImages() {
         const newImages = await getImageUrlsFromArchive(accountName, currentPage);
         if (newImages.length === 0) {
             allImagesLoaded = true;
-            hideLoadMoreButton();
         } else {
             loadImages(newImages);
             currentPage++;

@@ -1,22 +1,22 @@
-let stage, layer, gridLayer;
+// Stage and Layer Variables
+let stage, layer, gridLayer, gridGroup, gridPattern;
+let gridSize = 50;
+let gridActive = true;
+let gridOffset = { x: 0, y: 0 };
+let gridUpdateTimeout;
+
+// Tool State Variables
 let currentTool = null;
 let isDrawing = false;
 let lastLine;
-let gridSize = 50;
-let gridActive = true;
-let gridPattern;
-let gridOffset = {
-    x: 0,
-    y: 0
-};
 let isPanning = false;
-let gridGroup;
-let gridUpdateTimeout;
-var menuNode = document.getElementById('menu');
-let actionHistory = [];
-let currentActionIndex = -1;
+let lastPanPosition = { x: 0, y: 0 };
+
+// UI State Variables
+let menuNode = document.getElementById('menu');
 let activeMenu = null;
 let activeMenuItem = -1;
+let menuClick = false;
 let isShowingContextMenu = false;
 let isRightMouseDown = false;
 let rightClickStartPos = null;
@@ -24,73 +24,94 @@ let rightClickStartTime = null;
 let isEditingText = false;
 let isSearchBarFocused = false;
 let savedCursor;
-const MOVE_THRESHOLD = 5; // pixels
-const CLICK_DURATION_THRESHOLD = 200; // milliseconds
+let dropIndicator;
+let selectedImage = null;
+
+// Shortcuts and Overlays
 let shortcutsLink = document.getElementById('shortcuts');
 let shortcutsOverlay = document.getElementById('shortcuts-overlay');
 let closeShortcuts = document.getElementById('close-shortcuts');
 let shortcutsTable = document.getElementById('shortcuts-table');
-let searchData = {};
-let dropIndicator;
+
+// Action History
+let actionHistory = [];
+let currentActionIndex = -1;
+
+// Pagination
+let currentPage = 1;
+const resultsPerPage = 20;
+
+// Platform Detection
+const isMac = navigator.userAgentData.platform.toUpperCase().indexOf('MAC') >= 0;
+const isWindows = navigator.userAgentData.platform.toUpperCase().indexOf('WIN') >= 0;
+
+// Constants
+const MOVE_THRESHOLD = 5; // pixels
+const CLICK_DURATION_THRESHOLD = 200; // milliseconds
+
+// Transformers and Image Handling
 const transformers = [];
 let currentTransformer;
 let imagePresenceCallback;
 let imageNode = null;
-let currentPage = 1;
-const resultsPerPage = 20;
-const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-const isWindows = navigator.platform.toUpperCase().indexOf('WIN') >= 0;
+
+let searchData = {};
 
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('canvas-container');
 
-    //creates a new stage
+    // Create a new stage
     stage = new Konva.Stage({
         container: 'canvas-container',
         width: container.offsetWidth,
         height: container.offsetHeight
     });
 
-    //creates and adds a grid layer to the canvas
+    // Create and add a grid layer to the canvas
     gridLayer = new Konva.Layer();
     stage.add(gridLayer);
 
-    //adds layer to the canvas that everything is drawn and placed on.
+    // Create and add a grid group to the grid layer
+    gridGroup = new Konva.Group();
+    gridLayer.add(gridGroup);
+
+    // Add layer to the canvas that everything is drawn and placed on
     layer = new Konva.Layer();
     stage.add(layer);
 
-    createGrid(); //creates the grid on the grid layer
-    setupEventListeners(); //creates and manages event listeners
-    setupShortcutKeyHelp(); //creates te shortcut key help overlay
+    createGrid(); // Creates the grid on the grid layer
+    setupEventListeners(); // Creates and manages event listeners
+    setupShortcutKeyHelp(); // Creates the shortcut key help overlay
     shortcut_draggable();
-    rightPanel(); //manages the right panel, toggle, and everything included in the right panel
-    popup_draggable();//makes the popup tool box draggable
+    rightPanel(); // Manages the right panel, toggle, and everything included in the right panel
+    popup_draggable(); // Makes the popup tool box draggable
     loadSearch();
-    loadCustomFont();//load in any custom imported fonts that are saved in cache
+    loadCustomFont(); // Load in any custom imported fonts that are saved in cache
+
+    document.addEventListener('keydown', handleKeyDown);
 
     setInterval(checkImageOnCanvas, 10);
+
+    // Add drag and drop event listeners
+    document.addEventListener('dragstart', onDragStart);
+    container.addEventListener('dragover', onDragOver);
+    container.addEventListener('drop', onDrop);
+
+    // Add event listener for window resize
+    window.addEventListener('resize', resizeCanvas);
 });
 
-//listens for the right click menu
 document.addEventListener('click', function (event) {
-    if (activeMenu && !document.getElementById(`${activeMenu}-menu`).contains(event.target)) {
-        toggleMenu(activeMenu);
-    }
-
-    if (!isShowingContextMenu) {
-        hideContextMenu(); // Hide the context menu on click if it is not being shown
+    const container = stage.container();
+    if (!container.contains(event.target)) {
+        deselectAllImages();
     }
 });
 
-document.addEventListener('click', function () {
-    hideContextMenu();
-})
+//===========================================
+//search bar and search results
+//==========================================
 
-//searches for each character input
-//uses debounce to reduce the amount of search calls
-//uses memoization to cache results and recall from them
-// makes use of dociment fragment for better performance rather than manipulating the DOM directly.
-//uses lazy loading only loading images in that are in viewport
 const searchBar = document.getElementById('search-bar');
 const searchResults = document.getElementById('search-results');
 const resultsContainer = document.getElementById('image-grid');
@@ -257,14 +278,6 @@ document.addEventListener('click', (event) => {
     }
 });
 
-//hides the right click menu
-window.addEventListener('click', () => {
-    menuNode.style.display = 'none';
-});
-
-//resizes the toolbox popup depending whether the toolbox is visible or not
-window.addEventListener('resize', positionToolboxPopup);
-
 //all the other even listerns for eventListener or stages
 function setupEventListeners() {
     const toolbox = document.getElementById('toolbox');
@@ -296,8 +309,6 @@ function setupEventListeners() {
                     targetElement.classList.remove('active');
                     currentTool = null; // Reset the current tool
                     hideToolOptions(); // Hide tool options if needed
-                    updateCursor(); // Update cursor based on tool
-                    updateShapesDraggable(); // Update shape draggable status
                 } else {
                     document.querySelectorAll('#toolbox button').forEach(btn => {
                         btn.classList.remove('active');
@@ -305,9 +316,9 @@ function setupEventListeners() {
                     targetElement.classList.add('active');
                     currentTool = selectedTool;
                     showToolOptions(currentTool, targetElement);
-                    updateCursor();
-                    updateShapesDraggable();
                 }
+                updateCursor();
+                updateImagesDraggable(); // Add this line to update image draggability
             }
         });
     }
@@ -338,35 +349,39 @@ function setupEventListeners() {
         stage.content.addEventListener('contextmenu', function (e) {
             e.preventDefault();
         });
-
+    
+        // Consolidate click event listeners
+        stage.on('click', function(event) {
+            // Deselect all images if clicking on the canvas background
+            if (event.target === stage) {
+                deselectAllImages();
+                if (currentTransformer) {
+                    currentTransformer.nodes([]);
+                    layer.draw();
+                }
+            }
+        
+            // Hide context menu on click
+            hideContextMenu();
+        
+            // Handle clicking on stage to remove transformer
+            if (currentTool !== 'draw' && currentTool !== 'erase') {
+                if (currentTransformer) {
+                    currentTransformer.nodes([]);
+                    layer.draw();
+                }
+            }
+        });
+    
         stage.on('contextmenu', function (e) {
             e.evt.preventDefault();
         });
-
-        stage.on('click', function () {
-            hideContextMenu();
-        });
-
+    
         // Handle mouse events on the stage
         stage.on('mousedown', handleMouseDown);
         stage.on('mousemove', handleMouseMove);
         stage.on('mouseup', handleMouseUp);
         stage.on('wheel', handleZoom);
-
-        // Handle clicking on stage to remove transformer
-        stage.on('click', function () {
-            if (currentTransformer) {
-                currentTransformer.nodes([]); // Remove the transformer from the currently selected image
-                currentTransformer = null; // Clear the current transformer reference
-                layer.batchDraw();
-            }
-        });
-
-        const stageContainer = stage.container();
-        if (stageContainer) {
-            stageContainer.addEventListener('dragover', onDragOver);
-            stageContainer.addEventListener('drop', onDrop);
-        }
     }
 
     // Handle document-wide click events to hide context menus and search results
@@ -398,24 +413,89 @@ function setupEventListeners() {
 
     if (exportImageButton) {
         exportImageButton.addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent any default action
-            // Ensure all layers are drawn before exporting
-            stage.draw();
-            // Generate a data URL of the current state of the canvas
-            const dataURL = stage.toDataURL({
-                pixelRatio: 3, // Adjust the pixel ratio for image quality
-            });
-            // Create a hidden link element
-            const link = document.createElement('a');
-            link.href = dataURL;
-            link.download = 'battlemap.png'; // Set the name of the downloaded file
-            // Append the link to the body (it won't be visible)
-            document.body.appendChild(link);
-            // Programmatically click the link to trigger the download
-            link.click();
-            // Remove the link from the document
-            document.body.removeChild(link);
-            console.log('Exporting as image...');
+            e.preventDefault();
+            if (stage) {
+                // Save the current stage properties
+                const originalProps = {
+                    width: stage.width(),
+                    height: stage.height(),
+                    x: stage.x(),
+                    y: stage.y(),
+                    scaleX: stage.scaleX(),
+                    scaleY: stage.scaleY()
+                };
+    
+                // Get all shapes on the stage
+                const shapes = stage.find('Shape');
+    
+                // Calculate the bounding box of all shapes
+                const box = new Konva.Box();
+                shapes.forEach((shape) => {
+                    box.merge(shape.getClientRect());
+                });
+    
+                // Add some padding
+                const padding = 20;
+                box.x -= padding;
+                box.y -= padding;
+                box.width += padding * 2;
+                box.height += padding * 2;
+    
+                // Temporarily resize and reposition the stage to fit the content
+                stage.width(box.width);
+                stage.height(box.height);
+                stage.scale({ x: 1, y: 1 });
+                stage.position({
+                    x: -box.x,
+                    y: -box.y
+                });
+    
+                // Hide the grid temporarily if it exists
+                let gridLayer = stage.findOne('.grid-layer');
+                if (gridLayer) {
+                    gridLayer.hide();
+                }
+    
+                // Draw the stage
+                stage.draw();
+    
+                // Export the image
+                const dataURL = stage.toDataURL({
+                    mimeType: 'image/png',
+                    quality: 1,
+                    pixelRatio: 2, // Increase for higher resolution
+                });
+    
+                // Restore the grid visibility
+                if (gridLayer) {
+                    gridLayer.show();
+                }
+    
+                // Restore the original stage properties
+                stage.width(originalProps.width);
+                stage.height(originalProps.height);
+                stage.scale({
+                    x: originalProps.scaleX,
+                    y: originalProps.scaleY
+                });
+                stage.position({
+                    x: originalProps.x,
+                    y: originalProps.y
+                });
+    
+                // Redraw the stage
+                stage.draw();
+    
+                // Create a link to download the image
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = 'battlemap.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+    
+                console.log('Exporting as image...');
+            }
         });
     }
 
@@ -455,17 +535,18 @@ function setupShortcutKeyHelp() {
 }
 
 function showShortcuts() {
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     const shortcuts = [
-        { key: 'Alt + T', description: 'Toggle toolbox' },
-        { key: 'Alt + R', description: 'Toggle right panel' },
-        { key: 'Alt + G', description: 'Toggle grid' },
-        { key: 'Alt + N', description: 'New map' },
+        { key: isMac ? 'ctrl + T' : 'Alt + T', description: 'Toggle toolbox' },
+        { key: isMac ? 'ctrl + R' : 'Alt + R', description: 'Toggle right panel' },
+        { key: isMac ? 'ctrl + G' : 'Alt + G', description: 'Toggle grid' },
+        { key: isMac ? 'ctrl + N' : 'Alt + N', description: 'New map' },
         { key: 'D', description: 'Select draw tool' },
         { key: 'E', description: 'Select erase tool' },
         { key: 'S', description: 'Select select tool' },
-        { key: 'Ctrl + Z', description: 'Undo' },
-        { key: 'Ctrl + Y', description: 'Redo' },
-        { key: 'Alt + N', description: 'New Map' },
+        { key: isMac ? 'ctrl + Z' : 'Ctrl + Z', description: 'Undo' },
+        { key: isMac ? 'ctrl + Y' : 'Ctrl + Y', description: 'Redo' },
+        { key: isMac ? 'ctrl + N' : 'Alt + N', description: 'New Map' },
     ];
 
     shortcutsTable.innerHTML = shortcuts.map(shortcut => `
@@ -502,22 +583,42 @@ function onDragOver(e) {
     e.preventDefault();
 }
 
+// Modify the drop event handler
+
+// Function to deselect all images
+function deselectAllImages() {
+    layer.getChildren().each(function (node) {
+        if (node.hasName('image')) {
+            node.stroke(null);
+            node.selected = false;
+        }
+    });
+    selectedImage = null;
+    layer.draw();
+}
+
+function selectImage(image) {
+    deselectAllImages();
+    image.selected = true;
+    selectedImage = image;
+    layer.draw();
+}
+
 function onDrop(e) {
     e.preventDefault();
+    deselectAllImages();
+
     console.log('Drop event:', e);
     const elementId = e.dataTransfer.getData('text/plain');
     const draggedElement = document.getElementById(elementId);
 
-    // Get the stage's container and its bounding rectangle
     const stageContainer = stage.container();
     const stageRect = stageContainer.getBoundingClientRect();
 
-    // Calculate the drop position relative to the stage
     const dropX = (e.clientX - stageRect.left - stage.x()) / stage.scaleX();
     const dropY = (e.clientY - stageRect.top - stage.y()) / stage.scaleY();
 
     if (draggedElement && draggedElement.id === 'watermark') {
-        // Create a new Konva Image using the dragged element
         const konvaImage = new Konva.Image({
             image: draggedElement,
             draggable: true,
@@ -531,7 +632,6 @@ function onDrop(e) {
             crossOrigin: 'anonymous'
         });
 
-        // Add the image to the layer and record the action
         layer.add(konvaImage);
         layer.draw();
 
@@ -540,70 +640,29 @@ function onDrop(e) {
             image: konvaImage
         });
 
-        // Set up click event for the image
         konvaImage.on('click', function (evt) {
-            if (currentTransformer) {
-                currentTransformer.nodes([]);
-                layer.batchDraw();
+            if (currentTool === 'draw' || currentTool === 'erase') {
+                return;
             }
 
-            transformer.nodes([konvaImage]);
-            currentTransformer = transformer;
-            layer.batchDraw();
-
+            selectImage(konvaImage);
+            updateTransformer(konvaImage);
             evt.cancelBubble = true;
         });
 
-        const transformer = new Konva.Transformer({
-            nodes: [konvaImage],
-            borderStroke: 'blue',
-            borderStrokeWidth: 2,
-            padding: 10,
-            resizeEnabled: true,
-            rotateEnabled: true,
-            anchorCornerRadius: 50,
-            anchorSize: 14,
-            shouldOverdrawWholeArea: true,
-            rotateAnchorOffset: 60,
-            enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
-            rotationSnapTolerance: 10,
-        });
-
-        const minSize = 150;
-        const maxSize = 30000;
-
-        transformer.on('transform', () => {
-            const scaleX = konvaImage.scaleX();
-            const scaleY = konvaImage.scaleY();
-
-            const width = konvaImage.width() * scaleX;
-            const height = konvaImage.height() * scaleY;
-
-            const newWidth = Math.max(minSize, Math.min(maxSize, width));
-            const newHeight = Math.max(minSize, Math.min(maxSize, height));
-
-            konvaImage.scaleX(newWidth / konvaImage.width());
-            konvaImage.scaleY(newHeight / konvaImage.height());
-        });
-
-        layer.add(transformer);
-        transformer.nodes([konvaImage]);
-        currentTransformer = transformer;
-        layer.batchDraw();
+        selectImage(konvaImage);
+        updateTransformer(konvaImage);
     } else {
-        // Handle case where the image URL is provided
-        const imageUrl = e.dataTransfer.getData('text');
+        let imageUrl = isWindows ? e.dataTransfer.getData('text') : e.dataTransfer.getData('text/uri-list');
+        
+        console.log('Available data types:', e.dataTransfer.types);
 
-        // Check if the image URL is a WebP image
         if (imageUrl.endsWith('.webp')) {
-            // Convert WebP URL to PNG URL
             const pngUrl = imageUrl.replace('.webp', '.png');
 
-            // Load the PNG image
             const img = new Image();
-            img.crossOrigin = 'Anonymous'; // Ensure CORS is handled
+            img.crossOrigin = 'Anonymous';
             img.onload = function () {
-                // Create a Konva Image from the PNG image
                 const konvaImage = new Konva.Image({
                     image: img,
                     draggable: true,
@@ -613,23 +672,7 @@ function onDrop(e) {
                     offsetY: img.height / 2,
                 });
 
-                const transformer = new Konva.Transformer({
-                    nodes: [konvaImage],
-                    borderStroke: 'blue',
-                    borderStrokeWidth: 2,
-                    padding: 10,
-                    resizeEnabled: true,
-                    rotateEnabled: true,
-                    anchorCornerRadius: 50,
-                    anchorSize: 14,
-                    shouldOverdrawWholeArea: true,
-                    rotateAnchorOffset: 60,
-                    enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
-                    rotationSnapTolerance: 10,
-                });
-
                 layer.add(konvaImage);
-                layer.add(transformer);
 
                 recordAction({
                     type: 'addImage',
@@ -637,21 +680,17 @@ function onDrop(e) {
                 });
 
                 konvaImage.on('click', function (evt) {
-                    if (currentTransformer) {
-                        currentTransformer.nodes([]);
-                        layer.batchDraw();
+                    if (currentTool === 'draw' || currentTool === 'erase') {
+                        return;
                     }
 
-                    transformer.nodes([konvaImage]);
-                    currentTransformer = transformer;
-                    layer.batchDraw();
-
+                    selectImage(konvaImage);
+                    updateTransformer(konvaImage);
                     evt.cancelBubble = true;
                 });
 
-                transformer.nodes([konvaImage]);
-                currentTransformer = transformer;
-                layer.batchDraw();
+                selectImage(konvaImage);
+                updateTransformer(konvaImage);
                 stage.batchDraw();
 
                 console.log('PNG image added to canvas successfully');
@@ -659,21 +698,36 @@ function onDrop(e) {
 
             img.onerror = function (error) {
                 console.error('Error loading PNG image:', error);
-                // Optionally, handle fallback here
             };
 
-            // Start loading the PNG image
             img.src = pngUrl;
         } else {
-            // Handle non-WebP image URLs (if needed)
             console.warn('The image URL is not a WebP image.');
         }
     }
 }
 
+function updateTransformer(image) {
+    if (!currentTransformer) {
+        currentTransformer = new Konva.Transformer({
+            borderStroke: '#FF4500',
+            borderStrokeWidth: 2,
+            padding: 10,
+            resizeEnabled: true,
+            rotateEnabled: true,
+            anchorCornerRadius: 50,
+            anchorSize: 18,
+            shouldOverdrawWholeArea: true,
+            rotateAnchorOffset: 60,
+            enabledAnchors: ['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'],
+            rotationSnapTolerance: 10,
+        });
+        layer.add(currentTransformer);
+    }
 
-
-
+    currentTransformer.nodes([image]);
+    layer.batchDraw();
+}
 
 
 //==========================
@@ -699,6 +753,13 @@ function showNewMapOverlay() {
             currentActionIndex = -1;
         }
     }
+}
+
+function resizeCanvas() {
+    const container = document.getElementById('canvas-container');
+    stage.width(container.offsetWidth);
+    stage.height(container.offsetHeight);
+    createGrid(); // Redraw the grid based on the new size
 }
 
 //updates the grid when it's being drawn on or otherwise changed
@@ -872,13 +933,14 @@ function showContextMenu(e) {
     menuNode.innerHTML = ''; // Clear existing menu items
 
     const menuItems = [
-        { label: 'Add Text', action: addText },
+        { label: 'Add Text', action: showAddTextPopup },
         { label: 'Paste', action: paste },
     ];
 
     menuItems.forEach(item => {
         const menuItem = document.createElement('div');
         menuItem.textContent = item.label;
+        menuItem.className = 'menu-item'; 
         menuItem.addEventListener('click', () => {
             item.action(e);
             hideContextMenu();
@@ -941,7 +1003,7 @@ function handleKeyDown(e) {
         return;
     }
 
-    if (e.ctrlKey) {
+    if (e.ctrlKey || (isMac && e.altKey)) {
         switch (e.key.toLowerCase()) {
             case 'z':
                 e.preventDefault();
@@ -951,10 +1013,13 @@ function handleKeyDown(e) {
                 e.preventDefault();
                 redo();
                 break;
+            default:
+                console.log(`Key pressed: ${e.key}`);
         }
     }
-
-    if ((!isMac && e.altKey) || (isMac && e.metaKey) || (isWindows && e.altKey)) {addS
+    
+    if ((isWindows && e.altKey) || (isMac && e.ctrlKey)) {
+        console.log("yay");
         switch (e.key.toLowerCase()) {
             case 'f':
                 e.preventDefault();
@@ -969,6 +1034,7 @@ function handleKeyDown(e) {
                 toggleMenu('view');
                 return;
             case 'g':
+                e.preventDefault();
                 toggleGrid();
                 return;
             case 'n':
@@ -984,15 +1050,18 @@ function handleKeyDown(e) {
                 document.getElementById('toggle-toolbox').click();
                 return;
             case 's':
+                console.log("yay");
                 e.preventDefault();
                 if (shortcutsOverlay.style.display === "" || shortcutsOverlay.style.display === "none") {
                     showShortcuts();
                 } else if (shortcutsOverlay.style.display === "flex") {
                     hideShortcuts();
                 }
+                return;
             case 'u':
                 e.preventDefault();
                 window.open("tutorials.html", '_blank').focus();
+                return;
         }
     }
 
@@ -1004,26 +1073,24 @@ function handleKeyDown(e) {
     var isFontFocused = (document.activeElement === fontInput);
     var isEditing = (document.activeElement === editArea);
 
-    if ((!isMac && e.altKey) || (isMac && e.metaKey) || (isWindows && e.altKey)) {
-        switch (e.key.toLowerCase()) {
-            case 'd':
-                selectTool('draw');
+    switch (e.key.toLowerCase()) {
+        case 'd':
+            selectTool('draw');
+            break;
+        case 'e':
+            selectTool('erase');
+            break;
+        case 't':
+            selectTool('text');
+            break;
+        case 's':
+            selectTool('shape');
+            break;
+        case 'shift':
+            try {
+                document.getElementById(`${currentTool}-snap`).checked = true;
                 break;
-            case 'e':
-                selectTool('erase');
-                break;
-            case 's':
-                selectTool('select');
-                break;
-            case 'f':
-                selectTool('fill');
-                break;
-            case 'shift':
-                try {
-                    document.getElementById(`${currentTool}-snap`).checked = true;
-                    break;
-                } catch (TypeError) { }
-        }
+            } catch (TypeError) { }
     }
 
     if (activeMenu) {
@@ -1132,69 +1199,111 @@ function handleMouseDown(e) {
             addText(e);
         } else if (currentTool === 'shape') {
             addShape(e);
-        }
-    }
-}
-
-
-//==============================
-//tools and features
-//==============================
-
-function paste() {
-    console.log("nothing here");
-}
-
-function loadSearch() {
-    const storageData = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        const value = localStorage.getItem(key);
-        try {
-            storageData[key] = JSON.parse(value);
-        } catch (e) {
-            storageData[key] = value;
-        }
-    }
-
-    for (let key in storageData) {
-        if (storageData.hasOwnProperty(key)) {
-            const items = storageData[key];
-            for (let item of items) {
-                if (item.url && item.keywords) {
-                    if (!searchData[key]) {
-                        searchData[key] = {};
-                    }
-                    searchData[key][item.url] = item.keywords;
+        } else {
+            // Allow image selection only when no drawing tool is active
+            const clickedOnEmpty = e.target === stage;
+            if (clickedOnEmpty) {
+                // clicked on empty area - remove selection
+                if (currentTransformer) {
+                    currentTransformer.nodes([]);
+                    currentTransformer = null;
+                    layer.draw();
                 }
             }
         }
     }
 }
 
-function search(query) {
-    const results = [];
-    const lowerQuery = query.toLowerCase();
-
-    for (let itemKey in searchData) {
-        if (searchData.hasOwnProperty(itemKey)) {
-            const itemData = searchData[itemKey];
-            for (let url in itemData) {
-                if (itemData.hasOwnProperty(url)) {
-                    const keywords = itemData[url];
-                    if (keywords.some(keyword => {
-                        const lowerKeyword = keyword.toLowerCase();
-                        return lowerKeyword.includes(lowerQuery) || lowerQuery.includes(lowerKeyword);
-                    })) {
-                        results.push({ url, keywords });
-                    }
-                }
-            }
-        }
+function addText(e) {
+    let pos;
+    let text;
+    let fontName;
+    
+    try {
+        pos = getRelativePointerPosition(layer);
+        text = document.getElementById('text-content').value;
+        fontName = document.getElementById('text-font').value;
+    } catch (TypeError) {
+        const toolButton = document.querySelector(`#toolbox button[data-tool="text"]`);
+        toolButton.click();
+        pos = getRelativePointerPosition(layer);
+        text = document.getElementById('text-content').value;
+        fontName = document.getElementById('text-font').value;
     }
-    return results;
+
+        // Load the font before adding the text node
+        document.fonts.load(`16px ${fontName}`).then(() => {
+            const textNode = new Konva.Text({
+                x: pos.x,
+                y: pos.y,
+                text: text,
+                fontSize: parseInt(document.getElementById('text-size').value),
+                fontFamily: fontName,
+                fill: document.getElementById('text-color').value,
+                draggable: true,
+                width: 400
+            });
+
+            layer.add(textNode);
+            layer.draw();
+
+            // Double-click to edit
+            textNode.on('dblclick', function () {
+                createTextEditor(this);
+            });
+
+            recordAction({
+                type: 'addText',
+                node: textNode
+            });
+        }).catch((error) => {
+            console.error(`Failed to load font ${fontName}:`, error);
+        });
 }
 
+//==============================
+//images (not search specifically)
+//==============================
+function deselectAllImages() {
+    try {
+        layer.find('Image').forEach(function (node) {
+            node.stroke(null); // Remove the selection stroke
+            node.selected = false; // Custom property to manage selection state
+        });
+        layer.draw();
+    } catch (TypeError) {
+        console.log("No images found");
+    }
+}
+
+function updateImagesDraggable() {
+    layer.find('Image').forEach(image => {
+        image.draggable(currentTool !== 'draw' && currentTool !== 'erase');
+    });
+}
+
+function checkImageOnCanvas() {
+    const foundImage = layer.find('#konva-watermark');
+    const exportImageButton = document.getElementById('export-image');
+    const exportJsonButton = document.getElementById('export-json');
+
+    // Check if elements exist before modifying properties
+    if (exportImageButton && exportJsonButton) {
+        if (foundImage.length > 0) {
+            exportImageButton.disabled = false;
+            exportJsonButton.disabled = false;
+        } else {
+            exportImageButton.disabled = true;
+            exportJsonButton.disabled = true;
+        }
+    } else {
+        console.error('Export buttons not found in the DOM');
+    }
+}
+
+//==============================
+//Tools
+//==============================
 function addShape(e) {
     const startPos = getRelativePointerPosition(layer);
     let shape;
@@ -1372,8 +1481,230 @@ function addEllipse(e) {
 function addPentagon(e) {
     addShape(e);
 }
+
+//for the drawing tool
+function startDrawing(e) {
+    isDrawing = true;
+    const pos = getRelativePointerPosition(layer);
+    const size = currentTool === 'draw' ? parseInt(document.getElementById('draw-size').value) : parseInt(document.getElementById('erase-size').value);
+
+    let snapToGridEnabled = document.getElementById(`${currentTool}-snap`).checked || e.evt.shiftKey;
+    let startPos = snapToGridEnabled ? snapToGrid(pos.x, pos.y) : pos;
+
+    lastLine = new Konva.Line({
+        stroke: currentTool === 'draw' ? document.getElementById('draw-color').value : 'white',
+        strokeWidth: size,
+        globalCompositeOperation: currentTool === 'erase' ? 'destination-out' : 'source-over',
+        points: [startPos.x, startPos.y],
+        lineCap: 'round',
+        lineJoin: 'round'
+    });
+    layer.add(lastLine);
+}
+
+//also for the drawing tool
+function draw(e) {
+    if (!isDrawing) return;
+
+    const pos = getRelativePointerPosition(layer);
+
+    let straightLineEnabled = e.evt.altKey;
+    let snapToGridEnabled = false;
+    const snapElement = document.getElementById(`${currentTool}-snap`);
+    
+    if (snapElement) {
+        snapToGridEnabled = !straightLineEnabled && (snapElement.checked || e.evt.shiftKey);
+    } else {
+        return;
+    }
+
+    let newPos;
+
+    if (straightLineEnabled) {
+        // Get the start position of the line
+        const startPos = { x: lastLine.points()[0], y: lastLine.points()[1] };
+
+        // Calculate the angle of the line
+        const dx = pos.x - startPos.x;
+        const dy = pos.y - startPos.y;
+
+        // Determine the direction (horizontal or vertical) based on the larger difference
+        if (Math.abs(dx) > Math.abs(dy)) {
+            newPos = { x: pos.x, y: startPos.y };  // Horizontal line
+        } else {
+            newPos = { x: startPos.x, y: pos.y };  // Vertical line
+        }
+    } else if (snapToGridEnabled) {
+        newPos = snapToGrid(pos.x, pos.y);
+    } else {
+        newPos = pos;
+    }
+
+    let newPoints = lastLine.points().concat([newPos.x, newPos.y]);
+
+    lastLine.points(newPoints);
+    layer.batchDraw();
+}
+
+//uh, again when the user stops drawing
+function stopDrawing() {
+    if (isDrawing) {
+        isDrawing = false;
+        recordAction({
+            type: currentTool,
+            points: lastLine.points(),
+            color: lastLine.stroke(),
+            size: lastLine.strokeWidth()
+        });
+    }
+}
+
+function createTextEditor(textNode) {
+    if (!isEditingText) {
+        const textPosition = textNode.absolutePosition();
+        const areaPosition = {
+            x: stage.container().offsetLeft + textPosition.x,
+            y: stage.container().offsetTop + textPosition.y,
+        };
+
+        const textarea = document.createElement('textarea');
+        document.body.appendChild(textarea);
+        textarea.value = textNode.text();
+        textarea.id = "text-edit";
+        textarea.style.position = 'absolute';
+        textarea.style.top = areaPosition.y + 'px';
+        textarea.style.left = areaPosition.x + 'px';
+        textarea.style.width = textNode.width() * stage.scaleX() + 'px';
+        textarea.style.fontSize = (textNode.fontSize() * stage.scaleY()) + 'px';
+        textarea.style.fontFamily = textNode.fontFamily();
+        textarea.style.backgroundColor = 'var(--background-color)';
+        textarea.style.border = '1px solid var(--primary-color)';
+        textarea.style.borderRadius = '8px';
+        textarea.style.padding = '10px';
+        textarea.style.outline = 'none';
+        textarea.style.resize = 'none';
+        textarea.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+        textarea.style.transition = 'all 0.3s ease';
+        textarea.style.color = 'var(--text-color)';
+        textarea.style.zIndex = 1000; 
+
+        textarea.style.overflow = 'auto'; 
+        textarea.style.minHeight = '20px'; 
+        textarea.style.maxHeight = '100px'; 
+
+        // Adjust height dynamically based on content
+        textarea.style.height = 'auto';
+        textarea.style.boxSizing = 'border-box'; // Include padding and border in element's total width and height
+        textarea.style.whiteSpace = 'pre-wrap'; // Preserve whitespace and line breaks
+
+        // Add focus and hover effects
+        textarea.addEventListener('focus', function () {
+            textarea.style.borderColor = 'var(--accent-color)';
+            textarea.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+        });
+
+        textarea.addEventListener('blur', function () {
+            textarea.style.borderColor = 'var(--primary-color)';
+            textarea.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+        });
+
+        textarea.focus();
+
+        textarea.addEventListener('input', function () {
+            textNode.text(textarea.value);
+            layer.draw();
+        });
+
+        textarea.addEventListener('keydown', function (event) {
+            // Stop editing text when the Esc key is pressed
+            if (event.key === 'Escape') {
+                textNode.text(textarea.value);
+                layer.draw();
+                try {
+                    document.body.removeChild(textarea);
+                } catch (TypeError) { };
+                isEditingText = false;
+            } else {
+                // Prevent tool shortcuts during text editing
+                if (['d', 'e', 't', 's', 'D', 'E', 'T', 'S'].includes(event.key)) {
+                    event.stopPropagation();
+                }
+            }
+        });
+
+        textarea.addEventListener('blur', function () {
+            textNode.text(textarea.value);
+            layer.draw();
+            try {
+                document.body.removeChild(textarea);
+            } catch (TypeError) { }
+            isEditingText = false;
+        });
+
+        isEditingText = true;
+    }
+}
+
+//==============================
+//other fuctions and such
+//==============================
+
+function paste() {
+    console.log("nothing here");
+}
+
+function loadSearch() {
+    const storageData = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key);
+        try {
+            storageData[key] = JSON.parse(value);
+        } catch (e) {
+            storageData[key] = value;
+        }
+    }
+
+    for (let key in storageData) {
+        if (storageData.hasOwnProperty(key)) {
+            const items = storageData[key];
+            for (let item of items) {
+                if (item.url && item.keywords) {
+                    if (!searchData[key]) {
+                        searchData[key] = {};
+                    }
+                    searchData[key][item.url] = item.keywords;
+                }
+            }
+        }
+    }
+}
+
+function search(query) {
+    const results = [];
+    const lowerQuery = query.toLowerCase();
+
+    for (let itemKey in searchData) {
+        if (searchData.hasOwnProperty(itemKey)) {
+            const itemData = searchData[itemKey];
+            for (let url in itemData) {
+                if (itemData.hasOwnProperty(url)) {
+                    const keywords = itemData[url];
+                    if (keywords.some(keyword => {
+                        const lowerKeyword = keyword.toLowerCase();
+                        return lowerKeyword.includes(lowerQuery) || lowerQuery.includes(lowerKeyword);
+                    })) {
+                        results.push({ url, keywords });
+                    }
+                }
+            }
+        }
+    }
+    return results;
+}
+
 function popup_draggable() {
-    const popupToolbox = document.getElementById("toolbar-popup");
+    const popupToolbox = document.getElementById("popup-toolbox");
     if (popupToolbox) {
         dragElement(popupToolbox);
     }
@@ -1423,83 +1754,23 @@ function dragElement(elmnt) {
 }
 
 //used for key binds
+//used for key binds
 function selectTool(tool) {
     const toolButton = document.querySelector(`#toolbox button[data-tool="${tool}"]`);
     if (toolButton) {
-        toolButton.click();
-        currentTool = tool;
-        updateShapesDraggable();
-        updateCursor();
-    }
-}
-
-//for the drawing tool
-function startDrawing(e) {
-    isDrawing = true;
-    const pos = getRelativePointerPosition(layer);
-    const size = currentTool === 'draw' ? parseInt(document.getElementById('draw-size').value) : parseInt(document.getElementById('erase-size').value);
-
-    let snapToGridEnabled = document.getElementById(`${currentTool}-snap`).checked || e.evt.shiftKey;
-    let startPos = snapToGridEnabled ? snapToGrid(pos.x, pos.y) : pos;
-
-    lastLine = new Konva.Line({
-        stroke: currentTool === 'draw' ? document.getElementById('draw-color').value : 'white',
-        strokeWidth: size,
-        globalCompositeOperation: currentTool === 'erase' ? 'destination-out' : 'source-over',
-        points: [startPos.x, startPos.y],
-        lineCap: 'round',
-        lineJoin: 'round'
-    });
-    layer.add(lastLine);
-}
-
-//also for the drawing tool
-function draw(e) {
-    if (!isDrawing) return;
-
-    const pos = getRelativePointerPosition(layer);
-
-    let straightLineEnabled = e.evt.altKey;
-    let snapToGridEnabled = !straightLineEnabled && (document.getElementById(`${currentTool}-snap`).checked || e.evt.shiftKey);
-
-    let newPos;
-
-    if (straightLineEnabled) {
-        // Get the start position of the line
-        const startPos = { x: lastLine.points()[0], y: lastLine.points()[1] };
-
-        // Calculate the angle of the line
-        const dx = pos.x - startPos.x;
-        const dy = pos.y - startPos.y;
-
-        // Determine the direction (horizontal or vertical) based on the larger difference
-        if (Math.abs(dx) > Math.abs(dy)) {
-            newPos = { x: pos.x, y: startPos.y };  // Horizontal line
+        if (currentTool === tool) {
+            // If the tool is already selected, deselect it
+            currentTool = null;
+            hideToolOptions();
+            toolButton.classList.remove('active'); // Assuming you have a class to indicate active tool
+            updateCursor();
         } else {
-            newPos = { x: startPos.x, y: pos.y };  // Vertical line
+            // Select the tool
+            toolButton.click();
+            currentTool = tool;
+            toolButton.classList.add('active'); // Assuming you have a class to indicate active tool
+            updateCursor();
         }
-    } else if (snapToGridEnabled) {
-        newPos = snapToGrid(pos.x, pos.y);
-    } else {
-        newPos = pos;
-    }
-
-    let newPoints = lastLine.points().concat([newPos.x, newPos.y]);
-
-    lastLine.points(newPoints);
-    layer.batchDraw();
-}
-
-//uh, again when the user stops drawing
-function stopDrawing() {
-    if (isDrawing) {
-        isDrawing = false;
-        recordAction({
-            type: currentTool,
-            points: lastLine.points(),
-            color: lastLine.stroke(),
-            size: lastLine.strokeWidth()
-        });
     }
 }
 
@@ -1699,124 +1970,22 @@ function undo() {
     if (currentActionIndex >= 0) {
         currentActionIndex--;
         updateCanvas();
+        console.log('Undo function executed');
     }
 }
 
-//redo reature
 function redo() {
     if (currentActionIndex < actionHistory.length - 1) {
         currentActionIndex++;
         updateCanvas();
+        console.log('Redo function executed');
     }
 }
 
-function addText(e) {
-    const pos = getRelativePointerPosition(layer);
-    const text = document.getElementById('text-content').value;
-    const fontName = document.getElementById('text-font').value;
-
-    // Load the font before adding the text node
-    document.fonts.load(`16px ${fontName}`).then(() => {
-        const textNode = new Konva.Text({
-            x: pos.x,
-            y: pos.y,
-            text: text,
-            fontSize: parseInt(document.getElementById('text-size').value),
-            fontFamily: fontName,
-            fill: document.getElementById('text-color').value,
-            draggable: true,
-            width: 400
-        });
-
-        layer.add(textNode);
-        layer.draw();
-
-        // Double-click to edit
-        textNode.on('dblclick', function () {
-            createTextEditor(this);
-        });
-
-        recordAction({
-            type: 'addText',
-            node: textNode
-        });
-    }).catch((error) => {
-        console.error(`Failed to load font ${fontName}:`, error);
-    });
-}
-
-function createTextEditor(textNode) {
-    if (!isEditingText) {
-        const textPosition = textNode.absolutePosition();
-        const areaPosition = {
-            x: stage.container().offsetLeft + textPosition.x,
-            y: stage.container().offsetTop + textPosition.y - 80, // Adjusted the Y position to be 80 pixels higher
-        };
-
-        const textarea = document.createElement('textarea');
-        document.body.appendChild(textarea);
-        textarea.value = textNode.text();
-        textarea.id = "text-edit";
-        textarea.style.position = 'absolute';
-        textarea.style.top = areaPosition.y + 'px';
-        textarea.style.left = areaPosition.x + 'px';
-        textarea.style.width = textNode.width() * stage.scaleX() + 'px';
-        textarea.style.fontSize = (textNode.fontSize() * stage.scaleY()) + 'px';
-        textarea.style.fontFamily = textNode.fontFamily();
-        textarea.style.backgroundColor = '#B19CD9';
-        textarea.style.border = '1px solid #8A2BE2';
-        textarea.style.borderRadius = '4px';
-        textarea.style.padding = '4px';
-        textarea.style.outline = 'none';
-        textarea.style.resize = 'none';
-
-        textarea.style.overflow = 'auto'; // or 'scroll' if you always want a scrollbar visible
-        textarea.style.minHeight = '20px'; // or any suitable value for single-line text
-        textarea.style.maxHeight = '100px'; // or any suitable value to limit height
-
-        // Adjust height dynamically based on content
-        textarea.style.height = 'auto';
-        textarea.style.boxSizing = 'border-box'; // Include padding and border in element's total width and height
-        textarea.style.whiteSpace = 'pre-wrap'; // Preserve whitespace and line breaks
-
-        
-
-
-        textarea.focus();
-
-        textarea.addEventListener('input', function () {
-            textNode.text(textarea.value);
-            layer.draw();
-        });
-
-        textarea.addEventListener('keydown', function (event) {
-            // Stop editing text when the Esc key is pressed
-            if (event.key === 'Escape') {
-                textNode.text(textarea.value);
-                layer.draw();
-                try {
-                    document.body.removeChild(textarea);
-                } catch (TypeError) { };
-                isEditingText = false;
-            } else {
-                // Prevent tool shortcuts during text editing
-                if (isEditingText && (event.key === 'e' || event.key === 'd')) {
-                    event.stopPropagation();
-                }
-            }
-        });
-
-        textarea.addEventListener('blur', function () {
-            textNode.text(textarea.value);
-            layer.draw();
-            try {
-                document.body.removeChild(textarea);
-            } catch (TypeError) { }
-            isEditingText = false;
-        });
-
-        isEditingText = true;
-    }
+function showAddTextPopup(e) {
+    const toolButton = document.querySelector(`#toolbox button[data-tool="text"]`);
+    toolButton.click();
+    pos = getRelativePointerPosition(layer);
 }
 
 function loadGoogleFont() {
@@ -1915,16 +2084,85 @@ function rightPanel() {
         exportImageButton.addEventListener('click', function (e) {
             e.preventDefault();
             if (stage) {
-                stage.draw();
-                const dataURL = stage.toDataURL({
-                    pixelRatio: 3,
+                // Save the current stage properties
+                const originalProps = {
+                    width: stage.width(),
+                    height: stage.height(),
+                    x: stage.x(),
+                    y: stage.y(),
+                    scaleX: stage.scaleX(),
+                    scaleY: stage.scaleY()
+                };
+    
+                // Get all shapes on the stage
+                const shapes = stage.find('Shape');
+    
+                // Calculate the bounding box of all shapes
+                const box = new Konva.Box();
+                shapes.forEach((shape) => {
+                    box.merge(shape.getClientRect());
                 });
+    
+                // Add some padding
+                const padding = 20;
+                box.x -= padding;
+                box.y -= padding;
+                box.width += padding * 2;
+                box.height += padding * 2;
+    
+                // Temporarily resize and reposition the stage to fit the content
+                stage.width(box.width);
+                stage.height(box.height);
+                stage.scale({ x: 1, y: 1 });
+                stage.position({
+                    x: -box.x,
+                    y: -box.y
+                });
+    
+                // Hide the grid temporarily if it exists
+                let gridLayer = stage.findOne('.grid-layer');
+                if (gridLayer) {
+                    gridLayer.hide();
+                }
+    
+                // Draw the stage
+                stage.draw();
+    
+                // Export the image
+                const dataURL = stage.toDataURL({
+                    mimeType: 'image/png',
+                    quality: 1,
+                    pixelRatio: 2, // Increase for higher resolution
+                });
+    
+                // Restore the grid visibility
+                if (gridLayer) {
+                    gridLayer.show();
+                }
+    
+                // Restore the original stage properties
+                stage.width(originalProps.width);
+                stage.height(originalProps.height);
+                stage.scale({
+                    x: originalProps.scaleX,
+                    y: originalProps.scaleY
+                });
+                stage.position({
+                    x: originalProps.x,
+                    y: originalProps.y
+                });
+    
+                // Redraw the stage
+                stage.draw();
+    
+                // Create a link to download the image
                 const link = document.createElement('a');
                 link.href = dataURL;
                 link.download = 'battlemap.png';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+    
                 console.log('Exporting as image...');
             }
         });
@@ -1957,21 +2195,11 @@ function loadCustomFont() {
     }
 }
 
-function checkImageOnCanvas() {
-    const foundImage = layer.find('#konva-watermark');
-    const exportImageButton = document.getElementById('export-image');
-    const exportJsonButton = document.getElementById('export-json');
-
-    // Check if elements exist before modifying properties
-    if (exportImageButton && exportJsonButton) {
-        if (foundImage.length > 0) {
-            exportImageButton.disabled = false;
-            exportJsonButton.disabled = false;
-        } else {
-            exportImageButton.disabled = true;
-            exportJsonButton.disabled = true;
-        }
-    } else {
-        console.error('Export buttons not found in the DOM');
+function hideSearchResults() {
+    const searchResults = document.getElementById('search-results');
+    if (searchResults) {
+        searchResults.style.display = 'none';
     }
 }
+
+
