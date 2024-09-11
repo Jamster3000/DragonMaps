@@ -1,4 +1,1 @@
-js
-css
-images
-fonts
+This is an awesome test.
