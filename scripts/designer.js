@@ -500,8 +500,6 @@ function setupEventListeners() {
         });
     }
 
-    document.body.removeChild(tempContainer);
-
     if (exportJsonButton) {
         exportJsonButton.addEventListener('click', function () {
             console.log('Exporting as JSON...');
@@ -2171,8 +2169,6 @@ function rightPanel() {
             }
         });
     }
-
-    document.body.removeChild(tempContainer);
 
     if (exportJsonButton) {
         exportJsonButton.addEventListener('click', function () {
