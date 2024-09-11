@@ -420,8 +420,8 @@ function setupEventListeners() {
     
                 // Create a new canvas element
                 const canvas = document.createElement('canvas');
-                canvas.width = visibleRect.width;
-                canvas.height = visibleRect.height;
+                canvas.width = Math.round(visibleRect.width);
+                canvas.height = Math.round(visibleRect.height);
     
                 // Get the canvas context
                 const context = canvas.getContext('2d');
@@ -433,36 +433,38 @@ function setupEventListeners() {
                     gridLayer.hide();
                 }
     
-                // Draw the stage content onto the canvas
-                stage.drawScene({
-                    canvas: canvas,
-                    x: visibleRect.x,
-                    y: visibleRect.y,
-                    width: visibleRect.width,
-                    height: visibleRect.height
-                });
+                try {
+                    // Draw the stage content onto the canvas
+                    const dataURL = stage.toDataURL({
+                        x: visibleRect.x,
+                        y: visibleRect.y,
+                        width: visibleRect.width,
+                        height: visibleRect.height,
+                        pixelRatio: 2 // Increase for higher resolution
+                    });
     
-                // Show the grid again if it was originally visible
-                if (gridLayer && wasGridVisible) {
-                    gridLayer.show();
+                    // Create a link to download the image
+                    const link = document.createElement('a');
+                    link.href = dataURL;
+                    link.download = 'battlemap.png';
+                    document.body.appendChild(link);
+    
+                    // Trigger the download
+                    link.click();
+    
+                    // Clean up
+                    document.body.removeChild(link);
+    
+                    console.log('Exporting as image...');
+                } catch (error) {
+                    console.error('Error exporting image:', error);
+                } finally {
+                    // Show the grid again if it was originally visible
+                    if (gridLayer && wasGridVisible) {
+                        gridLayer.show();
+                    }
+                    stage.draw(); // Redraw the stage
                 }
-    
-                // Convert the canvas to a data URL
-                const dataURL = canvas.toDataURL('image/png');
-    
-                // Create a link to download the image
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = 'battlemap.png';
-                document.body.appendChild(link);
-    
-                // Trigger the download
-                link.click();
-    
-                // Clean up
-                document.body.removeChild(link);
-    
-                console.log('Exporting as image...');
             }
         });
     }
@@ -2057,8 +2059,8 @@ function rightPanel() {
     
                 // Create a new canvas element
                 const canvas = document.createElement('canvas');
-                canvas.width = visibleRect.width;
-                canvas.height = visibleRect.height;
+                canvas.width = Math.round(visibleRect.width);
+                canvas.height = Math.round(visibleRect.height);
     
                 // Get the canvas context
                 const context = canvas.getContext('2d');
@@ -2070,36 +2072,38 @@ function rightPanel() {
                     gridLayer.hide();
                 }
     
-                // Draw the stage content onto the canvas
-                stage.drawScene({
-                    canvas: canvas,
-                    x: visibleRect.x,
-                    y: visibleRect.y,
-                    width: visibleRect.width,
-                    height: visibleRect.height
-                });
+                try {
+                    // Draw the stage content onto the canvas
+                    const dataURL = stage.toDataURL({
+                        x: visibleRect.x,
+                        y: visibleRect.y,
+                        width: visibleRect.width,
+                        height: visibleRect.height,
+                        pixelRatio: 2 // Increase for higher resolution
+                    });
     
-                // Show the grid again if it was originally visible
-                if (gridLayer && wasGridVisible) {
-                    gridLayer.show();
+                    // Create a link to download the image
+                    const link = document.createElement('a');
+                    link.href = dataURL;
+                    link.download = 'battlemap.png';
+                    document.body.appendChild(link);
+    
+                    // Trigger the download
+                    link.click();
+    
+                    // Clean up
+                    document.body.removeChild(link);
+    
+                    console.log('Exporting as image...');
+                } catch (error) {
+                    console.error('Error exporting image:', error);
+                } finally {
+                    // Show the grid again if it was originally visible
+                    if (gridLayer && wasGridVisible) {
+                        gridLayer.show();
+                    }
+                    stage.draw(); // Redraw the stage
                 }
-    
-                // Convert the canvas to a data URL
-                const dataURL = canvas.toDataURL('image/png');
-    
-                // Create a link to download the image
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = 'battlemap.png';
-                document.body.appendChild(link);
-    
-                // Trigger the download
-                link.click();
-    
-                // Clean up
-                document.body.removeChild(link);
-    
-                console.log('Exporting as image...');
             }
         });
     }
