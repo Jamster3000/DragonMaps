@@ -415,6 +415,12 @@ function setupEventListeners() {
         exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
+                // Create a temporary container
+                const tempContainer = document.createElement('div');
+                tempContainer.id = 'temp-container';
+                tempContainer.style.display = 'none'; // Hide it from view
+                document.body.appendChild(tempContainer);
+    
                 // Get all shapes on the stage
                 const shapes = stage.find('Shape');
     
@@ -440,7 +446,7 @@ function setupEventListeners() {
     
                 // Create a new temporary stage and layer
                 const tempStage = new Konva.Stage({
-                    container: 'temp-container', // Make sure to create this temporary container in your HTML
+                    container: 'temp-container',
                     width: width,
                     height: height,
                 });
@@ -487,15 +493,14 @@ function setupEventListeners() {
     
                 // Clean up
                 tempStage.destroy();
-                const tempContainer = document.getElementById('temp-container');
-                if (tempContainer) {
-                    tempContainer.remove();
-                }
+                document.body.removeChild(tempContainer);
     
                 console.log('Exporting as image...');
             }
         });
     }
+
+    document.body.removeChild(tempContainer);
 
     if (exportJsonButton) {
         exportJsonButton.addEventListener('click', function () {
@@ -2082,6 +2087,12 @@ function rightPanel() {
         exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
+                // Create a temporary container
+                const tempContainer = document.createElement('div');
+                tempContainer.id = 'temp-container';
+                tempContainer.style.display = 'none'; // Hide it from view
+                document.body.appendChild(tempContainer);
+    
                 // Get all shapes on the stage
                 const shapes = stage.find('Shape');
     
@@ -2107,7 +2118,7 @@ function rightPanel() {
     
                 // Create a new temporary stage and layer
                 const tempStage = new Konva.Stage({
-                    container: 'temp-container', // Make sure to create this temporary container in your HTML
+                    container: 'temp-container',
                     width: width,
                     height: height,
                 });
@@ -2154,15 +2165,14 @@ function rightPanel() {
     
                 // Clean up
                 tempStage.destroy();
-                const tempContainer = document.getElementById('temp-container');
-                if (tempContainer) {
-                    tempContainer.remove();
-                }
+                document.body.removeChild(tempContainer);
     
                 console.log('Exporting as image...');
             }
         });
     }
+
+    document.body.removeChild(tempContainer);
 
     if (exportJsonButton) {
         exportJsonButton.addEventListener('click', function () {
