@@ -2019,42 +2019,77 @@ function rightPanel() {
         exportImageButton.addEventListener('click', function (e) {
             e.preventDefault();
             if (stage) {
-                // Save the current stage size, position, and scale
-                const originalWidth = stage.width();
-                const originalHeight = stage.height();
-                const originalX = stage.x();
-                const originalY = stage.y();
-                const originalScaleX = stage.scaleX();
-                const originalScaleY = stage.scaleY();
-
-                // Calculate the bounding box of all elements on the stage
-                const boundingBox = stage.getClientRect({ relativeTo: stage });
-
-                // Calculate the scale to fit the bounding box
-                const scaleX = originalWidth / boundingBox.width;
-                const scaleY = originalHeight / boundingBox.height;
-                const scale = Math.min(scaleX, scaleY);
-
-                // Resize and reposition the stage to fit the bounding box
-                stage.width(boundingBox.width * scale);
-                stage.height(boundingBox.height * scale);
-                stage.scale({ x: scale, y: scale });
-                stage.x(-boundingBox.x * scale);
-                stage.y(-boundingBox.y * scale);
-
-                // Draw the stage and export the image
-                stage.draw();
-                const dataURL = stage.toDataURL({
-                    pixelRatio: 3,
+                // Save the current stage properties
+                const originalProps = {
+                    width: stage.width(),
+                    height: stage.height(),
+                    x: stage.x(),
+                    y: stage.y(),
+                    scaleX: stage.scaleX(),
+                    scaleY: stage.scaleY()
+                };
+    
+                // Get all shapes on the stage
+                const shapes = stage.find('Shape');
+    
+                // Calculate the bounding box of all shapes
+                const box = new Konva.Box();
+                shapes.forEach((shape) => {
+                    box.merge(shape.getClientRect());
                 });
-
-                // Restore the original stage size, position, and scale
-                stage.width(originalWidth);
-                stage.height(originalHeight);
-                stage.scale({ x: originalScaleX, y: originalScaleY });
-                stage.x(originalX);
-                stage.y(originalY);
-
+    
+                // Add some padding
+                const padding = 20;
+                box.x -= padding;
+                box.y -= padding;
+                box.width += padding * 2;
+                box.height += padding * 2;
+    
+                // Temporarily resize and reposition the stage to fit the content
+                stage.width(box.width);
+                stage.height(box.height);
+                stage.scale({ x: 1, y: 1 });
+                stage.position({
+                    x: -box.x,
+                    y: -box.y
+                });
+    
+                // Hide the grid temporarily if it exists
+                let gridLayer = stage.findOne('.grid-layer');
+                if (gridLayer) {
+                    gridLayer.hide();
+                }
+    
+                // Draw the stage
+                stage.draw();
+    
+                // Export the image
+                const dataURL = stage.toDataURL({
+                    mimeType: 'image/png',
+                    quality: 1,
+                    pixelRatio: 2, // Increase for higher resolution
+                });
+    
+                // Restore the grid visibility
+                if (gridLayer) {
+                    gridLayer.show();
+                }
+    
+                // Restore the original stage properties
+                stage.width(originalProps.width);
+                stage.height(originalProps.height);
+                stage.scale({
+                    x: originalProps.scaleX,
+                    y: originalProps.scaleY
+                });
+                stage.position({
+                    x: originalProps.x,
+                    y: originalProps.y
+                });
+    
+                // Redraw the stage
+                stage.draw();
+    
                 // Create a link to download the image
                 const link = document.createElement('a');
                 link.href = dataURL;
@@ -2062,6 +2097,7 @@ function rightPanel() {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+    
                 console.log('Exporting as image...');
             }
         });
