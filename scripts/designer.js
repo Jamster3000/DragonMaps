@@ -415,11 +415,13 @@ function setupEventListeners() {
         exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
-                // Create a temporary container
-                const tempContainer = document.createElement('div');
-                tempContainer.id = 'temp-container';
-                tempContainer.style.display = 'none'; // Hide it from view
-                document.body.appendChild(tempContainer);
+                // Save the current stage properties
+                const originalProps = {
+                    width: stage.width(),
+                    height: stage.height(),
+                    scale: stage.scale(),
+                    position: stage.position()
+                };
     
                 // Get all shapes on the stage
                 const shapes = stage.find('Shape');
@@ -444,40 +446,41 @@ function setupEventListeners() {
                 const width = maxX - minX;
                 const height = maxY - minY;
     
-                // Create a new temporary stage and layer
-                const tempStage = new Konva.Stage({
-                    container: 'temp-container',
-                    width: width,
-                    height: height,
-                });
-                const tempLayer = new Konva.Layer();
-                tempStage.add(tempLayer);
-    
-                // Clone and adjust positions of shapes
-                shapes.forEach((shape) => {
-                    const clone = shape.clone();
-                    clone.position({
-                        x: clone.x() - minX,
-                        y: clone.y() - minY
-                    });
-                    tempLayer.add(clone);
-                });
+                // Temporarily resize and reposition the stage to fit the content
+                stage.width(width);
+                stage.height(height);
+                stage.scale({ x: 1, y: 1 });
+                stage.position({ x: -minX, y: -minY });
     
                 // Hide the grid temporarily if it exists
-                let gridLayer = tempLayer.findOne('.grid-layer');
+                let gridLayer = stage.findOne('.grid-layer');
                 if (gridLayer) {
                     gridLayer.hide();
                 }
     
-                // Draw the temporary stage
-                tempStage.draw();
+                // Draw the stage
+                stage.draw();
     
                 // Export the image
-                const dataURL = tempStage.toDataURL({
+                const dataURL = stage.toDataURL({
                     mimeType: 'image/png',
                     quality: 1,
-                    pixelRatio: 2, // Increase for higher resolution
+                    pixelRatio: 2 // Increase for higher resolution
                 });
+    
+                // Restore the original stage properties
+                stage.width(originalProps.width);
+                stage.height(originalProps.height);
+                stage.scale(originalProps.scale);
+                stage.position(originalProps.position);
+    
+                // Show the grid again if it was hidden
+                if (gridLayer) {
+                    gridLayer.show();
+                }
+    
+                // Redraw the stage
+                stage.draw();
     
                 // Create a link to download the image
                 const link = document.createElement('a');
@@ -490,10 +493,6 @@ function setupEventListeners() {
     
                 link.click();
                 document.body.removeChild(link);
-    
-                // Clean up
-                tempStage.destroy();
-                document.body.removeChild(tempContainer);
     
                 console.log('Exporting as image...');
             }
@@ -2085,11 +2084,13 @@ function rightPanel() {
         exportImageButton.addEventListener('click', async function (e) {
             e.preventDefault();
             if (stage) {
-                // Create a temporary container
-                const tempContainer = document.createElement('div');
-                tempContainer.id = 'temp-container';
-                tempContainer.style.display = 'none'; // Hide it from view
-                document.body.appendChild(tempContainer);
+                // Save the current stage properties
+                const originalProps = {
+                    width: stage.width(),
+                    height: stage.height(),
+                    scale: stage.scale(),
+                    position: stage.position()
+                };
     
                 // Get all shapes on the stage
                 const shapes = stage.find('Shape');
@@ -2114,40 +2115,41 @@ function rightPanel() {
                 const width = maxX - minX;
                 const height = maxY - minY;
     
-                // Create a new temporary stage and layer
-                const tempStage = new Konva.Stage({
-                    container: 'temp-container',
-                    width: width,
-                    height: height,
-                });
-                const tempLayer = new Konva.Layer();
-                tempStage.add(tempLayer);
-    
-                // Clone and adjust positions of shapes
-                shapes.forEach((shape) => {
-                    const clone = shape.clone();
-                    clone.position({
-                        x: clone.x() - minX,
-                        y: clone.y() - minY
-                    });
-                    tempLayer.add(clone);
-                });
+                // Temporarily resize and reposition the stage to fit the content
+                stage.width(width);
+                stage.height(height);
+                stage.scale({ x: 1, y: 1 });
+                stage.position({ x: -minX, y: -minY });
     
                 // Hide the grid temporarily if it exists
-                let gridLayer = tempLayer.findOne('.grid-layer');
+                let gridLayer = stage.findOne('.grid-layer');
                 if (gridLayer) {
                     gridLayer.hide();
                 }
     
-                // Draw the temporary stage
-                tempStage.draw();
+                // Draw the stage
+                stage.draw();
     
                 // Export the image
-                const dataURL = tempStage.toDataURL({
+                const dataURL = stage.toDataURL({
                     mimeType: 'image/png',
                     quality: 1,
-                    pixelRatio: 2, // Increase for higher resolution
+                    pixelRatio: 2 // Increase for higher resolution
                 });
+    
+                // Restore the original stage properties
+                stage.width(originalProps.width);
+                stage.height(originalProps.height);
+                stage.scale(originalProps.scale);
+                stage.position(originalProps.position);
+    
+                // Show the grid again if it was hidden
+                if (gridLayer) {
+                    gridLayer.show();
+                }
+    
+                // Redraw the stage
+                stage.draw();
     
                 // Create a link to download the image
                 const link = document.createElement('a');
@@ -2160,10 +2162,6 @@ function rightPanel() {
     
                 link.click();
                 document.body.removeChild(link);
-    
-                // Clean up
-                tempStage.destroy();
-                document.body.removeChild(tempContainer);
     
                 console.log('Exporting as image...');
             }
