@@ -259,7 +259,49 @@ button:hover {
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
 }
 
+.migration-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(10, 10, 26, 0.8);
+        }
 
+        .warning-content {
+            background-color: var(--header-color);
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .warning-title {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .warning-text {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .warning-link {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .warning-link:hover {
+         
 
 /* Webkit Scrollbar Styles */
 ::-webkit-scrollbar {
