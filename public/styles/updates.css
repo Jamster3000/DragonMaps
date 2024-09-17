@@ -1,0 +1,40 @@
+#posts-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.update-post-container {
+    border-radius: 10px;
+    margin: 1rem 0;
+    padding: 1.5rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.post-date {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 0.5rem;
+}
+
+.update-post-container h1 {
+    font-family: 'MedievalSharp', cursive;
+    color: #fff;
+    margin-top: 0;
+}
+
+.update-post-container p {
+    color: #ddd;
+    line-height: 1.6;
+}
+
+.update-post-container a {
+    color: #B19CD9;
+    text-decoration: none;
+}
+
+.update-post-container a:hover {
+    text-decoration: underline;
+}

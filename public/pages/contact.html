@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DragonMaps | Contact Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="theme-color" content="#1A1A2E">
+    <meta name="description" content="Contact form to contact the developer about issues, bugs, suggestions or anything else you might have to say in relation to Dragon Maps.">
+    <meta property="og:title" content="Dragon Maps - Contact Form">
+    <meta property="og:description" content="Contact form to contact the developer about issues, bugs, suggestions or anything else you might have to say in relation to Dragon Maps.">
+    <meta property="og:image" content="URL_to_image.jpg">
+    <meta property="og:url" content="https://jamster3000.github.io/dragonmaps/pages/contact">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/contact-form.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap">
+    <script src="../components/components.js"></script>
+    <style>
+        /* Dragon Animation Styles */
+        #dragon {
+            width: 100px;
+            height: 100px;
+            background-image: url('dragon.png'); /* Replace with your dragon image */
+            background-size: cover;
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Fun Message Styles */
+        #fun-message {
+	    display: none;
+            position: fixed;
+            bottom: 120px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Roboto', sans-serif;
+	    width: 250px;
+        }
+
+        /* Response Styles */
+        #response.success {
+            color: #28a745; /* Green for success */
+        }
+
+        #response.error {
+            color: #dc3545; /* Red for error */
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+    <main>
+        <section id="contact">
+            <h2>Contact Form</h2>
+            <div class="container">
+                <form id="contactForm" action="https://formsubmit.co/8ec5f0fd9c7950112b8763c79a3cdd9c" method="POST">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+                    <input type="text" name="_honey" style="display:none">
+                    <input type="hidden" name="_captcha" value="false">
+                    <button type="submit">Send</button>
+                </form>
+                <div id="response"></div>
+            </div>
+            <div id="dragon"></div>
+            <div id="fun-message"></div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const form = document.getElementById('contactForm');
+                    const responseDiv = document.getElementById('response');
+                    const dragon = document.getElementById('dragon');
+                    const funMessage = document.getElementById('fun-message');
+
+                    const messages = [
+                        "The dragon is carefully sending your message with its fiery breath!",
+                        "Your email is being delivered on a dragon’s enchanted wings!",
+                        "The dragon is making sure your message reaches us with great speed!",
+                        "Your message is on a dragon’s trusty journey to our inbox!",
+                        "The dragon is weaving its magic to ensure your email gets through!",
+                        "Your email is soaring through the dragon’s mystical clouds!",
+                        "The dragon’s fiery breath is ensuring your message arrives promptly!",
+                        "Your message is being carried by a dragon with the utmost care!",
+                        "The dragon is guiding your email with its ancient magic!",
+                        "Your message is riding on the dragon’s mystical path to us!",
+                        "The dragon is using its magical breath to send your message!",
+                        "Your email is being transported on the dragon’s swift wings!",
+                        "The dragon is making sure your message reaches its destination!",
+                        "Your message is being sent with a touch of dragon magic!",
+                        "The dragon’s scales are glowing as it delivers your email!",
+                        "Your email is being carried by the dragon’s enchanted spell!",
+                        "The dragon is ensuring your message arrives with its magical touch!",
+                        "Your message is being delivered with the dragon’s powerful breath!",
+                        "The dragon is guiding your email through its mystical realm!",
+                        "Your email is being sent with a burst of dragon magic!",
+                        "The dragon is using its fiery breath to speed up your message!",
+                        "Your message is being escorted by the dragon’s enchanted wings!",
+                        "The dragon’s ancient magic is making sure your email gets through!",
+                        "Your email is being flown across enchanted lands by the dragon!",
+                        "The dragon is using its mystical flames to ensure your message arrives!",
+                        "Your message is being delivered with a touch of dragon’s whimsy!",
+                        "The dragon’s magical breath is making sure your email is on its way!",
+                        "Your email is riding on the dragon’s majestic wings to us!",
+                        "The dragon is using its fiery magic to send your message swiftly!",
+                        "Your message is being carried by the dragon’s enchanted flight!",
+                        "The dragon’s magical breath is guiding your email safely to us!",
+                        "Your email is being delivered with a hint of dragon’s charm!",
+                        "The dragon is ensuring your message gets to us with its mystical power!",
+                        "Your message is being flown on the dragon’s magical trail!",
+                        "The dragon’s enchanted wings are carrying your email to its destination!",
+                        "Your email is being sent with the dragon’s magical efficiency!"
+                    ];
+
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault();
+
+                        const formData = new FormData(form);
+                        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                        funMessage.textContent = randomMessage;
+			funMessage.style.display = "block";
+
+                        responseDiv.textContent = 'Sending...';
+                        responseDiv.className = '';
+
+                        confetti({ particleCount: 500, spread: 200, gravity: 0.75 });
+
+                        // Immediately show success message
+                        responseDiv.textContent = 'Thank you for your message. We\'ll get back to you soon!';
+                        responseDiv.className = 'success';
+
+                        // Perform the actual form submission in the background
+                        fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        }).then(response => {
+                            if (!response.ok) {
+                                throw new Error('Form submission failed');
+                            }
+                        }).catch(error => {
+                            console.error('Form submission error:', error);
+                            // Optionally, you can show an error message here if the submission fails
+                            // responseDiv.textContent = 'There was an issue sending your message. Please try again later.';
+                            // responseDiv.className = 'error';
+                        });
+
+                        form.reset(); // Clear the form
+                    });
+                });
+            </script>
+        </section>
+    </main>
+    <div id="footer-placeholder"></div>
+</body>
+</html>

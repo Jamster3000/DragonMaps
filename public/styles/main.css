@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Roboto:wght@300;400;700&display=swap');
+
+:root {
+    --background-color: #0A0A1A;
+    --header-color: #1A1A2E;
+    --primary-color: #8A2BE2;
+    --secondary-color: #FF6B6B;
+    --text-color: #E0E0E0;
+    --nav-link-color: #B19CD9;
+    --accent-color: #FF4500;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 70%),
+        radial-gradient(circle at 20% 20%, rgba(255, 107, 107, 0.05) 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(255, 69, 0, 0.05) 0%, transparent 60%);
+    background-size: 150% 150%, 100% 100%, 100% 100%;
+    background-repeat: no-repeat;
+    animation: backgroundShimmer 4s infinite alternate;
+    z-index: -1;
+}
+
+
+@keyframes backgroundShimmer {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+a {
+    color: var(--nav-link-color);
+}
+
+header, footer {
+    background-color: var(--header-color);
+    color: var(--text-color);
+    padding: 1rem;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin-left: 1.5rem;
+}
+
+nav ul li a {
+    color: var(--nav-link-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: var(--accent-color);
+}
+
+.logo {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--secondary-color);
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+.logo a:link{
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: rgba(26, 26, 46, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+    animation: contentFadeIn 1s ease-out;
+}
+
+@keyframes contentFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1{
+    font-family: 'Cinzel', serif;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    animation: headerGlow 4s infinite alternate;
+}
+
+h2{
+    font-family: 'Cinzel', serif;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    animation: headerGlow 4s infinite alternate;
+}
+
+h3{
+    font-family: 'Cinzel', serif;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    animation: headerGlow 4s infinite alternate;
+}
+
+@keyframes headerGlow {
+    0% { text-shadow: 0 0 15px rgba(255, 107, 107, 0.3); }
+    100% { text-shadow: 0 0 25px rgba(255, 107, 107, 0.6); }
+}
+
+button {
+    font-family: 'Cinzel', serif;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+}
+
+button:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #1A1A2E;
+    border: 2px solid #8A2BE2;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.2);
+    z-index: 1000;
+    max-width: 300px;
+    transition: opacity 0.3s ease-in-out;
+    color: #E0E0E0;
+}
+
+.popup-content {
+    margin-bottom: 15px;
+}
+
+    .popup-content h2 {
+        color: #FF6B6B;
+        margin-top: 0;
+    }
+
+.close-btn {
+    color: #B19CD9;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+    .close-btn:hover {
+        color: #FF4500;
+    }
+
+.cta-button {
+    background-color: #8A2BE2;
+    color: #E0E0E0;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .cta-button:hover {
+        background-color: #FF4500;
+    }
+
+.disclosure {
+    background-color: var(--header-color);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.disclosure p {
+    color: var(--text-color);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.disclosure .privacy-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.disclosure .privacy-link:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.btn {
+    font-family: 'Cinzel', serif;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+}
+
+
+
+/* Webkit Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 6px;
+    border: 3px solid var(--background-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-color);
+}

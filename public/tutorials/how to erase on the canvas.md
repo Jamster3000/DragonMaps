@@ -1,0 +1,1 @@
+### How to erase on the canvas
