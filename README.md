@@ -1,17 +1,17 @@
-# DragonMaps©
+# Dragon Maps©
 
-DragonMaps is a free to use battlemap maker with Tabletop Role Playing games specifically in mind. WHen I say for TTRPG's I mean virtual Tabletops such as Roll20, Foundry, and the awesome **__Cauldron VTT__**. There are a lot of plans for this, so far, DragonMaps© is sill in it's early days, with exciting plans for the future.  Whether you're crafting an epic encounter or working on designing a detailed world, DragonMaps© provides a user-friendly platform to create and bring your maps to life.
+Dragon Maps is a free to use battlemap maker with Tabletop Role Playing games specifically in mind. WHen I say for TTRPG's I mean virtual Tabletops such as Roll20, Foundry, and the awesome **__Cauldron VTT__**. There are a lot of plans for this, so far, Dragon Maps© is sill in it's early days, with exciting plans for the future.  Whether you're crafting an epic encounter or working on designing a detailed world, Dragon Maps© provides a user-friendly platform to create and bring your maps to life.
 
 # Features
 
-Currently, DragonMaps© offers a basic set of features to help you create your battlemaps quickly and easily:
+Currently, Dragon Maps© offers a basic set of features to help you create your battlemaps quickly and easily:
 - Intuitive Interfact: Simple drag-and-drop functionality with an awesome unique colour theme.
 - Grid: Includes a square grid where it's visibiliy can be toggled on and off.
 - Asset Library: Includes a currently limited selection of non-comercial, pre-made asets that can be used for non-comercial use with your maps.
-- Export: You can currently export your created map as a png file. (You must put the DragonMaps© logo on your map before you can export the map as an image - The watermark image will change to the logo).
+- Export: You can currently export your created map as a png file. (You must put the Dragon Maps© logo on your map before you can export the map as an image - The watermark image will change to the logo).
 - Tools: There are tools to allow you to draw, erase, and place text, using GoogleFonts to apply your own custom fonts (The shape tool is still a work in progress).
 
-While DragonMaps© is still in its (very) early stages, it provides some of the essentials for creating and exporting very simple battlemaps. I plan to add additional features and enhancements to make DragonMaps a free powerful tool for everyone to create awesome battlemaps.
+While Dragon Maps© is still in its (very) early stages, it provides some of the essentials for creating and exporting very simple battlemaps. I plan to add additional features and enhancements to make Dragon Maps a free powerful tool for everyone to create awesome battlemaps.
 
 # RoadMap
 Rather than listing everything there is planned to impliment here, just take a look at the [issues](https://github.com/Jamster3000/dragonmaps/issues) Page for a list of all features, enhancements and bugs. Alternitivly you can take a look at [Project DragonCode](https://github.com/users/Jamster3000/projects/11) to see what will and won't be worked on, what is currently being worked on, and what has already been done.
