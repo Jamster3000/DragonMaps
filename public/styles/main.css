@@ -247,53 +247,93 @@ button:hover, .btn:hover {
     background-color: var(--accent-color);
 }
 
-/* Mobile Responsiveness */
 @media screen and (max-width: 768px) {
     body {
         font-size: 16px;
     }
 
+    header {
+        padding: 1rem 0.5rem;
+    }
+
     nav {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 24px;
+        margin-bottom: 1rem;
+        text-align: center;
     }
 
     nav ul {
         flex-direction: column;
         width: 100%;
         padding-top: 1rem;
+        align-items: center;
     }
 
     nav ul li {
-        margin-left: 0;
-        margin-bottom: 0.5rem;
-    }
-
-    .logo {
-        font-size: 24px;
-        margin-bottom: 1rem;
+        margin: 0.5rem 0;
     }
 
     main {
-        padding: 1rem;
+        padding: 1.5rem;
         margin: 1rem;
+        max-width: 100%;
     }
 
-    h1 { font-size: 2rem; }
+    h1 { 
+        font-size: 2rem; 
+        text-align: center;
+    }
     h2 { font-size: 1.75rem; }
     h3 { font-size: 1.5rem; }
 
-    .popup {
-        left: 20px;
-        right: 20px;
-        max-width: none;
+    #hero {
+        text-align: center;
     }
 
     .btn, button {
-        display: block;
-        width: 100%;
-        margin-bottom: 1rem;
+        display: inline-block;
+        width: auto;
+        min-width: 200px;
+        max-width: 80%;
+        margin: 1rem auto;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .popup {
+        left: 10px;
+        right: 10px;
+        max-width: calc(100% - 20px);
+        bottom: 10px;
+    }
+
+    .disclosure {
+        padding: 15px;
+        margin-top: 2rem;
+    }
+
+    .disclosure p {
+        font-size: 12px;
+    }
+
+    footer {
+        padding: 1rem 0.5rem;
         text-align: center;
+    }
+
+    footer ul {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+    }
+
+    footer ul li {
+        margin: 0.5rem 0;
     }
 }
 
@@ -306,11 +346,7 @@ button:hover, .btn:hover {
     h2 { font-size: 1.5rem; }
     h3 { font-size: 1.25rem; }
 
-    .disclosure {
-        padding: 10px;
-    }
-
-    .disclosure p {
-        font-size: 12px;
+    .btn, button {
+        min-width: 180px;
     }
 }
