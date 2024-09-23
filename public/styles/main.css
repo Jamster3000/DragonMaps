@@ -260,9 +260,6 @@ button:hover {
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
 }
 
-
-
-/* Webkit Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 12px;
 }
@@ -279,4 +276,60 @@ button:hover {
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--accent-color);
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem; /* Add padding for mobile */
+    }
+
+    header, footer {
+        padding: 0.75rem; /* Adjust header/footer padding */
+    }
+
+    nav ul {
+        flex-direction: column; /* Stack nav items vertically */
+        align-items: flex-start; /* Align to the left */
+    }
+
+    nav ul li {
+        margin: 0.5rem 0; /* Adjust margin for stacked items */
+    }
+
+    .logo {
+        font-size: 24px; /* Smaller logo font size */
+    }
+
+    main {
+        margin: 1rem; /* Reduce main margin */
+        padding: 1.5rem; /* Adjust padding */
+    }
+
+    h1 {
+        font-size: 2rem; /* Adjust heading sizes */
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    button, .btn {
+        width: 100%; /* Full width buttons */
+        padding: 1rem; /* Adjust padding for buttons */
+        font-size: 1rem; /* Slightly smaller font size */
+    }
+
+    .popup {
+        max-width: 90%; /* Responsive popup width */
+        bottom: 10px; /* Adjust position */
+        right: 10px; /* Adjust position */
+    }
+
+    .disclosure {
+        margin: 10px 0; /* Adjust margin */
+    }
 }
