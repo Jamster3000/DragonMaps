@@ -37,7 +37,6 @@ body::before {
     z-index: -1;
 }
 
-
 @keyframes backgroundShimmer {
     0% { background-position: 0% 0%; }
     100% { background-position: 100% 100%; }
@@ -58,6 +57,7 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 nav ul {
@@ -65,10 +65,12 @@ nav ul {
     list-style: none;
     margin: 0;
     padding: 0;
+    flex-wrap: wrap;
 }
 
 nav ul li {
     margin-left: 1.5rem;
+    margin-bottom: 0.5rem;
 }
 
 nav ul li a {
@@ -109,39 +111,24 @@ main {
     to { opacity: 1; transform: translateY(0); }
 }
 
-h1{
+h1, h2, h3 {
     font-family: 'Cinzel', serif;
     color: var(--secondary-color);
     margin-bottom: 1.5rem;
-    font-size: 2.5rem;
     text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
     animation: headerGlow 4s infinite alternate;
 }
 
-h2{
-    font-family: 'Cinzel', serif;
-    color: var(--secondary-color);
-    margin-bottom: 1.5rem;
-    font-size: 2rem;
-    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
-    animation: headerGlow 4s infinite alternate;
-}
-
-h3{
-    font-family: 'Cinzel', serif;
-    color: var(--secondary-color);
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-    text-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
-    animation: headerGlow 4s infinite alternate;
-}
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
 
 @keyframes headerGlow {
     0% { text-shadow: 0 0 15px rgba(255, 107, 107, 0.3); }
     100% { text-shadow: 0 0 25px rgba(255, 107, 107, 0.6); }
 }
 
-button {
+button, .btn {
     font-family: 'Cinzel', serif;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -152,9 +139,11 @@ button {
     transition: all 0.3s ease;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+    text-decoration: none;
+    display: inline-block;
 }
 
-button:hover {
+button:hover, .btn:hover {
     background-color: var(--accent-color);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
@@ -180,10 +169,10 @@ button:hover {
     margin-bottom: 15px;
 }
 
-    .popup-content h2 {
-        color: #FF6B6B;
-        margin-top: 0;
-    }
+.popup-content h2 {
+    color: #FF6B6B;
+    margin-top: 0;
+}
 
 .close-btn {
     color: #B19CD9;
@@ -194,9 +183,9 @@ button:hover {
     transition: color 0.2s;
 }
 
-    .close-btn:hover {
-        color: #FF4500;
-    }
+.close-btn:hover {
+    color: #FF4500;
+}
 
 .cta-button {
     background-color: #8A2BE2;
@@ -208,9 +197,9 @@ button:hover {
     transition: background-color 0.2s;
 }
 
-    .cta-button:hover {
-        background-color: #FF4500;
-    }
+.cta-button:hover {
+    background-color: #FF4500;
+}
 
 .disclosure {
     background-color: var(--header-color);
@@ -239,27 +228,7 @@ button:hover {
     text-decoration: underline;
 }
 
-.btn {
-    font-family: 'Cinzel', serif;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    cursor: pointer;
-    font-size: 1.1rem;
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    transition: all 0.3s ease;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn:hover {
-    background-color: var(--accent-color);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
-}
-
+/* Webkit Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 12px;
 }
@@ -278,58 +247,70 @@ button:hover {
     background-color: var(--accent-color);
 }
 
-@media (max-width: 768px) {
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
     body {
-        padding: 1rem; /* Add padding for mobile */
+        font-size: 16px;
     }
 
-    header, footer {
-        padding: 0.75rem; /* Adjust header/footer padding */
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     nav ul {
-        flex-direction: column; /* Stack nav items vertically */
-        align-items: flex-start; /* Align to the left */
+        flex-direction: column;
+        width: 100%;
+        padding-top: 1rem;
     }
 
     nav ul li {
-        margin: 0.5rem 0; /* Adjust margin for stacked items */
+        margin-left: 0;
+        margin-bottom: 0.5rem;
     }
 
     .logo {
-        font-size: 24px; /* Smaller logo font size */
+        font-size: 24px;
+        margin-bottom: 1rem;
     }
 
     main {
-        margin: 1rem; /* Reduce main margin */
-        padding: 1.5rem; /* Adjust padding */
+        padding: 1rem;
+        margin: 1rem;
     }
 
-    h1 {
-        font-size: 2rem; /* Adjust heading sizes */
-    }
-
-    h2 {
-        font-size: 1.75rem;
-    }
-
-    h3 {
-        font-size: 1.25rem;
-    }
-
-    button, .btn {
-        width: 100%; /* Full width buttons */
-        padding: 1rem; /* Adjust padding for buttons */
-        font-size: 1rem; /* Slightly smaller font size */
-    }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.5rem; }
 
     .popup {
-        max-width: 90%; /* Responsive popup width */
-        bottom: 10px; /* Adjust position */
-        right: 10px; /* Adjust position */
+        left: 20px;
+        right: 20px;
+        max-width: none;
     }
 
+    .btn, button {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+
     .disclosure {
-        margin: 10px 0; /* Adjust margin */
+        padding: 10px;
+    }
+
+    .disclosure p {
+        font-size: 12px;
     }
 }
