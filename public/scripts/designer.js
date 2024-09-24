@@ -529,22 +529,6 @@ function onDragStart(e) {
     e.dataTransfer.setData('text/plain', e.target.id);
 }
 
-// Function to deselect all images
-function deselectAllImages() {
-    layer.getChildren().each(function (node) {
-        if (node.hasName('image')) {
-            // Ensure that node is still valid before modifying
-            if (node.isDestroyed()) {
-                console.warn('Attempted to modify a destroyed node.');
-                return; // Skip destroyed nodes
-            }
-            node.stroke(null);
-            node.selected = false;
-        }
-    });
-}
-
-
 function selectImage(image) {
     deselectAllImages();
     image.selected = true;
