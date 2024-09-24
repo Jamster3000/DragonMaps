@@ -783,38 +783,7 @@ function updateCanvas() {
         }
     }
     layer.batchDraw();
-} function updateCanvas() {
-    // Clear existing nodes without destroying them
-    layer.removeChildren(); // This only removes nodes from the layer but doesn't destroy them
-
-    // Re-add nodes based on the action history
-    for (let i = 0; i <= currentActionIndex; i++) {
-        const action = actionHistory[i];
-        switch (action.type) {
-            case 'draw':
-            case 'erase':
-                const line = new Konva.Line({
-                    points: action.points,
-                    stroke: action.color,
-                    strokeWidth: action.size,
-                    globalCompositeOperation: action.type === 'erase' ? 'destination-out' : 'source-over',
-                    lineCap: 'round',
-                    lineJoin: 'round'
-                });
-                layer.add(line);
-                break;
-            case 'addText':
-            case 'addShape':
-            case 'addImage':
-                // Clone the node to avoid reusing destroyed nodes
-                const nodeClone = action.node.clone();
-                layer.add(nodeClone);
-                break;
-        }
-    }
-    layer.batchDraw();
 }
-
 
 //toggles the grid visibiliy
 function toggleGrid() {
