@@ -178,7 +178,7 @@ button:hover {
 
 @media screen and (max-width: 768px) {
     #fun-message {
-        bottom: 20px;
+        bottom: 180px;
         left: 5px;    
         width: 200px; 
         padding: 8px; 
