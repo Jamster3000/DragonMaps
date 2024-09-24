@@ -175,3 +175,12 @@ button:hover {
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--accent-color);
 }
+
+@media (max-width: 600px) {
+    #fun-message {
+        bottom: 80px;
+        left: 5px;    
+        width: 200px; 
+        padding: 8px; 
+    }
+}
