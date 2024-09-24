@@ -157,7 +157,6 @@ button:hover {
     color: #FF6B6B;
 }
 
-/* Webkit Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 12px;
 }
@@ -177,10 +176,63 @@ button:hover {
 }
 
 @media screen and (max-width: 768px) {
+    .container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+    }
+
+    input[type="email"],
+    textarea, input {
+        position: relative;
+        padding: 0.35rem;
+    }
+
+    button {
+        padding: 0.6rem 1.2rem;
+    }
+
+  #fun-message {
+    position: fixed;
+    bottom: -30px !important;
+    left: 15% !important;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 8px;
+    border-radius: 5px;
+    font-family: 'Roboto', sans-serif;
+    width: calc(100% - 20px);
+    max-width: 300px;
+    z-index: 10;
+}
+}
+
+@media screen and (min-width: 769px) {
+    .container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    h2 {
+        font-size: 2.5rem;
+    }
+
+    input[type="email"],
+    textarea, input {
+        padding: 0.75rem;
+    }
+
+    button {
+        padding: 0.75rem 1.5rem;
+    }
+
     #fun-message {
-        bottom: 180px;
-        left: 5px;    
-        width: 200px; 
-        padding: 8px; 
+        bottom: 120px;
+        left: 10px;
+        width: 250px;
     }
 }
