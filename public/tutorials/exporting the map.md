@@ -1,4 +1,4 @@
-### exporting the map
+### Exporting the map
 
 In this tutorial, we will learn how to export the map to an image. Currently, the export feature is tricky to use, but we are working on improving it.
 
