@@ -14,13 +14,13 @@
     <meta name="robots" content="index, follow">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="theme-color" content="#1A1A2E">
-    <meta name="description" content="Designer to design your own battlemaps using the Dragon Map Designer tools and avaliable assets.">
+    <meta name="description" content="Designer to design your own battlemaps using the Dragon Map Designer tools and available assets.">
     <meta property="og:title" content="Dragon Maps Designer">
-    <meta property="og:description" content="Designer to design your own battlemaps using the Dragon Map Designer tools and avaliable assets.">
+    <meta property="og:description" content="Designer to design your own battlemaps using the Dragon Map Designer tools and available assets.">
     <meta property="og:image" content="URL_to_image.jpg">
     <meta property="og:url" content="https://jamster3000.github.io/dragonmaps/pages/designer">
-    <link rel="preload" href="../styles/designer.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap&display=swap">
+    <link rel="stylesheet" href="../styles/designer.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <script src="https://unpkg.com/konva@8.4.2/konva.min.js" defer></script>
 </head>
@@ -42,8 +42,8 @@
                   <button class="dropbtn" aria-haspopup="true" aria-expanded="false">File</button>
                   <div class="dropdown-content">
                      <a href="#" id="new-map-option" title="New Map, clearing the existing creation: (ALT+n)">New</a>
-                     <a href="#" title="open a map that has already been exported via Json">Open</a>
-                     <a href="#" title="Import your own selection of assets. This will be kept stored on your device and will need to be reimported if you clear your devices cache.">Import</a>
+                     <a href="#" title="Open a map that has already been exported via JSON">Open</a>
+                     <a href="#" title="Import your own selection of assets. This will be kept stored on your device and will need to be reimported if you clear your device's cache.">Import</a>
                   </div>
                </div>
                <div id="edit-menu" class="dropdown">
@@ -88,7 +88,7 @@
          </section>
          <div id="toolbar-popup"></div>
          <div class="search-results" id="search-results">
-            <div class="image-grid" id="image-grid"></div>
+            <div class="image-grid" id="image-grid" style="display: flex; flex-wrap: wrap;"></div> <!-- Updated to use flex display -->
          </div>
          <button id="toggle-right-panel" aria-label="Toggle right panel">&#9668;&#9668;</button>
          <aside id="right-panel">
@@ -115,7 +115,7 @@
                      </picture>
                   </div>
                   <button id="export-image" title="Export your creation as an image">Export as Image</button>
-                  <button id="export-json" title="Export your image as a super special data structured format. You can use this to open your map back into dragonMaps.">Export as JSON</button>
+                  <button id="export-json" title="Export your image as a super special data structured format. You can use this to open your map back into DragonMaps.">Export as JSON</button>
                   <p style="font-size: 12px; text-align: center;">Before exporting take a look at <a href="attribution">attribution</a> for yourself for any assets you might have used.</p>
                </div>
             </div>
@@ -132,7 +132,6 @@
          <div class="spinner"></div>
          <p>Loading more images...</p>
       </div>
-      <script src="../scripts/designer.js" defer></script>
-      <script src="../scripts/archive.js" defer></script>
+      <script src="scripts/designer.js" type="module" defer></script>
    </body>
 </html>
