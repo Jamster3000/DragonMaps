@@ -176,7 +176,7 @@ button:hover {
     background-color: var(--accent-color);
 }
 
-@media (max-width: 600px) {
+@media screen and (max-width: 768px) {
     #fun-message {
         bottom: 80px;
         left: 5px;    
