@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "nqsq1gjza7");
+  </script>
+  <title>DragonMaps | Tutorials</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme-color" content="#1A1A2E">
+  <meta name="description" content="Tutorials on how to use Dragon Maps Designer">
+  <meta property="og:title" content="Dragon Maps | Tutorials">
+  <meta property="og:description" content="Tutorials on how to use Dragon Maps Designer">
+  <meta property="og:image" content="URL_to_image.jpg">
+  <meta property="og:url" content="https://jamster3000.github.io/dragonmaps/pages/tutorials">
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="../styles/tutorials.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="../components/components.js"></script>
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const postsContainer = document.getElementById('posts-container');
+    const searchInput = document.getElementById('search-input');
+
+    const postFiles = ['How to draw on the canvas.md', 'how to erase on the canvas.md', 'How to deal with not seeing an update to the website.md', 'exporting the map.md'];
+
+    function extractTitleFromFilename(filename) {
+        const title = filename.split('.').join(' ').replace('.md', '').replace(' md', '');
+        return title.trim(); // Ensuring we don't have extra spaces
+    }
+
+    async function fetchMarkdownFile(filename) {
+        const response = await fetch(`../tutorials/${filename}`);
+        if (!response.ok) {
+            throw new Error(`Error fetching ${filename}`);
+        }
+        return await response.text();
+    }
+
+    function extractDescription(markdown) {
+        const lines = markdown.split('\n');
+        let description = '';
+        let isInParagraph = false;
+        let foundFirstParagraph = false;
+
+        for (const line of lines) {
+            const trimmedLine = line.trim();
+
+            if (!isInParagraph && trimmedLine === '') {
+                continue;
+            }
+
+            if (!foundFirstParagraph && !isInParagraph && trimmedLine !== '') {
+                foundFirstParagraph = true;
+                continue;
+            }
+
+            if (foundFirstParagraph && !isInParagraph && trimmedLine !== '') {
+                isInParagraph = true;
+            }
+
+            if (isInParagraph && trimmedLine === '') {
+                break;
+            }
+
+            if (isInParagraph) {
+                description += trimmedLine + ' ';
+            }
+        }
+
+        return description.trim();
+    }
+
+    async function renderTutorialLinks() {
+        postsContainer.innerHTML = '';
+
+        for (const file of postFiles) {
+            const postElement = document.createElement('div');
+            const title = extractTitleFromFilename(file);
+            
+            try {
+                const markdown = await fetchMarkdownFile(file);
+                const description = extractDescription(markdown);
+
+                postElement.innerHTML = `
+                    <div class="tutorial-list-item">
+                        <h2>${title}</h2>
+                        <p>${description}</p>
+                        <a href="tutorial.html?file=${file}">Read more</a>
+                    </div>
+                `;
+                
+                // Set data-title attribute to lowercased title for easier search comparison
+                postElement.classList.add('tutorial-card');
+                postElement.setAttribute('data-title', title.toLowerCase());
+
+                postsContainer.appendChild(postElement);
+            } catch (error) {
+                console.error('Error loading tutorial:', error);
+            }
+        }
+    }
+
+    // Search functionality
+    function filterTutorials() {
+        const query = searchInput.value.toLowerCase();
+        const tutorials = document.querySelectorAll('.tutorial-card');
+
+        tutorials.forEach(tutorial => {
+            const title = tutorial.getAttribute('data-title');
+            
+            // Check if the title contains the query string
+            if (title.includes(query)) {
+                tutorial.style.display = 'flex';
+            } else {
+                tutorial.style.display = 'none';
+            }
+        });
+    }
+
+    searchInput.addEventListener('input', filterTutorials);
+
+    renderTutorialLinks();
+});
+  </script>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main class="tutorials-container">
+    <h1>Tutorials</h1>
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-bar" placeholder="Search tutorials...">
+    </div>
+    <div id="posts-container" class="tutorials-list">
+      <!-- Tutorials will be injected here as list items -->
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+</body>
+</html>
