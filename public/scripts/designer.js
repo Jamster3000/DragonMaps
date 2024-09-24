@@ -1580,10 +1580,6 @@ function addSquare(e) {
     layer.batchDraw();
 }
 
-function addSquare(e) {
-    addShape(e);
-}
-
 function addEllipse(e) {
     addShape(e);
 }
