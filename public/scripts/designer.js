@@ -47,8 +47,7 @@ let currentPage = 1;
 const resultsPerPage = 20;
 
 // Platform Detection
-const isMac = navigator.userAgentData.platform.toUpperCase().indexOf('MAC') >= 0;
-const isWindows = navigator.userAgentData.platform.toUpperCase().indexOf('WIN') >= 0;
+const { isMac, isWindows } = detectPlatform();
 
 // Constants
 const MOVE_THRESHOLD = 5; // pixels
@@ -2538,5 +2537,19 @@ function setupDrawingPropertyListeners() {
     if (sizeInput) {
         sizeInput.addEventListener('change', updateDrawingProperties);
     }
+}
+
+function detectPlatform() {
+    // Check if userAgentData is available
+    const platform = navigator.userAgentData ? navigator.userAgentData.platform : navigator.platform;
+
+    // Normalize platform string to uppercase for consistent comparisons
+    const normalizedPlatform = platform ? platform.toUpperCase() : '';
+
+    // Detect Mac and Windows platforms
+    const isMac = normalizedPlatform.indexOf('MAC') >= 0;
+    const isWindows = normalizedPlatform.indexOf('WIN') >= 0;
+
+    return { isMac, isWindows };
 }
 
