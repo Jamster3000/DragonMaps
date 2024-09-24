@@ -529,12 +529,6 @@ function onDragStart(e) {
     e.dataTransfer.setData('text/plain', e.target.id);
 }
 
-function onDragOver(e) {
-    e.preventDefault();
-}
-
-// Modify the drop event handler
-
 // Function to deselect all images
 function deselectAllImages() {
     layer.getChildren().each(function (node) {
