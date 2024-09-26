@@ -16,64 +16,6 @@
     <script src="../components/components.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* Include styles from main.css and contact-form.css here */
-        /* Main styles */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #1A1A2E;
-            color: #E94560;
-        }
-
-        /* Contact form styles */
-        #contact {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        input[type="email"],
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #E94560;
-            background-color: #16213E;
-            color: #E94560;
-        }
-
-        button {
-            background-color: #E94560;
-            color: #1A1A2E;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #0F3460;
-        }
-
-        /* Dragon Animation Styles */
         #dragon-container {
             position: relative;
             width: 100%;
@@ -84,7 +26,7 @@
         #dragon {
             width: 100px;
             height: 100px;
-            background-image: url('dragon.png'); /* Replace with your dragon image */
+            background-image: url('dragon.png');
             background-size: cover;
             position: absolute;
             bottom: 10px;
@@ -97,7 +39,6 @@
             50% { transform: translateY(-10px); }
         }
 
-        /* Fun Message Styles */
         #fun-message {
             position: absolute;
             bottom: 120px;
@@ -110,17 +51,7 @@
             width: 250px;
             display: none;
         }
-
-        /* Response Styles */
-        #response.success {
-            color: #28a745;
-        }
-
-        #response.error {
-            color: #dc3545;
-        }
-
-        /* Discord Section Styles */
+        
         .discord-section {
             width: 100%;
             display: flex;
