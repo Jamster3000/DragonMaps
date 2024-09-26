@@ -246,7 +246,7 @@ button:hover {
 /* For smaller screens like mobile */
 @media (max-width: 600px) {
     .discord-widget-container iframe {
-        width: 90%; /* Adjust width to fit better on small screens */
+        width: 85%; /* Adjust width to fit better on small screens */
         height: 400px; /* Lower height for mobile */
     }
 }
