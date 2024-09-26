@@ -236,3 +236,33 @@ button:hover {
         width: 250px;
     }
 }
+
+.discord-widget-container {
+    display: flex;
+    justify-content: center; /* Center the widget horizontally */
+    margin: 20px 0; /* Add some space around the widget */
+}
+
+/* For smaller screens like mobile */
+@media (max-width: 600px) {
+    .discord-widget-container iframe {
+        width: 90%; /* Adjust width to fit better on small screens */
+        height: 400px; /* Lower height for mobile */
+    }
+}
+
+/* For tablets or medium screens */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .discord-widget-container iframe {
+        width: 80%; /* Larger width on medium screens */
+        height: 450px; /* Adjust the height accordingly */
+    }
+}
+
+/* For larger screens like desktops */
+@media (min-width: 1025px) {
+    .discord-widget-container iframe {
+        width: 350px; /* Set a fixed width for desktop */
+        height: 500px; /* Maintain the original height */
+    }
+}
