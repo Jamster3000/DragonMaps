@@ -245,6 +245,9 @@
                     }
                 }).catch(error => {
                     console.error('Form submission error:', error);
+                    // Optionally, you can show an error message here if the submission fails
+                    // responseDiv.textContent = 'There was an issue sending your message. Please try again later.';
+                    // responseDiv.className = 'error';
                 });
 
                 form.reset(); // Clear the form
