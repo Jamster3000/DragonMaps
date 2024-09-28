@@ -204,6 +204,7 @@ button:hover, .btn:hover {
 .disclosure {
     background-color: var(--header-color);
     padding: 15px;
+    padding-bottom: 30px;
     border-radius: 8px;
     text-align: center;
     margin-top: 20px;
