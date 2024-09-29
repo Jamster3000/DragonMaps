@@ -269,7 +269,7 @@ button:hover {
 #dragon {
 	width: 100px;
 	height: 100px;
-	background-image: url('../assets/images/dragon.png');
+	background-image: url('../assets/image/dragon.png');
 	background-size: cover;
 	position: fixed;
 	bottom: 10px;
