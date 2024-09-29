@@ -243,26 +243,68 @@ button:hover {
     margin: 20px 0; /* Add some space around the widget */
 }
 
-/* For smaller screens like mobile */
+        
+        #dragon {
+            width: 100px;
+            height: 100px;
+            background-image: url('dragon.png'); /* Replace with your dragon image */
+            background-size: cover;
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        
+        #fun-message {
+	    display: none;
+            position: fixed;
+            bottom: 120px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Roboto', sans-serif;
+	    width: 250px;
+        }
+
+        
+        #response.success {
+            color: #28a745; 
+        }
+
+        #response.error {
+            color: #dc3545; 
+        }
+
 @media (max-width: 600px) {
     .discord-widget-container iframe {
-        width: 85%; /* Adjust width to fit better on small screens */
-        height: 400px; /* Lower height for mobile */
+        width: 85%; 
+        height: 400px; 
     }
 }
 
-/* For tablets or medium screens */
 @media (min-width: 601px) and (max-width: 1024px) {
     .discord-widget-container iframe {
-        width: 80%; /* Larger width on medium screens */
-        height: 450px; /* Adjust the height accordingly */
+        width: 80%; 
+        height: 450px; 
     }
 }
 
-/* For larger screens like desktops */
 @media (min-width: 1025px) {
     .discord-widget-container iframe {
-        width: 350px; /* Set a fixed width for desktop */
-        height: 500px; /* Maintain the original height */
+        width: 350px; 
+        height: 500px; 
     }
 }
