@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const postsContainer = document.getElementById('posts-container');
     const searchInput = document.getElementById('search-input');
 
-    const postFiles = ['Exporting the map.md', 'How to deal with not seeing an update to the website.md'];
+    const postFiles = ['exporting the map.md', 'How to deal with not seeing an update to the website.md'];
 
     function extractTitleFromFilename(filename) {
         const title = filename.split('.').join(' ').replace('.md', '').replace(' md', '');
