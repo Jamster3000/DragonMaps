@@ -1,7 +1,7 @@
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", async function() {
     const tutorialContent = document.getElementById('tutorial-content');
     const tutorialTitle = document.getElementById('tutorial-title');
-    
+
     function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
@@ -17,13 +17,20 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
         const file = getQueryParam('file');
+        if (!file) {
+            throw new Error('No file specified in query parameter.');
+        }
         const markdown = await fetchMarkdownFile(file);
         const htmlContent = marked.parse(markdown);
-        
+
         // Display title dynamically from the filename
         const title = file.split('-').slice(3).join(' ').replace('.md', '');
-        tutorialTitle.textContent = title;
-        
+        if (tutorialTitle) {
+            tutorialTitle.textContent = title;
+        } else {
+            console.error('Element with ID "tutorial-title" not found.');
+        }
+
         tutorialContent.innerHTML = htmlContent;
     } catch (error) {
         console.error('Error loading tutorial:', error);
