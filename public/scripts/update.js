@@ -11,7 +11,7 @@ function extractDateFromFilename(filename) {
 }
 
 async function renderPosts() {
-    const postFiles = ['14-9-2024-Migration.md', '19-8-2024-DragonMap Update.md', '24-7-2024-Welcome.md'];
+    const postFiles = ['30-9-2024-Asset Library.md', 14-9-2024-Migration.md', '19-8-2024-DragonMap Update.md', '24-7-2024-Welcome.md'];
 
     // Sort files by date (newest first)
     postFiles.sort((a, b) => extractDateFromFilename(b) - extractDateFromFilename(a));
