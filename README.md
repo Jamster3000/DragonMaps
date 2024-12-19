@@ -12,6 +12,9 @@ Currently, DragonMaps offers a basic set of features to help you create your bat
 
 While DragonMaps is still in its (very) early stages, it provides some of the essentials for creating and exporting very simple battlemaps. I plan to add additional features and enhancements to make DragonMaps a free powerful tool for everyone to create awesome battlemaps.
 
+# why is there no files here for the website?
+Despite my initial action having it open source, moving away from github pages to another source has made me consider whether to have it open or closed source. For the time being I plan on keeping it closed source. I am planning to reconsider as to whether this should stay as so.
+
 # Road Map
 Rather than listing everything there is planned to impliment here, just take a look at the [issues](https://github.com/Jamster3000/dragonmaps/issues) Page for a list of all features, enhancements and bugs. Alternitivly you can take a look at [Project DragonCode](https://github.com/users/Jamster3000/projects/11) to see what will and won't be worked on, what is currently being worked on, and what has already been done.
 
