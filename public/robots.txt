@@ -1,4 +1,0 @@
-User-agent: *
-Disallow:
-
-Sitemap: https://dragon-maps.web.app/sitemap.xml
